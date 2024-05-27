@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import AppFrame from './components/frame/Index.vue'
+import Versions from './components/Versions.vue'
 
 const ipcHandle = () => window.electron.ipcRenderer.send('ping')
 </script>
 
 <template>
-  <AppFrame />
-  <!-- <img alt="logo" class="logo" src="./assets/electron.svg" />
+  <img alt="logo" class="logo" src="./assets/electron.svg" />
   <div class="creator">Powered by electron-vite</div>
   <div class="text">
     Build an Electron app with
@@ -23,5 +22,5 @@ const ipcHandle = () => window.electron.ipcRenderer.send('ping')
       <a target="_blank" rel="noreferrer" @click="ipcHandle">Send IPC</a>
     </div>
   </div>
-  <Versions /> -->
+  <Versions />
 </template>
