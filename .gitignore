@@ -3,3 +3,5 @@ dist
 out
 .DS_Store
 *.log*
+docs/.vitepress/cache
+docs/.vitepress/dist
