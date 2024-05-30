@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-
+import { resolve } from 'path'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Velec Frame 开发文档",
@@ -62,5 +62,12 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
     ]
+  },
+  vite:{
+    resolve:{
+      alias: {
+        '@renderer': resolve(__dirname,'../../src/renderer/src')
+      }
+    }
   }
 })

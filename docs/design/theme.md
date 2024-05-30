@@ -10,28 +10,26 @@
 
 ### 命名
 
-设计标识命名需要以 BEM 规范进行 （Block -- Element __ Modifier）
-    - Block 指代设计标识的命名空间或功能范围
-    - Element 指代设计标识的功能
-    - Modifier 指代设计标识的修饰符
+设计标识命名需要以 BEM 规范进行 （**Block** -- Element __ Modifier）
+    
+- **Block** 指代设计标识的命名空间或功能范围
+- **Element** 指代设计标识的功能
+- **Modifier** 指代设计标识的修饰符
 
+其中
 
 - **Block** 和 **Element** 之间以 `--` 分割
-
 - **Element** 和 **Modifier** 之间以 `__` 分割
-
-- **Block**  **Element** **Modifier** 内部如果需要层级结构，则以 `.` 分割
-
-- **Block**  **Element** **Modifier** 名称以 `-` 作为连字符
+- 内部如果需要层级结构，则以 `.` 分割
+- 名称以 `-` 作为连字符
 
 
 如 `theme.color--ux-icon__error` 可以表述为：
 
 - **Block** ：`theme` 主题下的子模块 `color`
-
 - **Element** ：`ux-icon` 组件
-
 - **Modifier** ：`error` 修饰符
+
 ::: tip
 标识需要根据其设计意图命名。当一个标识的值根据范围或功能应用到多个不同的位置时，应按需为功能或范围新增对应的标识名，通过引用关系将其联系在一起。
 :::
