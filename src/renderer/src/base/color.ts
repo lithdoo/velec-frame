@@ -37,16 +37,14 @@ export class NColor {
 
 }
 
-type ColorList = [NColor, NColor, NColor, NColor, NColor, NColor, NColor, NColor, NColor, NColor]
-
 export class ColorPalette {
-    static hex(hexList:[number,number,number,number,number,number,number,number,number,number]) {
+    static hex(hexList:number[]) {
         const colorList = hexList.map(v=>{
             const b = v % 256
             const g = Math.floor(v/256) % 256
             const r = Math.floor(v/(256*256)) % 256
             return new NColor(r,g,b)
-        }) as ColorList
+        }) as NColor[]
         return new ColorPalette(colorList)
     }
 
@@ -55,8 +53,10 @@ export class ColorPalette {
     static Polar_Green = ColorPalette.hex([0xf6ffed,0xd9f7be,0xb7eb8f,0x95de64,0x73d13d,0x52c41a,0x389e0d,0x237804,0x135200,0x092b00])
     static Daybreak_Blue = ColorPalette.hex([0xe6f4ff,0xbae0ff,0x91caff,0x69b1ff,0x4096ff,0x1677ff,0x0958d9,0x003eb3,0x002c8c,0x001d66])
 
-    list: [NColor, NColor, NColor, NColor, NColor, NColor, NColor, NColor, NColor, NColor]
-    constructor(list: ColorList) {
+    static Clay_Brown = ColorPalette.hex([0xfdf6e3,0xEEE8D5,0xDDD6C1,0xD3CBB7,0xC8BE96,0xBEB478,0xAC9D57,0x968046,0x7D6228,0x645435])
+
+    list: NColor[]
+    constructor(list: NColor[]) {
         this.list = list
     }
 }

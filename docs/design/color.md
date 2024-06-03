@@ -27,12 +27,13 @@ const palette = (cp) => {
 
     .color-palette-list__item{
         list-style: none;
-        height: 72px;
-        width: 72px;
+        height: 60px;
+        width: 60px;
         padding: 0!important;
         margin: 0!important;
-        line-height: 72px;
+        line-height: 60px;
         text-align:center;
+        font-size:12px;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -123,6 +124,22 @@ const palette = (cp) => {
     </li>
 </ul>
 
+- Clay_Brown
+
+<ul class="color-palette-list">
+    <li 
+        class="color-palette-list__item"
+        v-for="(item) in palette(ColorPalette.Clay_Brown)"
+        :key="item.bgColor"
+        :style="{
+            'background':item.bgColor,
+            '--box-shadow': item.shadow,
+            '--text-color': item.text,
+        }"
+    >
+        {{item.hex}}
+    </li>
+</ul>
 
 ## 衍生色
 
