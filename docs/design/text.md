@@ -126,7 +126,8 @@ todo...
         <td>{{color.type}}</td>
         <td>{{color.title}}</td>
         <td :style="{
-            'background':'#fff'
+            'background':'#fff',
+            'color':'#333'
         }"> <span :style="{
             height: '16px', 
             width: '16px',
