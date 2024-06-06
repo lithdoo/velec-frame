@@ -1,14 +1,19 @@
+
+<script lang="ts" setup>
+import TitleBar from "./TitleBar.vue";
+</script>
+
+
 <template>
 <div class="app-frame">
-    <div class="app-frame__title-bar"></div>
+    <div class="app-frame__title-bar">
+        <TitleBar></TitleBar>
+    </div>
     <div class="app-frame__menu-bar"></div>
     <div class="app-frame__conent"></div>
 </div>    
 </template>
 
-
-<script lang="ts" setup>
-</script>
 
 <style lang="scss" scoped>
 .app-frame{

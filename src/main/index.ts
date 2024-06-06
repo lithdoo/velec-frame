@@ -7,13 +7,22 @@ Menu.setApplicationMenu(null)
 
 function createWindow(): void {
   // Create the browser window.
+    console.log('1232131')
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     minWidth: 600,
     minHeight: 428,
-    frame: false,
-    show: false,
+    // frame: false,
+    // titleBarOverlay: true,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#292929',
+      symbolColor: '#fff',
+      height: 36
+    },
+  
+    show: true,
     autoHideMenuBar: true,
     backgroundColor: '#292929',
     fullscreenable: false,
@@ -28,6 +37,7 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    mainWindow.webContents.openDevTools()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
