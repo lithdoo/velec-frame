@@ -35,8 +35,8 @@
 *::before,
 *::after {
   box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
+  /* margin: 0;
+  font-weight: normal; */
 }
 
 ul {

@@ -7,7 +7,6 @@ Menu.setApplicationMenu(null)
 
 function createWindow(): void {
   // Create the browser window.
-    console.log('1232131')
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,

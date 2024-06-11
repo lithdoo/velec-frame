@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import logo from '@renderer/assets/icon.png'
 const menus = ['文件', '编辑', '选择', '查看', '运行', '帮助']
+const drag = {'app-region':'drag'}
 </script>
 
 <template>
 
     <div class="frame-title-bar">
-        <div class="frame-title-bar__logo" :style="{ backgroundImage: `url(${logo})` ,'app-region':'drag'}">
+        <div class="frame-title-bar__logo" :style="{ backgroundImage: `url(${logo})` ,...drag}">
 
         </div>
 
@@ -18,7 +19,7 @@ const menus = ['文件', '编辑', '选择', '查看', '运行', '帮助']
             </div>
         </div>
 
-        <div class="frame-title-bar__extra" :style="{'app-region':'drag'}"></div>
+        <div class="frame-title-bar__extra" :style="drag"></div>
 
     </div>
 
