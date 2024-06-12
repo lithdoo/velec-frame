@@ -2,13 +2,18 @@
 import TitleBar from "./TitleBar.vue";
 import ActivityBar from "./ActivityBar.vue";
 import SideBar from "./SideBar.vue";
-import TaskTab from './TaskTab.vue'
+import PageTab from './PageTab.vue'
 
-import SinglePanelSplit from "../base/SinglePanelSplit.vue";
-import { SinglePanelSplitHandler } from "../base/SinglePanelSplitHandler";
-import { ref } from "vue";
+import SinglePanelSplit from "@renderer/components/base/SinglePanelSplit.vue";
+import { SinglePanelSplitHandler } from "@renderer/components/base/SinglePanelSplitHandler";
+import { computed, ref } from "vue";
+import { appSider } from "@renderer/state/sider";
 
 const splitCenter = ref(new SinglePanelSplitHandler())
+const isSiderBarShown = computed(() => !!appSider.currentPanel())
+const siderSplitWidth = computed(() => isSiderBarShown.value ? splitCenter.value.distance : 0)
+
+
 </script>
 
 
@@ -27,19 +32,19 @@ const splitCenter = ref(new SinglePanelSplitHandler())
 
                 <SinglePanelSplit :handler="splitCenter">
                     <template #panel>
-                        <div class="app-frame__side-bar" :style="{width:splitCenter.distance + 'px'}">
+                        <div :class="[
+                            'app-frame__side-bar',
+                            isSiderBarShown ? '' : 'app-frame__side-bar--hidden'
+                        ]" :style="{ width: siderSplitWidth + 'px' }">
                             <SideBar></SideBar>
                         </div>
                     </template>
                     <template #extra>
-                        <div class="app-frame__process-tab" >
-                            <TaskTab></TaskTab>
+                        <div class="app-frame__process-tab">
+                            <PageTab></PageTab>
                         </div>
                     </template>
                 </SinglePanelSplit>
-
-
-
             </div>
 
         </div>
@@ -74,15 +79,20 @@ const splitCenter = ref(new SinglePanelSplitHandler())
             flex: 0 0 auto;
         }
 
-        .app-frame__center{
+        .app-frame__center {
             flex: 1 1 0;
             width: 0;
         }
 
 
-        .app-frame__side-bar{
+        .app-frame__side-bar {
             height: 100%;
             width: 100%;
+            opacity: 1;
+
+            &.app-frame__side-bar--hidden {
+                opacity: 0;
+            }
         }
 
         .app-frame__process-tab {

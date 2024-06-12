@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppFrame from './components/frame/Index.vue'
+import AppFrame from './view/frame/Index.vue'
 
 const ipcHandle = () => window.electron.ipcRenderer.send('ping')
 </script>
