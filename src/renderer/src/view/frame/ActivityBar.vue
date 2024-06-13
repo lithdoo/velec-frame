@@ -4,8 +4,8 @@ import { appSider } from '@renderer/state/sider';
 import { computed } from 'vue';
 
 const list = computed(() => appSider.list)
-const currentId = computed(() => appSider.currentPanelId)
-const active = (id: string) => appSider.active(id === appSider.currentPanelId ? null : id)
+const currentId = computed(() => appSider.currentId)
+const active = (id: string) => appSider.active(id === appSider.currentId ? null : id)
 
 </script>
 

@@ -15,6 +15,7 @@ export class SiderFileExplorer implements AppSiderPanel {
     element = document.createElement('div')
     vueApp: App<Element>
     constructor() {
+        this.element.style.height = '100%'
         this.vueApp = createApp(ExplorerSider)
         this.vueApp.mount(this.element)
     }

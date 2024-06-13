@@ -6,6 +6,9 @@
     "src/renderer/src/**/*.vue",
     "src/preload/*.d.ts"
   ],
+  "vueCompilerOptions": {
+    
+  },
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
