@@ -9,7 +9,7 @@ export interface MenuButton {
 }
 
 export interface MenuHandler {
-    onClick?: () => void
+    onClick?: () => void | boolean
     onHover?: () => void
 }
 
@@ -28,6 +28,7 @@ export class MenuListHandler {
     }
     list: MenuItem[] = []
     width?: number
+    $close: () => void = () => { }
 }
 
 

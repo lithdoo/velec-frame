@@ -50,12 +50,16 @@ const show = () => {
     isMenuVisible.value = true
 }
 
-watch([menu],(menu)=>{
+watch([menu],()=>{
     isMenuVisible.value = false
-    if(menu){
-        setTimeout(()=>{
-            show()
-        })
+    if(menu.value){
+        const current = menu.value
+        current.$close = ()=>{
+            if(current === menu.value){
+                hide()
+            }
+        }
+        setTimeout(()=>show())
     }
 })
 

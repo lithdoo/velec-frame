@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { VxIcon } from '../VxIcon';
-import { MenuListHandler } from './MenuListHandler';
+import { MenuButton, MenuListHandler } from './MenuListHandler';
 
 const props = defineProps<{
     handler: MenuListHandler
@@ -10,6 +10,13 @@ const props = defineProps<{
 const list = computed(() => {
     return props.handler.list
 })
+
+const onButtonClick = (item: MenuButton) => {
+    if (!item.handler) return
+    if (item.handler.onClick?.() !== false) {
+        props.handler.$close()
+    }
+}
 
 </script>
 
@@ -20,7 +27,8 @@ const list = computed(() => {
                 <hr class="menu-list__divide" />
             </template>
             <template v-if="item.type === 'button'">
-                <div @click="item.handler?.onClick" :class="['menu-list__button',item.handler?'':'menu-list__button--disabled']">
+                <div @click="() => onButtonClick(item)"
+                    :class="['menu-list__button', item.handler ? '' : 'menu-list__button--disabled']">
                     <div class="menu-list__button-icon">
                         <VxIcon v-if="item.icon" :name="item.icon"></VxIcon>
                     </div>
@@ -48,7 +56,7 @@ const list = computed(() => {
     --menu-list-button-height: 28px;
     --menu-list-button-font-size: 14px;
     --menu-list-button-text-color: #fff;
-    --menu-list-button-disabled-text-color: rgba(255,255,255,0.3);
+    --menu-list-button-disabled-text-color: rgba(255, 255, 255, 0.3);
 }
 </style>
 
@@ -77,14 +85,15 @@ const list = computed(() => {
         align-items: center;
 
 
-        &.menu-list__button--disabled{
+        &.menu-list__button--disabled {
             color: var(--menu-list-button-disabled-text-color);
-            &:hover{
+
+            &:hover {
                 background: none
             }
         }
 
-        .menu-list__button-icon{
+        .menu-list__button-icon {
             width: 24px;
             display: flex;
             flex-direction: column;
@@ -92,10 +101,10 @@ const list = computed(() => {
             align-items: center;
         }
 
-        .menu-list__button-label{
+        .menu-list__button-label {
             font-size: var(--menu-list-button-font-size);
         }
-        
+
     }
 
     .menu-list__divide {
