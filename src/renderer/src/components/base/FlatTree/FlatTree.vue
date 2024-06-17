@@ -77,18 +77,21 @@ const toggle = (id, e: Event) => {
   </div>
 </template>
 
+<style>
+:root{
+  --flat-tree-hover-bg: rgba(255, 255, 255, 0.1);
+  --flat-tree-selected-bg: rgba(255, 255, 255, 0.1);
+  --flat-tree-border-radius: 2px;
+}
+</style>
 
 <style lang="scss" scoped>
+
 .flat-tree {
   height: 100%;
   width: 100%;
   overflow: auto;
   padding: 8px 4px;
-
-  --flat-tree-hover-bg: rgba(255, 255, 255, 0.1);
-  --flat-tree-selected-bg: rgba(255, 255, 255, 0.1);
-  --flat-tree-border-radius: 2px;
-
 
   .flat-tree__inner {
     flex-direction: column;

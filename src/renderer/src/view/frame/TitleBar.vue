@@ -26,15 +26,20 @@ const drag = {'app-region':'drag'}
 
 </template>
 
-
-<style lang="scss">
-.frame-title-bar {
+<style>
+:root{
     --title-bar-height: 36px;
     --menu-title-padding: 0 8px;
     --menu-title-bg-hover: rgb(255, 255, 255, 0.12);
     --menu-title-radius-hover: 2px;
     --logo-size: 24px;
     --logo-margin: 0 8px 0 8px;
+}
+</style>
+
+<style lang="scss">
+.frame-title-bar {
+
 
     display: flex;
     flex-direction: row;

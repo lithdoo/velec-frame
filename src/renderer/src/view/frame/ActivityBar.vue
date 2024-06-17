@@ -23,15 +23,18 @@ const active = (id: string) => appSider.active(id === appSider.currentId ? null 
     </ul>
 </template>
 
-
-<style scoped lang="scss">
-.frame-activity-bar {
+<style>
+:root{
     --activity-bar-width: 48px;
     --activity-bar-item-height: 48px;
     --activity-bar-icon-size: 24px;
     --activity-bar-border: 1px solid rgba(255, 255, 255, 0.1);
     --activity-bar-icon-opacity: 0.3;
+}
+</style>
 
+<style scoped lang="scss">
+.frame-activity-bar {
     display: flex;
     flex-direction: column;
     padding: 0;

@@ -70,15 +70,20 @@ load(testFile)
     </div>
 </template>
 
+<style>
+:root{
+    --explorer-sider-title-height: 36px;
+    --explorer-sider-title-border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    --explorer-sider-title-font-size: 12px;
+    --explorer-sider-title-padding-left: 18px;
+}
+</style>
+
 <style lang="scss" scoped>
 .explorer-sider-panel {
     height: 100%;
     display: flex;
     flex-direction: column;
-    --explorer-sider-title-height: 36px;
-    --explorer-sider-title-border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    --explorer-sider-title-font-size: 12px;
-    --explorer-sider-title-padding-left: 18px;
 
     .explorer-sider-panel__title {
         height: var(--explorer-sider-title-height);

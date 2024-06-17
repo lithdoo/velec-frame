@@ -1,27 +1,10 @@
-import { VNode, reactive } from "vue";
-
-interface MenuButton {
-    key: string,
-    label: string | VNode,
-    icon?: string,
-    handler: MenuHandler
-}
-
-interface MenuHandler {
-    onClick: () => void
-    onHover: () => void
-}
-
-interface MenuDiv {
-    type: 'divide'
-}
-
-type MenuItem = MenuDiv | MenuButton
+import { MenuItem, MenuListHandler } from "@renderer/components/base/MenuList";
+import { reactive } from "vue";
 
 class ContextMenu {
     ev: MouseEvent | null = null
-    current: MenuItem[] | null = null
-    open(list: MenuItem[]) {
+    current: MenuListHandler | null = null
+    open(list: MenuListHandler) {
         this.current = list
     }
     close() {

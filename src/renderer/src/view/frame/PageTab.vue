@@ -46,14 +46,19 @@ const activeTab = (tabId: string) => {
     </div>
 </template>
 
-
-<style lang="scss" scoped>
-.frame-task-tab {
+<style>
+:root{
     --task-tab-border: 1px solid rgba(255, 255, 255, 0.1);
     --task-tab-list-border: 1px solid rgba(255, 255, 255, 0.1);
     --task-tab-list-height: 36px;
     --task-tab-item-border-right: 1px solid rgba(255, 255, 255, 0.1);
     --task-tab-item-border-top: 1px solid transparent;
+}
+
+</style>
+
+<style lang="scss" scoped>
+.frame-task-tab {
 
 
     --task-tab-item-border-top-selected: 1px solid #66ccff;
