@@ -63,7 +63,7 @@ const toggle = (id, e: Event) => {
       <div :class="{ 'flat-tree__item': true, 'flat-tree__item--selected': selectKeysSet.has(v.id) }"
         v-for="v in listToRender" :key="v.id" :style="{ paddingLeft: v.deep * 16 + 'px' }"
         @mouseover="() => handler.$emitHover(v.data)" @mouseleave="() => handler.$emitLeave(v.data)"
-        @click="() => handler.$emitSelect(v.data)">
+        @click="() => handler.$emitSelect(v.data)" @contextmenu="() => handler.$emitContextMenu(v.data)">
 
         <div class="flat-tree__item-open-icon" @click="(e) => toggle(v.id, e)">
           <VxIcon v-if="(!v.isLeaf) && v.isOpen" :name="'del'"></VxIcon>
@@ -78,7 +78,7 @@ const toggle = (id, e: Event) => {
 </template>
 
 <style>
-:root{
+:root {
   --flat-tree-hover-bg: rgba(255, 255, 255, 0.1);
   --flat-tree-selected-bg: rgba(255, 255, 255, 0.1);
   --flat-tree-border-radius: 2px;
@@ -86,7 +86,6 @@ const toggle = (id, e: Event) => {
 </style>
 
 <style lang="scss" scoped>
-
 .flat-tree {
   height: 100%;
   width: 100%;

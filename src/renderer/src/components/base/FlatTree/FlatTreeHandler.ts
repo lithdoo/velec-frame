@@ -45,9 +45,8 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
         tree.forEach(item => step(item))
         this.data = newData
     }
-
     $emitSelect(item: T) {
-        const result = this.onSelectItem?.(item)
+        const result = this.onItemSelect?.(item)
 
         if (result === false) return
 
@@ -57,17 +56,19 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
             this.selectedKeys = this.selectedKeys.concat([item.id])
         }
     }
-
     $emitHover(item: T) {
-        this.onHoverItem?.(item)
+        this.onItemHover?.(item)
     }
     $emitLeave(item: T) {
-        this.onLeaveItem?.(item)
+        this.onItemLeave?.(item)
     }
-
-    onSelectItem: (item: T) => boolean | void = () => { }
-    onLeaveItem: (item: T) => boolean | void = () => { }
-    onHoverItem: (item: T) => boolean | void = () => { }
+    $emitContextMenu(item:T){
+        this.onItemContextMenu?.(item)
+    }
+    onItemSelect: (item: T) => boolean | void = () => { }
+    onItemLeave: (item: T) => boolean | void = () => { }
+    onItemHover: (item: T) => boolean | void = () => { }
+    onItemContextMenu: (item: T) => boolean | void = () => { }
 
 
     open(id) {

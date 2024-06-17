@@ -3,6 +3,8 @@ import { FlatTreeHandler, FlatTreeItem, FlatTree } from '@renderer/components/ba
 import { ref } from 'vue';
 import { appTab } from '@renderer/state/tab';
 import { PageBgTask } from '@renderer/view/page/bgTask';
+import { contextMenu } from '@renderer/view/fixed/contextmenu';
+import { Menu, MenuListHandler } from '@renderer/components/base/MenuList';
 
 const testFile = {
     'vscode': '',
@@ -26,10 +28,23 @@ const testFile = {
     }
 }
 
-
 const fileTree = ref(new FlatTreeHandler<FlatTreeItem & {
     name: string
 }>())
+
+fileTree.value.onItemContextMenu = ()=>{
+    contextMenu.open(MenuListHandler.create([
+        Menu.button({ icon: 'del', key: '3', label: '撤销', onClick: () => { alert('打开文件') } }),
+        Menu.button({ icon: 'del', key: '4', label: '恢复' }),
+        Menu.div(),
+        Menu.button({ key: '1', label: '打开文件', onClick: () => { alert('打开文件') } }),
+        Menu.button({ key: '2', label: '打开文件夹', onClick: () => { alert('打开文件') } }),
+        Menu.div(),
+        Menu.button({ icon: 'del', key: '5', label: '粘贴', onClick: () => { alert('打开文件') } }),
+        Menu.button({ icon: 'del', key: '6', label: '复制', onClick: () => { alert('打开文件') } }),
+        Menu.button({ icon: 'del', key: '7', label: '剪切', onClick: () => { alert('打开文件') } }),
+    ]))
+}
 
 const load = (data: any, pid?: string) => {
     Array.from(Object.entries(data)).forEach(([key, value]) => {

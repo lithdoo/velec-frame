@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { contextMenu } from './index'
-import { Menu, MenuList, MenuListHandler } from '@renderer/components/base/MenuList'
+import { MenuList } from '@renderer/components/base/MenuList'
+import { createPopper } from '@popperjs/core';
+import type { Instance } from '@popperjs/core'
 
 document.addEventListener('contextmenu', (ev) => {
-    console.log(contextMenu)
     contextMenu.ev = ev
-    contextMenu.open(MenuListHandler.create([
-        Menu.button({ icon: 'del', key: '3', label: '撤销', onClick: () => { alert('打开文件') }}),
-        Menu.button({ icon: 'del', key: '4', label: '恢复' }),
-        Menu.div(),
-        Menu.button({ key: '1', label: '打开文件', onClick: () => { alert('打开文件') }}),
-        Menu.button({ key: '2', label: '打开文件夹', onClick: () => { alert('打开文件') }}),
-        Menu.div(),
-        Menu.button({ icon: 'del', key: '5', label: '粘贴', onClick: () => { alert('打开文件') }}),
-        Menu.button({ icon: 'del', key: '6', label: '复制', onClick: () => { alert('打开文件') }}),
-        Menu.button({ icon: 'del', key: '7', label: '剪切', onClick: () => { alert('打开文件') }}),
-    ]))
 })
 
 const menu = computed(() => contextMenu.current)
+const pop = ref<Instance | null>(null)
+
+const archerElement = ref<HTMLElement>()
+const menuElement = ref<HTMLElement>()
+
+onMounted(() => {
+    if (archerElement.value && menuElement.value) {
+        pop.value = createPopper(archerElement.value, menuElement.value, { placement: 'right-start' })
+    }
+})
 
 const pos = computed(() => {
     if (!contextMenu.ev) return {
@@ -32,20 +32,65 @@ const pos = computed(() => {
     }
 })
 
+const stopPropagation = (e: Event) => {
+    e.stopPropagation()
+}
 
+const isMenuVisible = ref(false)
+
+const hide = () => {
+    isMenuVisible.value = false
+    setTimeout(() => {
+        contextMenu.close()
+    });
+}
+
+const show = () => {
+    if (pop.value) pop.value.forceUpdate()
+    isMenuVisible.value = true
+}
+
+watch([menu],(menu)=>{
+    isMenuVisible.value = false
+    if(menu){
+        setTimeout(()=>{
+            show()
+        })
+    }
+})
 
 </script>
 
 
 <template>
-    <div v-if="pos && menu" class="gloal-context-menu" :style="{ 'left': pos.x, 'top': pos.y }">
-        <MenuList :handler="menu"></MenuList>
+    <div v-if="pos && menu" class="global-context-menu__mask" @contextmenu="e => { stopPropagation(e); hide() }"
+        @mousedown="hide" @wheel="hide"></div>
+    <div class="global-context-menu__archer" :style="{ 'left': pos.x, 'top': pos.y }" ref="archerElement"
+        @contextmenu="stopPropagation"></div>
+    <div class="global-context-menu__menu" ref="menuElement" :style="{ opacity: isMenuVisible ? 1 : 0 }"
+        @contextmenu="stopPropagation">
+        <MenuList v-if="pos && menu" :handler="menu"></MenuList>
     </div>
 </template>
 
 <style>
-.gloal-context-menu {
+.global-context-menu__menu {
+    z-index: 999;
+}
+
+.global-context-menu__archer {
     position: fixed;
     z-index: 999;
+    width: 1px;
+    height: 1px;
+}
+
+.global-context-menu__mask {
+    position: fixed;
+    z-index: 998;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 0;
 }
 </style>
