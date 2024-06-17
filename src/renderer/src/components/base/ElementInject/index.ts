@@ -1,0 +1,1 @@
+export { default as ElementInject } from './ElementInject.vue'

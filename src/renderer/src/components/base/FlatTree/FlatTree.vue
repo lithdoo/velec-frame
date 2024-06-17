@@ -1,7 +1,7 @@
 <script lang="ts" setup generic="T extends FlatTreeItem">
 import { computed, defineProps } from 'vue';
 import { FlatTreeHandler, type FlatTreeItem } from './FlatTreeHandler'
-import VxIcon from './VxIcon.vue';
+import { VxIcon } from '../VxIcon';
 
 
 const props = defineProps<{

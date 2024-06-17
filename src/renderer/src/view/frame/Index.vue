@@ -4,8 +4,7 @@ import ActivityBar from "./ActivityBar.vue";
 import SideBar from "./SideBar.vue";
 import PageTab from './PageTab.vue'
 
-import SinglePanelSplit from "@renderer/components/base/SinglePanelSplit.vue";
-import { SinglePanelSplitHandler } from "@renderer/components/base/SinglePanelSplitHandler";
+import { SinglePanelSplitHandler, SinglePanelSplit } from "@renderer/components/base/SinglePanelSplit";
 import { computed, ref } from "vue";
 import { appSider } from "@renderer/state/sider";
 

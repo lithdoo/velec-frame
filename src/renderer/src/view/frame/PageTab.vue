@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { appTab } from '@renderer/state/tab'
-import VxIcon from '@renderer/components/base/VxIcon.vue'
+import { VxIcon } from '@renderer/components/base/VxIcon'
 import { computed, onMounted, ref } from 'vue';
-import ElementInject from '@renderer/components/base/ElementInject.vue'
+import { ElementInject } from '@renderer/components/base/ElementInject'
 
 const tabList = ref<HTMLElement | null>(null)
 
@@ -21,7 +21,7 @@ const currentPage = computed(() => {
 })
 
 const activeTab = (tabId: string) => {
-    if(appTab.currentId == tabId) return
+    if (appTab.currentId == tabId) return
     appTab.active(tabId)
 }
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { FlatTreeHandler, FlatTreeItem } from '@renderer/components/base/FlatTreeHandler';
-import FlatTree from '@renderer/components/base/FlatTree.vue';
+import { FlatTreeHandler, FlatTreeItem, FlatTree } from '@renderer/components/base/FlatTree';
 import { ref } from 'vue';
 import { appTab } from '@renderer/state/tab';
 import { PageBgTask } from '@renderer/view/page/bgTask';
@@ -29,24 +28,24 @@ const testFile = {
 
 
 const fileTree = ref(new FlatTreeHandler<FlatTreeItem & {
-    name:string
+    name: string
 }>())
 
-const load = (data: any, pid?: string ) => {
-    Array.from(Object.entries(data)).forEach(([key,value])=>{
+const load = (data: any, pid?: string) => {
+    Array.from(Object.entries(data)).forEach(([key, value]) => {
         const id = Math.random().toString()
         const isLeaf = !(value && typeof value === 'object')
         fileTree.value.data.push({
-            id,pid,name:key, isLeaf,
+            id, pid, name: key, isLeaf,
         })
 
-        if(value && typeof value === 'object'){
-            load(value,id)
+        if (value && typeof value === 'object') {
+            load(value, id)
         }
     })
 }
 
-const openFile = (name:string)=>{
+const openFile = (name: string) => {
     appTab.addTab(new PageBgTask(name))
 }
 
@@ -61,8 +60,8 @@ load(testFile)
         </div>
         <div class="explorer-sider-panel__tree">
             <FlatTree :handler="fileTree">
-                <template #item="{item}">
-                    <div @dblclick="()=>openFile(item.name)">
+                <template #item="{ item }">
+                    <div @dblclick="() => openFile(item.name)">
                         {{ item.name }}
                     </div>
                 </template>
@@ -91,7 +90,7 @@ load(testFile)
         flex: 0 0 auto;
     }
 
-    .explorer-sider-panel__tree{
+    .explorer-sider-panel__tree {
         flex: 1 1 0;
         height: 0;
     }

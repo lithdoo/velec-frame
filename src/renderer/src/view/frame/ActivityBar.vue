@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import VxIcon from '@renderer/components/base/VxIcon.vue';
+import { VxIcon } from '@renderer/components/base/VxIcon';
 import { appSider } from '@renderer/state/sider';
 import { computed } from 'vue';
 
