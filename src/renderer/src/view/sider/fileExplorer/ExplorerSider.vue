@@ -32,7 +32,8 @@ const fileTree = ref(new FlatTreeHandler<FlatTreeItem & {
     name: string
 }>())
 
-fileTree.value.onItemContextMenu = ()=>{
+fileTree.value.onItemContextMenu = (item)=>{
+    fileTree.value.selectedKeys = [item.id]
     contextMenu.open(MenuListHandler.create([
         Menu.button({ icon: 'del', key: '3', label: '撤销', onClick: () => { alert('打开文件') } }),
         Menu.button({ icon: 'del', key: '4', label: '恢复' }),
