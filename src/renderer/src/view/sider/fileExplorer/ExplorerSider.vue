@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import { appTab } from '@renderer/state/tab';
 import { PageBgTask } from '@renderer/view/page/bgTask';
 import { contextMenu } from '@renderer/view/fixed/contextmenu';
-import { Menu, MenuListHandler } from '@renderer/components/base/MenuList';
+import { Menu, MenuListHandler } from '@renderer/components/base/Menu';
 
 const testFile = {
     'vscode': '',
@@ -32,18 +32,45 @@ const fileTree = ref(new FlatTreeHandler<FlatTreeItem & {
     name: string
 }>())
 
-fileTree.value.onItemContextMenu = (item)=>{
+fileTree.value.onItemContextMenu = (item) => {
     fileTree.value.selectedKeys = [item.id]
     contextMenu.open(MenuListHandler.create([
         Menu.button({ icon: 'del', key: '3', label: '撤销', onClick: () => { alert('打开文件') } }),
         Menu.button({ icon: 'del', key: '4', label: '恢复' }),
-        Menu.div(),
+        Menu.divide(),
         Menu.button({ key: '1', label: '打开文件', onClick: () => { alert('打开文件') } }),
         Menu.button({ key: '2', label: '打开文件夹', onClick: () => { alert('打开文件') } }),
-        Menu.div(),
+        Menu.divide(),
         Menu.button({ icon: 'del', key: '5', label: '粘贴', onClick: () => { alert('打开文件') } }),
         Menu.button({ icon: 'del', key: '6', label: '复制', onClick: () => { alert('打开文件') } }),
-        Menu.button({ icon: 'del', key: '7', label: '剪切', onClick: () => { alert('打开文件') } }),
+        Menu.subMenu({
+            icon: 'del', key: '7', label: '剪切', subMenu: () => {
+
+                return MenuListHandler.create([
+                    Menu.subMenu({
+                        icon: 'del', key: '3', label: '撤销', subMenu: () => {
+
+                            return MenuListHandler.create([
+                                Menu.button({ icon: 'del', key: '4', label: '恢复' }),
+                                Menu.divide(),
+                                Menu.button({ key: '1', label: '打开文件', onClick: () => { alert('打开文件') } }),
+                                Menu.button({ key: '2', label: '打开文件夹', onClick: () => { alert('打开文件') } }),
+                                Menu.divide(),
+                                Menu.button({ icon: 'del', key: '5', label: '粘贴', onClick: () => { alert('打开文件') } }),
+                                Menu.button({ icon: 'del', key: '6', label: '复制', onClick: () => { alert('打开文件') } }),
+                            ])
+                        }
+                    }),
+                    Menu.button({ icon: 'del', key: '4', label: '恢复' }),
+                    Menu.divide(),
+                    Menu.button({ key: '1', label: '打开文件', onClick: () => { alert('打开文件') } }),
+                    Menu.button({ key: '2', label: '打开文件夹', onClick: () => { alert('打开文件') } }),
+                    Menu.divide(),
+                    Menu.button({ icon: 'del', key: '5', label: '粘贴', onClick: () => { alert('打开文件') } }),
+                    Menu.button({ icon: 'del', key: '6', label: '复制', onClick: () => { alert('打开文件') } }),
+                ])
+            }
+        }),
     ]))
 }
 
@@ -87,7 +114,7 @@ load(testFile)
 </template>
 
 <style>
-:root{
+:root {
     --explorer-sider-title-height: 36px;
     --explorer-sider-title-border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     --explorer-sider-title-font-size: 12px;

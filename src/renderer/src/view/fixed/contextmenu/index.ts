@@ -1,14 +1,16 @@
-import { MenuItem, MenuListHandler } from "@renderer/components/base/MenuList";
+import { MenuLayerHandler, MenuListHandler } from "@renderer/components/base/Menu";
 import { reactive } from "vue";
 
 class ContextMenu {
     ev: MouseEvent | null = null
-    current: MenuListHandler | null = null
+    layer = new MenuLayerHandler()
     open(list: MenuListHandler) {
-        this.current = list
+        this.$emitOpen?.(list)
     }
-    close() {
-        this.current = null
+    $emitOpen?: (list: MenuListHandler) =>void
+
+    close(){
+        this.layer.clear()
     }
 }
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, handleError } from 'vue';
 import { VxIcon } from '../VxIcon';
-import { MenuButton, MenuListHandler } from './MenuListHandler';
+import { MenuButton, MenuListHandler } from './MenuHandler';
 
 const props = defineProps<{
     handler: MenuListHandler
@@ -12,8 +12,8 @@ const list = computed(() => {
 })
 
 const onButtonClick = (item: MenuButton) => {
-    if (!item.handler) return
-    if (item.handler.onClick?.() !== false) {
+    if (!item.action) return
+    if (item.action.onClick?.({menu:props.handler}) !== false) {
         props.handler.$close()
     }
 }
@@ -28,11 +28,16 @@ const onButtonClick = (item: MenuButton) => {
             </template>
             <template v-if="item.type === 'button'">
                 <div @click="() => onButtonClick(item)"
-                    :class="['menu-list__button', item.handler ? '' : 'menu-list__button--disabled']">
+                    :ref="(el)=>item.$el = el as HTMLElement"
+                    :class="['menu-list__button', item.action ? '' : 'menu-list__button--disabled']">
                     <div class="menu-list__button-icon">
                         <VxIcon v-if="item.icon" :name="item.icon"></VxIcon>
                     </div>
                     <div class="menu-list__button-label">{{ item.label }}</div>
+                    <div class="menu-list__button-extra" v-if="item.extra && typeof item.extra === 'string'">{{  item.extra }}</div>
+                    <div class="menu-list__button-extra" v-if="item.extra && typeof item.extra === 'object'">
+                        <component :is="item.extra"/>
+                    </div>
                 </div>
             </template>
         </div>
@@ -99,10 +104,20 @@ const onButtonClick = (item: MenuButton) => {
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            flex:  0 0 auto;
         }
 
         .menu-list__button-label {
             font-size: var(--menu-list-button-font-size);
+            flex: 1 1 0;
+            width: 0;
+        }
+
+        .menu-list__button-extra{
+            flex:  0 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
     }
