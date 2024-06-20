@@ -1,22 +1,60 @@
 <script setup lang="ts">
-import { computed, handleError } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { VxIcon } from '../VxIcon';
-import { MenuButton, MenuListHandler } from './MenuHandler';
+import { PopMenuLayerHandler, PopMenuListHandler, MenuButton, SubMenu, MenuRenderOption } from './handler';
+
 
 const props = defineProps<{
-    handler: MenuListHandler
+    handler: PopMenuListHandler,
+    layer: PopMenuLayerHandler,
 }>()
 
 const list = computed(() => {
     return props.handler.list
 })
 
+const layer = computed(() => {
+    return props.layer
+})
+
 const onButtonClick = (item: MenuButton) => {
-    if (!item.action) return
-    if (item.action.onClick?.({menu:props.handler}) !== false) {
-        props.handler.$close()
+    if (item.disabled) return
+    else item.action?.()
+}
+
+const onSubMenuMouseEnter = (item: SubMenu, e: MouseEvent) => {
+    if (!item.menu) return
+    stopHide()
+    const renderOption = reactive<MenuRenderOption>({
+        placement: 'right-start',
+        target: e.target as HTMLElement
+    })
+    layer.value.submenu(props.handler.id, renderOption, item.menu)
+    watch([renderOption], () => {
+        if (renderOption.container) {
+            renderOption.container.addEventListener('mouseenter', stopHide)
+        }
+    })
+}
+
+let hideSubmenuTimeout: any | null = null
+
+const hideSubmenu = () => {
+    if (hideSubmenuTimeout) return
+    hideSubmenuTimeout = setTimeout(() => {
+        layer.value.remove({ after: props.handler.id })
+        hideSubmenuTimeout = null
+    }, 300)
+}
+
+const stopHide = () => {
+    if (hideSubmenuTimeout) {
+        clearTimeout(hideSubmenuTimeout)
+        hideSubmenuTimeout = null
     }
 }
+
+
 
 </script>
 
@@ -27,23 +65,32 @@ const onButtonClick = (item: MenuButton) => {
                 <hr class="menu-list__divide" />
             </template>
             <template v-if="item.type === 'button'">
-                <div @click="() => onButtonClick(item)"
-                    :ref="(el)=>item.$el = el as HTMLElement"
-                    :class="['menu-list__button', item.action ? '' : 'menu-list__button--disabled']">
+                <div @click="() => onButtonClick(item)" @mouseenter="() => hideSubmenu()"
+                    @mouseleave="() => hideSubmenu()" :ref="(el) => item.$el = el as HTMLElement"
+                    :class="['menu-list__button', item.disabled ? 'menu-list__button--disabled' : '']">
                     <div class="menu-list__button-icon">
                         <VxIcon v-if="item.icon" :name="item.icon"></VxIcon>
                     </div>
                     <div class="menu-list__button-label">{{ item.label }}</div>
-                    <div class="menu-list__button-extra" v-if="item.extra && typeof item.extra === 'string'">{{  item.extra }}</div>
+                    <div class="menu-list__button-extra" v-if="item.extra && typeof item.extra === 'string'">{{
+                        item.extra }}</div>
                     <div class="menu-list__button-extra" v-if="item.extra && typeof item.extra === 'object'">
-                        <component :is="item.extra"/>
+                        <component :is="item.extra" />
                     </div>
                 </div>
             </template>
+
+            <template v-if="item.type === 'submenu'">
+                <div @mouseenter="(e) => onSubMenuMouseEnter(item, e)" @mouseleave="() => hideSubmenu()"
+                    :class="['menu-list__button', (!item.menu) ? 'menu-list__button--disabled' : '']">
+                    <div class="menu-list__button-icon">
+                        <VxIcon v-if="item.icon" :name="item.icon"></VxIcon>
+                    </div>
+                    <div class="menu-list__button-label">{{ item.label }}</div>
+                </div>
+            </template>
         </div>
-
     </div>
-
 </template>
 <style>
 :root {
@@ -104,7 +151,7 @@ const onButtonClick = (item: MenuButton) => {
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            flex:  0 0 auto;
+            flex: 0 0 auto;
         }
 
         .menu-list__button-label {
@@ -113,8 +160,8 @@ const onButtonClick = (item: MenuButton) => {
             width: 0;
         }
 
-        .menu-list__button-extra{
-            flex:  0 0 auto;
+        .menu-list__button-extra {
+            flex: 0 0 auto;
             display: flex;
             justify-content: center;
             align-items: center;

@@ -1,30 +1,17 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { contextMenu } from './index'
-import { MenuLayer } from '@renderer/components/base/Menu'
-import { createPopper } from '@popperjs/core';
-import type { Instance } from '@popperjs/core'
 
 document.addEventListener('contextmenu', (ev) => {
     contextMenu.ev = ev
 })
 
-const layer = computed(() => contextMenu.layer)
 
 contextMenu.$emitOpen = (handler) => {
-    setTimeout(()=>{
-        if (!archerElement.value) return
-        contextMenu.layer.open({
-            target: archerElement.value,
-            place: 'right-start'
-        }, handler)
-    })
+  
 }
 
-const pop = ref<Instance | null>(null)
-
 const archerElement = ref<HTMLElement>()
-
 
 const pos = computed(() => {
     if (!contextMenu.ev) return {
@@ -41,43 +28,13 @@ const stopPropagation = (e: Event) => {
     e.stopPropagation()
 }
 
-const isMenuVisible = ref(false)
-
-const hide = () => {
-    isMenuVisible.value = false
-    setTimeout(() => {
-        contextMenu.close()
-    });
-}
-
-const show = () => {
-    if (pop.value) pop.value.forceUpdate()
-    isMenuVisible.value = true
-}
-
-
 </script>
 
 
 <template>
     <div class="global-context-menu__archer" :style="{ 'left': pos.x, 'top': pos.y }" ref="archerElement"
         @contextmenu="stopPropagation"></div>
-    <MenuLayer :handler="contextMenu.layer"></MenuLayer>
 </template>
-
-<!-- 
-<template>
-    <div v-if="pos && menu" class="global-context-menu__mask" @contextmenu="e => { stopPropagation(e); hide() }"
-        @mousedown="hide" @wheel="hide"></div>
-    <div class="global-context-menu__archer" :style="{ 'left': pos.x, 'top': pos.y }" ref="archerElement"
-        @contextmenu="stopPropagation"></div>
-    <div class="global-context-menu__menu" ref="menuElement" :style="{ opacity: isMenuVisible ? 1 : 0 }"
-        @contextmenu="stopPropagation">
-        <MenuList v-if="pos && menu" :handler="menu"></MenuList>
-    </div>
-
-</template>-->
-
 
 
 <style>
@@ -100,4 +57,4 @@ const show = () => {
     left: 0;
     top: 0;
 }
-</style> 
+</style>

@@ -1,17 +1,18 @@
-import { MenuLayerHandler, MenuListHandler } from "@renderer/components/base/Menu";
 import { reactive } from "vue";
 
 class ContextMenu {
     ev: MouseEvent | null = null
-    layer = new MenuLayerHandler()
-    open(list: MenuListHandler) {
+   
+    open(list: any) {
         this.$emitOpen?.(list)
     }
-    $emitOpen?: (list: MenuListHandler) =>void
+    $emitOpen?: (list: any) =>void
 
     close(){
-        this.layer.clear()
+        
     }
 }
 
-export const contextMenu = reactive(new ContextMenu())
+export const contextMenu = reactive(new ContextMenu()) as ContextMenu
+
+; (window as any).context = contextMenu

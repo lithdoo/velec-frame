@@ -1,2 +1,2 @@
 export { default as SinglePanelSplit } from './SinglePanelSplit.vue'
-export * from './SinglePanelSplitHandler'
+export * from './handler'

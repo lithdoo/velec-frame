@@ -1,33 +1,36 @@
 <script setup lang="ts">
 import logo from '@renderer/assets/icon.png'
+import { ClickPopMenu, testMenu } from '@renderer/components/base/PopMenu'
 const menus = ['文件', '编辑', '选择', '查看', '运行', '帮助']
-const drag = {'app-region':'drag'}
+const drag = { 'app-region': 'drag' }
+
+const menu = testMenu
 </script>
 
 <template>
 
     <div class="frame-title-bar">
-        <div class="frame-title-bar__logo" :style="{ backgroundImage: `url(${logo})` ,...drag}">
 
-        </div>
-
-        <div class="frame-title-bar__menu">
-            <div class="frame-title-bar__menu-item" v-for="item in menus" :key="item">
-                <div class="frame-title-bar__menu-title">
-                    {{ item }}
+        <div class="frame-title-bar__logo" :style="{ backgroundImage: `url(${logo})`, ...drag }" ></div>
+        <ClickPopMenu :menu="menu" :placement="'bottom-start'">
+            <template #triggler="{ slotScope }">
+                <div class="frame-title-bar__menu" :ref="el => slotScope.bind(el as HTMLElement)">
+                    <div class="frame-title-bar__menu-item" v-for="item in menus" :key="item">
+                        <div class="frame-title-bar__menu-title">
+                            {{ item }}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
+            </template>
+        </ClickPopMenu>
         <div class="frame-title-bar__extra" :style="drag"></div>
-
     </div>
 
 
 </template>
 
 <style>
-:root{
+:root {
     --title-bar-height: 36px;
     --menu-title-padding: 0 8px;
     --menu-title-bg-hover: rgb(255, 255, 255, 0.12);
@@ -78,11 +81,11 @@ const drag = {'app-region':'drag'}
         }
     }
 
-    .frame-title-bar__extra{
+    .frame-title-bar__extra {
         flex: 1 1 0;
         width: 0;
-        
-        height:100%
+
+        height: 100%
     }
 
 

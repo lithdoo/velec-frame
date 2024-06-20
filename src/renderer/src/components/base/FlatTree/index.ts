@@ -1,2 +1,2 @@
 export { default as FlatTree } from './FlatTree.vue'
-export * from './FlatTreeHandler'
+export * from './handler'
