@@ -1,30 +1,25 @@
 <template>
-    <div ref="container" :style="props.style"></div>
+     <HtmlElementInject v-if="target?.element" :target="target.element" />
+     <component v-if="target?.vnode" :is="target.vnode"></component>
 </template>
 
 <script setup lang="ts">
-import { CSSProperties, computed, onMounted, ref, watch } from "vue"
 
-const container = ref<HTMLElement | null>(null)
+import { VNode, computed } from 'vue';
+import HtmlElementInject from './HtmlElementInject.vue';
+
 const props = defineProps<{
-    target: HTMLElement | null,
-    style?: Partial<CSSProperties>
+     target: HTMLElement | VNode | null
 }>()
 
-const target = computed(() => props.target)
-
-watch(target, () => {
-    if (container.value) container.value.innerHTML = ''
-    if (target.value && container.value) {
-        container.value.appendChild(target.value)
-    }
+const target = computed(() => {
+     const element = props.target
+     if (element && element instanceof HTMLElement) {
+          return { element, vnode: null }
+     } else if (element) {
+          return { vnode: element, element: null }
+     } else {
+          return null
+     }
 })
-
-onMounted(() => {
-    if (props.target && container.value) {
-        container.value.innerHTML = ''
-        container.value.appendChild(props.target)
-    }
-})
-
 </script>

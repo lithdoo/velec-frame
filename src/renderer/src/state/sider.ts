@@ -1,11 +1,11 @@
 // import App from '../App.vue'
-import { reactive } from 'vue'
+import { VNode, reactive } from 'vue'
 
 export interface AppSiderPanel {
     panelId: string
     icon: string
     label: string
-    element: HTMLElement
+    element: HTMLElement | VNode
     onActive?(): void
     onDeactive?(): void
     onDestroy?(): void

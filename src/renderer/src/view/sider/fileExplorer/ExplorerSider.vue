@@ -31,8 +31,9 @@ const fileTree = ref(new FlatTreeHandler<FlatTreeItem & {
     name: string
 }>())
 
-fileTree.value.onItemContextMenu = () => {
+fileTree.value.onItemContextMenu = (item) => {
     setTimeout(() => {
+        fileTree.value.selectedKeys = [item.id]
         contextMenu.open(testMenu)
     })
 }

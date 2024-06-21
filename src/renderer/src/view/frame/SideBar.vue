@@ -2,12 +2,15 @@
 import { appSider } from '@renderer/state/sider';
 import { ElementInject } from '@renderer/components/base/ElementInject';
 import { computed } from 'vue';
-const element = computed(() => appSider.currentPanel()?.element ?? null)
+const target = computed(() => {
+    return appSider.currentPanel()?.element ?? null
+})
+
 </script>
 
 <template>
     <div class="frame-side-bar">
-        <ElementInject :target="element" :style="{ 'height': '100%' }" />
+        <ElementInject :target="target" />
     </div>
 </template>
 

@@ -1,17 +1,17 @@
-import { reactive } from "vue"
+import { VNode, reactive } from "vue"
 
 export interface TabPage {
     tabId: string
     icon: string
     title: string
-    element: HTMLElement
+    element: HTMLElement | VNode
     onActive?(): void
     onDeactive?(): void
     onDestroy?(): void
 }
 
 class AppTab {
-    list:TabPage[] = []
+    list: TabPage[] = []
     currentId: string | null = null
 
 
