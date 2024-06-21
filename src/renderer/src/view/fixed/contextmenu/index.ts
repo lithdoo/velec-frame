@@ -1,18 +1,16 @@
-import { reactive } from "vue";
-
+import { PopMenuListHandler } from "@renderer/components/base/PopMenu";
+import { fixReactive } from "@renderer/fix";
 class ContextMenu {
     ev: MouseEvent | null = null
-   
-    open(list: any) {
+
+    open(list: PopMenuListHandler) {
         this.$emitOpen?.(list)
     }
-    $emitOpen?: (list: any) =>void
+    $emitOpen?: (list: any) => void
 
-    close(){
-        
+    close() {
+
     }
 }
 
-export const contextMenu = reactive(new ContextMenu()) as ContextMenu
-
-; (window as any).context = contextMenu
+export const contextMenu = fixReactive(new ContextMenu())

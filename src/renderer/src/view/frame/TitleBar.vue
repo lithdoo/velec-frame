@@ -1,32 +1,69 @@
 <script setup lang="ts">
 import logo from '@renderer/assets/icon.png'
-import { ClickPopMenu, testMenu } from '@renderer/components/base/PopMenu'
+import { PopMenuLayer, PopMenuLayerHandler, testMenu } from '@renderer/components/base/PopMenu'
+import { fixReactive } from '@renderer/fix';
+import { onUnmounted } from 'vue';
 const menus = ['文件', '编辑', '选择', '查看', '运行', '帮助']
 const drag = { 'app-region': 'drag' }
 
 const menu = testMenu
+const layer = fixReactive(new PopMenuLayerHandler())
+
+
+const mouseenter = (e: MouseEvent, item: any) => {
+    setTimeout(() => {
+        if (layer.stack[0] && e.target) {
+            layer.open({
+                target: e.target as HTMLElement,
+                placement: 'bottom-start'
+            }, menu)
+        }
+    })
+}
+const click = (e: MouseEvent, item: any) => {
+    setTimeout(() => {
+        if (layer.stack[0]) {
+            layer.clear()
+        } else if (e.target) {
+            layer.open({
+                target: e.target as HTMLElement,
+                placement: 'bottom-start'
+            }, menu)
+        }
+    })
+}
+
+const remove = () => { layer.hide(true) }
+
+document.body.addEventListener('click', remove)
+document.body.addEventListener('contextmenu', remove)
+document.body.addEventListener('wheel', remove)
+
+onUnmounted(() => {
+    document.body.removeEventListener('click', remove)
+    document.body.removeEventListener('contextmenu', remove)
+    document.body.removeEventListener('wheel', remove)
+})
+
+
+
 </script>
 
 <template>
 
     <div class="frame-title-bar">
-
-        <div class="frame-title-bar__logo" :style="{ backgroundImage: `url(${logo})`, ...drag }" ></div>
-        <ClickPopMenu :menu="menu" :placement="'bottom-start'">
-            <template #triggler="{ slotScope }">
-                <div class="frame-title-bar__menu" :ref="el => slotScope.bind(el as HTMLElement)">
-                    <div class="frame-title-bar__menu-item" v-for="item in menus" :key="item">
-                        <div class="frame-title-bar__menu-title">
-                            {{ item }}
-                        </div>
-                    </div>
+        <div class="frame-title-bar__logo" :style="{ backgroundImage: `url(${logo})`, ...drag }"></div>
+        <div class="frame-title-bar__menu" @click.stop>
+            <div class="frame-title-bar__menu-item" v-for="item in menus" :key="item" @click="(e) => click(e, item)"
+                @mouseenter="(e) => { mouseenter(e, item) }">
+                <div class="frame-title-bar__menu-title">
+                    {{ item }}
                 </div>
-            </template>
-        </ClickPopMenu>
+            </div>
+        </div>
         <div class="frame-title-bar__extra" :style="drag"></div>
     </div>
-
-
+    <PopMenuLayer :handler="layer"></PopMenuLayer>
 </template>
 
 <style>

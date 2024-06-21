@@ -12,39 +12,20 @@ const props = defineProps<{
 
 const layer = fixReactive(new PopMenuLayerHandler())
 
-const click = (e: MouseEvent) => {
-    setTimeout(() => {
-        layer.open({
-            target: e.target as HTMLElement,
-            placement: props.placement
-        }, props.menu)
-    })
-
-}
-
 const bind = (target: HTMLElement) => {
-    target.onclick = click
-}
-
-let hideTimeout: any = null
-
-const hide = (force: boolean = true) => {
-    if (force) {
-        layer.clear()
-        return
+    target.onclick = () => {
+        setTimeout(() => {
+            layer.open({
+                target,
+                placement: props.placement
+            }, props.menu)
+        })
     }
-    if (hideTimeout) clearTimeout(hideTimeout)
-    hideTimeout = setTimeout(() => {
-        layer.clear()
-        hideTimeout = null
-    }, 1000)
 }
 
-const stopHide = () => {
-    if (hideTimeout) clearTimeout(hideTimeout)
-}
+const stopHide = () => { layer.stopHide() }
 
-const remove = () => { hide(true) }
+const remove = () => { layer.hide(true) }
 
 document.body.addEventListener('click', remove)
 document.body.addEventListener('contextmenu', remove)
@@ -57,7 +38,6 @@ onUnmounted(() => {
 })
 
 </script>
-
 
 <template>
     <slot name="triggler" :slot-scope="{ bind }"></slot>

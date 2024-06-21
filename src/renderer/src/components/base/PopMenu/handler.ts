@@ -87,7 +87,24 @@ export class PopMenuLayerHandler {
             }
         }
     }
-    $stopHide?: () => void
+
+    private hideTimeout: any | null = null
+
+    hide(force: boolean = true) {
+        if (force) {
+            this.clear()
+            return
+        }
+        if (this.hideTimeout) clearTimeout(this.hideTimeout)
+        this.hideTimeout = setTimeout(() => {
+            this.clear()
+            this.hideTimeout = null
+        }, 1000)
+    }
+
+    stopHide() {
+        if (this.hideTimeout) clearTimeout(this.hideTimeout)
+    }
 }
 
 export class Menu {

@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { contextMenu } from './index'
+import { PopMenuLayerHandler, PopMenuListHandler, PopMenuLayer } from '@renderer/components/base/PopMenu';
+import { fixReactive } from '@renderer/fix';
 
 document.addEventListener('contextmenu', (ev) => {
     contextMenu.ev = ev
 })
 
 
-contextMenu.$emitOpen = (handler) => {
-  
+contextMenu.$emitOpen = (handler: PopMenuListHandler) => {
+    if (!archerElement.value) return
+    layer.open({ target: archerElement.value, placement: 'right-start' }, handler)
 }
+
+const layer = fixReactive(new PopMenuLayerHandler())
 
 const archerElement = ref<HTMLElement>()
 
@@ -28,12 +33,19 @@ const stopPropagation = (e: Event) => {
     e.stopPropagation()
 }
 
+const clear = () => {
+    layer.clear()
+}
+
 </script>
 
 
 <template>
     <div class="global-context-menu__archer" :style="{ 'left': pos.x, 'top': pos.y }" ref="archerElement"
         @contextmenu="stopPropagation"></div>
+    <div v-if="pos && layer.stack[0]" class="global-context-menu__mask"
+        @contextmenu="e => { stopPropagation(e); clear() }" @mousedown="clear" @wheel="clear"></div>
+    <PopMenuLayer :handler="layer"></PopMenuLayer>
 </template>
 
 

@@ -3,7 +3,8 @@ import { FlatTreeHandler, FlatTreeItem, FlatTree } from '@renderer/components/ba
 import { ref } from 'vue';
 import { appTab } from '@renderer/state/tab';
 import { PageBgTask } from '@renderer/view/page/bgTask';
-
+import { contextMenu } from '@renderer/view/fixed/contextmenu';
+import { testMenu } from '@renderer/components/base/PopMenu';
 const testFile = {
     'vscode': '',
     'build': {
@@ -30,7 +31,11 @@ const fileTree = ref(new FlatTreeHandler<FlatTreeItem & {
     name: string
 }>())
 
-fileTree.value.onItemContextMenu = () => {}
+fileTree.value.onItemContextMenu = () => {
+    setTimeout(() => {
+        contextMenu.open(testMenu)
+    })
+}
 
 const load = (data: any, pid?: string) => {
     Array.from(Object.entries(data)).forEach(([key, value]) => {
