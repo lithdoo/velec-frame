@@ -19,7 +19,10 @@ const layer = computed(() => {
 
 const onButtonClick = (item: MenuButton) => {
     if (item.disabled) return
-    else item.action?.()
+    else{
+        item.action?.()
+        layer.value.clear()
+    }
 }
 
 const onSubMenuMouseEnter = (item: SubMenu, e: MouseEvent) => {
