@@ -5,7 +5,7 @@ const props = defineProps<{name:string}>()
 
 <template>
     <svg class="icon" aria-hidden="true">
-        <use :xlink:href="'#gp-' + props.name"></use>
+        <use :xlink:href="'#vx-base-' + props.name"></use>
     </svg>
 </template>
 

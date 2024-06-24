@@ -60,14 +60,18 @@ const toggle = (id, e: Event) => {
   <div class="flat-tree">
 
     <div class="flat-tree__inner">
+      <div v-if="handler.loadingId" class="flat-tree__loadding-mask"></div>
       <div :class="{ 'flat-tree__item': true, 'flat-tree__item--selected': selectKeysSet.has(v.id) }"
         v-for="v in listToRender" :key="v.id" :style="{ paddingLeft: v.deep * 16 + 'px' }"
         @mouseover="() => handler.$emitHover(v.data)" @mouseleave="() => handler.$emitLeave(v.data)"
         @click="() => handler.$emitSelect(v.data)" @contextmenu="() => handler.$emitContextMenu(v.data)">
 
-        <div class="flat-tree__item-open-icon" @click="(e) => toggle(v.id, e)">
-          <VxIcon v-if="(!v.isLeaf) && v.isOpen" :name="'del'"></VxIcon>
-          <VxIcon v-if="(!v.isLeaf) && (!v.isOpen)" :name="'home'"></VxIcon>
+        <div
+          :class="['flat-tree__item-open-icon', v.id === handler.loadingId ? 'flat-tree__item-open-icon--loading' : '']"
+          @click="(e) => toggle(v.id, e)">
+          <VxIcon v-if="v.id === handler.loadingId" :name="'auto_renew'"></VxIcon>
+          <VxIcon v-else-if="(!v.isLeaf) && v.isOpen" :name="'menu_down'"></VxIcon>
+          <VxIcon v-else-if="(!v.isLeaf) && (!v.isOpen)" :name="'menu_right'"></VxIcon>
         </div>
         <div class="flat-tree__item-content" :class="{ 'flat-tree__item-content--v-scroll': handler.vScroll }">
           <slot name="item" :item="v.data"></slot>
@@ -97,6 +101,16 @@ const toggle = (id, e: Event) => {
     display: flex;
     width: fit-content;
     min-width: 100%;
+    position: relative
+  }
+
+  .flat-tree__loadding-mask {
+    z-index: 999;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
   }
 
   .flat-tree__item {
@@ -122,6 +136,21 @@ const toggle = (id, e: Event) => {
     align-items: center;
     transform: translateY(1px);
     margin-left: 11px;
+    margin-right: 4px;
+  }
+
+  @keyframes flat-tree__item-open-icon--rotate {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .flat-tree__item-open-icon--loading {
+    animation: flat-tree__item-open-icon--rotate 2s linear infinite;
   }
 
 

@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import { FlatTreeHandler, FlatTreeItem, FlatTree } from '@renderer/components/base/FlatTree';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { appTab } from '@renderer/state/tab';
 import { PageBgTask } from '@renderer/view/page/bgTask';
 import { contextMenu } from '@renderer/view/fixed/contextmenu';
 import { testMenu } from '@renderer/components/base/PopMenu';
+import type { SiderFileExplorer } from '.';
+
+const props = defineProps<{
+    handler: SiderFileExplorer
+}>()
+
+const handler = computed(() => props.handler)
+
 const testFile = {
     'vscode': '',
     'build': {
@@ -56,6 +64,8 @@ const openFile = (name: string) => {
     appTab.addTab(new PageBgTask(name))
 }
 
+const addWorkspace = () => handler.value.addExplorerWrokspace()
+
 load(testFile)
 
 </script>
@@ -65,15 +75,23 @@ load(testFile)
         <div class="explorer-sider-panel__title">
             资源管理器
         </div>
-        <div class="explorer-sider-panel__tree">
-            <FlatTree :handler="fileTree">
-                <template #item="{ item }">
-                    <div @dblclick="() => openFile(item.name)">
-                        {{ item.name }}
-                    </div>
-                </template>
-            </FlatTree>
-        </div>
+
+        <template v-if="!handler.list.length">
+            <div>
+                <button @click="addWorkspace">添加工作空间</button>
+            </div>
+        </template>
+        <template v-else>
+            <div class="explorer-sider-panel__tree" v-for="(ws, idx) in handler.list" :key="idx">
+                <FlatTree :handler="ws.tree">
+                    <template #item="{ item }">
+                        <div @dblclick="() => openFile(item.url)">
+                            {{ item.name }}
+                        </div>
+                    </template>
+                </FlatTree>
+            </div>
+        </template>
     </div>
 </template>
 

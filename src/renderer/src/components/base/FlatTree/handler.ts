@@ -1,6 +1,6 @@
 
 export interface FlatTreeItem {
-    id: string, pid?: string, isLeaf?: boolean
+    id: string, pid?: string, isLeaf?: boolean, loaded?: boolean
 }
 
 export class FlatTreeHandler<T extends FlatTreeItem> {
@@ -16,6 +16,7 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
             xScroll: false,
         }
 
+    loadingId: string | null = null
     vScroll = true
 
     openKeys: string[] = []
@@ -62,7 +63,7 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
     $emitLeave(item: T) {
         this.onItemLeave?.(item)
     }
-    $emitContextMenu(item:T){
+    $emitContextMenu(item: T) {
         this.onItemContextMenu?.(item)
     }
     onItemSelect: (item: T) => boolean | void = () => { }
@@ -71,8 +72,25 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
     onItemContextMenu: (item: T) => boolean | void = () => { }
 
 
-    open(id) {
-        this.openKeys = this.openKeys.filter(v => v !== id).concat([id])
+    async open(id) {
+        if (this.loadingId) return
+        const node = this.data.find(v => v.id == id)
+        if (!node || node.isLeaf) return
+
+        if (node.loaded === false) {
+            this.loadingId = node.id
+            try {
+                node.loaded = await this.onload?.(node)
+                if(node.loaded){
+                    this.openKeys = this.openKeys.filter(v => v !== id).concat([id])
+                }
+            } finally {
+                this.loadingId = null
+            }
+
+        } else {
+            this.openKeys = this.openKeys.filter(v => v !== id).concat([id])
+        }
     }
 
     close(id) {
@@ -86,4 +104,6 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
             this.open(id)
         }
     }
+
+    onload?: (id: T) => Promise<boolean>
 }
