@@ -4,6 +4,8 @@ import { FlatTreeHandler, FlatTreeItem } from "@renderer/components/base/FlatTre
 import { VNode } from "vue"
 import { fixReactive } from "@renderer/fix"
 import { FileType } from "@common/file"
+import { appTab } from "@renderer/state/tab"
+import { PageFileEditor } from "@renderer/view/page/fileEditor"
 
 
 export class SiderFileExplorer implements AppSiderPanel {
@@ -38,6 +40,16 @@ export class SiderFileExplorer implements AppSiderPanel {
 
     init() {
         this.element = <ExplorerSider handler={this}></ExplorerSider>
+    }
+
+
+    openFile(file:FileTreeItem){
+        if(file.name.indexOf('.ts')>0){
+            appTab.addTab(new PageFileEditor({
+                name:file.name,
+                url:file.url
+            }))
+        }
     }
 
 }

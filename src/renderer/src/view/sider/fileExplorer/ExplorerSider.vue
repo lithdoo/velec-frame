@@ -60,9 +60,6 @@ const load = (data: any, pid?: string) => {
     })
 }
 
-const openFile = (name: string) => {
-    appTab.addTab(new PageBgTask(name))
-}
 
 const addWorkspace = () => handler.value.addExplorerWrokspace()
 
@@ -85,7 +82,7 @@ load(testFile)
             <div class="explorer-sider-panel__tree" v-for="(ws, idx) in handler.list" :key="idx">
                 <FlatTree :handler="ws.tree">
                     <template #item="{ item }">
-                        <div @dblclick="() => openFile(item.url)">
+                        <div @dblclick="() => handler.openFile(item)">
                             {{ item.name }}
                         </div>
                     </template>
