@@ -72,6 +72,7 @@ const toggle = (id, e: Event) => {
           <VxIcon v-if="v.id === handler.loadingId" :name="'auto_renew'"></VxIcon>
           <VxIcon v-else-if="(!v.isLeaf) && v.isOpen" :name="'menu_down'"></VxIcon>
           <VxIcon v-else-if="(!v.isLeaf) && (!v.isOpen)" :name="'menu_right'"></VxIcon>
+          <slot v-else name="leaf-icon" :item="v.data"></slot>
         </div>
         <div class="flat-tree__item-content" :class="{ 'flat-tree__item-content--v-scroll': handler.vScroll }">
           <slot name="item" :item="v.data"></slot>
