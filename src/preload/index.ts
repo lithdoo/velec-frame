@@ -1,6 +1,7 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { explorerApi } from './explorer'
+import { editorApi } from './editor'
 
 // Custom APIs for renderer
 const api = {
@@ -15,6 +16,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
     contextBridge.exposeInMainWorld('explorerApi', explorerApi)
+    contextBridge.exposeInMainWorld('editorApi', editorApi)
   } catch (error) {
     console.error(error)
   }

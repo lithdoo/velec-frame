@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { ExplorerService } from './explorer'
+import { EditorService } from './editor'
 
 Menu.setApplicationMenu(null)
 
@@ -72,6 +73,7 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
 
   ExplorerService.install()
+  EditorService.install()
 
   createWindow()
 

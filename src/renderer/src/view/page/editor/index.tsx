@@ -2,6 +2,10 @@ import { TabPage } from "@renderer/state/tab";
 import FileEditor from './FileEditor.vue'
 
 export class PageFileEditor implements TabPage {
+
+    static create(){
+        
+    }
     tabId: string = Math.random().toString()
     element = <FileEditor/>
     icon = 'del'

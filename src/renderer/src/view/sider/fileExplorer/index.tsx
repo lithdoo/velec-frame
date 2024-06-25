@@ -45,7 +45,7 @@ export class SiderFileExplorer implements AppSiderPanel {
 
     openFile(file:FileTreeItem){
         if(file.name.indexOf('.ts')>0){
-            appTab.addTab(new PageFileEditor({
+            appTab.addTab(PageFileEditor.create({
                 name:file.name,
                 url:file.url
             }))

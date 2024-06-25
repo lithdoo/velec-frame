@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { FlatTreeHandler, FlatTreeItem, FlatTree } from '@renderer/components/base/FlatTree';
 import { computed, ref } from 'vue';
-import { appTab } from '@renderer/state/tab';
-import { PageBgTask } from '@renderer/view/page/bgTask';
 import { contextMenu } from '@renderer/view/fixed/contextmenu';
 import { testMenu } from '@renderer/components/base/PopMenu';
 import type { SiderFileExplorer } from '.';
@@ -12,28 +10,6 @@ const props = defineProps<{
 }>()
 
 const handler = computed(() => props.handler)
-
-const testFile = {
-    'vscode': '',
-    'build': {
-        'docs': '',
-        'resoucre': {},
-        'src': {
-            'vscode': '',
-            'build': '',
-            'docs': '',
-            'resoucre': {},
-        }
-    },
-    'docs': '',
-    'resoucre': {},
-    'src': {
-        'vscode': '',
-        'build': '',
-        'docs': '',
-        'resoucre': {},
-    }
-}
 
 const fileTree = ref(new FlatTreeHandler<FlatTreeItem & {
     name: string
@@ -46,24 +22,7 @@ fileTree.value.onItemContextMenu = (item) => {
     })
 }
 
-const load = (data: any, pid?: string) => {
-    Array.from(Object.entries(data)).forEach(([key, value]) => {
-        const id = Math.random().toString()
-        const isLeaf = !(value && typeof value === 'object')
-        fileTree.value.data.push({
-            id, pid, name: key, isLeaf,
-        })
-
-        if (value && typeof value === 'object') {
-            load(value, id)
-        }
-    })
-}
-
-
 const addWorkspace = () => handler.value.addExplorerWrokspace()
-
-load(testFile)
 
 </script>
 

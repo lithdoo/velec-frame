@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { PageFileEditor } from './index';
+import {ElementInject} from '@renderer/components/base/ElementInject'
 
 const props = defineProps<{
     page: PageFileEditor
@@ -8,7 +9,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div>
+    <!-- <div>
         tabId: {{ props.page.tabId }}
     </div>
     <div>
@@ -16,5 +17,6 @@ const props = defineProps<{
     </div>
     <div>
         url: {{ props.page.file.url }}
-    </div>
+    </div> -->
+    <ElementInject :target="props.page.editorElement"/>
 </template>
