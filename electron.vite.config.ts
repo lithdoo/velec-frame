@@ -5,12 +5,26 @@ import vueJsx from "@vitejs/plugin-vue-jsx";
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin({exclude:['vscode-ws-jsonrpc']})],
     resolve: {
       alias: {
         '@common': resolve('src/common')
       }
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('vscode-ws-jsonrpc')) {
+              return 'vscode-ws-jsonrpc'
+            }
+            if(id.includes('jsonServer')){
+              return 'jsonServer'
+            }
+          }
+        }
+      }
+    }
   },
   preload: {
     plugins: [externalizeDepsPlugin()]
