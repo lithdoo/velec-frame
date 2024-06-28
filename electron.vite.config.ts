@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from "@vitejs/plugin-vue-jsx";
+import vsix from '@codingame/monaco-vscode-rollup-vsix-plugin'
 
 export default defineConfig({
   main: {
@@ -36,6 +37,6 @@ export default defineConfig({
         '@common': resolve('src/common')
       }
     },
-    plugins: [vue(),vueJsx()]
+    plugins: [vue(),vueJsx(),vsix()]
   }
 })

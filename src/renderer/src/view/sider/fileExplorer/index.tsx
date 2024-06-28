@@ -50,6 +50,12 @@ export class SiderFileExplorer implements AppSiderPanel {
                 url:file.url
             }))
         }
+        if(file.name.indexOf('.json')>0){
+            appTab.addTab(PageFileEditor.create({
+                name:file.name,
+                url:file.url
+            },'json'))
+        }
     }
 
 }

@@ -24,7 +24,10 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
+    "@codingame/monaco-vscode-javascript-default-extension": "^6.0.3",
     "@codingame/monaco-vscode-json-default-extension": "~5.2.0",
+    "@codingame/monaco-vscode-rollup-vsix-plugin": "^6.0.3",
+    "@codingame/monaco-vscode-sql-default-extension": "^6.0.3",
     "@codingame/monaco-vscode-textmate-service-override": "~5.2.0",
     "@codingame/monaco-vscode-theme-defaults-default-extension": "~5.2.0",
     "@codingame/monaco-vscode-theme-service-override": "~5.2.0",

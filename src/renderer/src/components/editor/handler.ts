@@ -3,8 +3,14 @@ import { useWorkerFactory } from 'monaco-editor-wrapper/workerFactory';
 import { initServices as initVscodeServices } from 'monaco-languageclient/vscode/services';
 import { WebSocketMessageReader, WebSocketMessageWriter, toSocket } from 'vscode-ws-jsonrpc';
 import { CloseAction, ErrorAction, MessageTransports } from 'vscode-languageclient';
+import getThemeServiceOverride from '@codingame/monaco-vscode-theme-service-override';
+import getTextmateServiceOverride from '@codingame/monaco-vscode-textmate-service-override';
 import { MonacoLanguageClient } from 'monaco-languageclient';
 import { markRaw } from 'vue';
+import '@codingame/monaco-vscode-theme-defaults-default-extension';
+import '@codingame/monaco-vscode-json-default-extension';
+import '@codingame/monaco-vscode-sql-default-extension';
+import '@codingame/monaco-vscode-javascript-default-extension';
 
 export class FileEditorHandler {
     static {
@@ -18,8 +24,8 @@ export class FileEditorHandler {
         await initVscodeServices({
             serviceConfig: {
                 userServices: {
-                    // ...getThemeServiceOverride(),
-                    // ...getTextmateServiceOverride(),
+                    ...getThemeServiceOverride(),
+                    ...getTextmateServiceOverride(),
                 },
                 debugLogging: true,
             }

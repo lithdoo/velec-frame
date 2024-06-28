@@ -8,8 +8,8 @@ import FileEditor from "@renderer/components/editor/FileEditor.vue";
 
 export class PageFileEditor implements TabPage {
 
-    static create(file: { name: string, url: string }) {
-        const page = fixReactive(new PageFileEditor(file))
+    static create(file: { name: string, url: string } ,lang:string = 'typescript') {
+        const page = fixReactive(new PageFileEditor(file,lang))
         page.init()
         return page
     }
@@ -22,10 +22,10 @@ export class PageFileEditor implements TabPage {
 
 
 
-    constructor(file: { name: string, url: string }) {
+    constructor(file: { name: string, url: string } ,lang:string = 'typescript') {
         this.file = file
         this.title = this.file.name
-        this.handler = new FileEditorHandler(this.file.url, 'typescript')
+        this.handler = new FileEditorHandler(this.file.url, lang)
         this.element = <FileEditor handler={this.handler}></FileEditor>
     }
 
