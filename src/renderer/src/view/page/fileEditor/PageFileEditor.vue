@@ -9,14 +9,5 @@ const props = defineProps<{
 </script>
 
 <template>
-    <!-- <div>
-        tabId: {{ props.page.tabId }}
-    </div>
-    <div>
-        title: {{ props.page.title }}
-    </div>
-    <div>
-        url: {{ props.page.file.url }}
-    </div> -->
-    <ElementInject :target="props.page.editorElement"/>
+    <ElementInject :target="props.page.element"/>
 </template>

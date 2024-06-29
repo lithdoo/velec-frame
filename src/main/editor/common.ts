@@ -76,7 +76,6 @@ export class LanguageServerCenter {
                         }
                     }),
                     onMessage: cb => webSocket.on('message', (data) => {
-                        console.log(data.toString());
                         cb(data);
                     }),
                     onError: cb => webSocket.on('error', cb),

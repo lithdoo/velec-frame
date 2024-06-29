@@ -5,12 +5,12 @@ import { WebSocketMessageReader, WebSocketMessageWriter, toSocket } from 'vscode
 import { CloseAction, ErrorAction, MessageTransports } from 'vscode-languageclient';
 import getThemeServiceOverride from '@codingame/monaco-vscode-theme-service-override';
 import getTextmateServiceOverride from '@codingame/monaco-vscode-textmate-service-override';
+import getFileServiceOverrride from '@codingame/monaco-vscode-files-service-override'
 import { MonacoLanguageClient } from 'monaco-languageclient';
-import { markRaw } from 'vue';
+import { markRaw } from 'vue'
 import '@codingame/monaco-vscode-theme-defaults-default-extension';
-import '@codingame/monaco-vscode-json-default-extension';
-import '@codingame/monaco-vscode-sql-default-extension';
-import '@codingame/monaco-vscode-javascript-default-extension';
+import './ts-highlight-0.0.1.vsix'
+
 
 export class FileEditorHandler {
     static {
@@ -24,6 +24,7 @@ export class FileEditorHandler {
         await initVscodeServices({
             serviceConfig: {
                 userServices: {
+                    ...getFileServiceOverrride(),
                     ...getThemeServiceOverride(),
                     ...getTextmateServiceOverride(),
                 },
@@ -31,8 +32,8 @@ export class FileEditorHandler {
             }
         });
 
-        await initWebSocketAndStartClient('ws://localhost:30001/typescript',['typescript']);
-        await initWebSocketAndStartClient('ws://localhost:30001/json',['json']);
+        await initWebSocketAndStartClient('ws://localhost:30001/typescript', ['typescript']);
+        await initWebSocketAndStartClient('ws://localhost:30001/json', ['json']);
         monaco.languages.register({
             id: 'typescript',
             extensions: ['.ts', '.tsx'],

@@ -3,10 +3,11 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import vsix from '@codingame/monaco-vscode-rollup-vsix-plugin'
+import importMetaUrlPlugin from '@codingame/esbuild-import-meta-url-plugin'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin({exclude:['vscode-ws-jsonrpc']})],
+    plugins: [externalizeDepsPlugin({ exclude: ['vscode-ws-jsonrpc'] })],
     resolve: {
       alias: {
         '@common': resolve('src/common')
@@ -19,9 +20,10 @@ export default defineConfig({
             if (id.includes('vscode-ws-jsonrpc')) {
               return 'vscode-ws-jsonrpc'
             }
-            if(id.includes('jsonServer')){
+            if (id.includes('jsonServer')) {
               return 'jsonServer'
             }
+            return undefined
           }
         }
       }
@@ -35,8 +37,13 @@ export default defineConfig({
       alias: {
         '@renderer': resolve('src/renderer/src'),
         '@common': resolve('src/common')
-      }
+      },
     },
-    plugins: [vue(),vueJsx(),vsix()]
+    plugins: [vue(), vueJsx(), vsix()],
+    optimizeDeps: {
+      esbuildOptions: {
+        plugins: [importMetaUrlPlugin]
+      }
+    }
   }
 })

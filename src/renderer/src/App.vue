@@ -2,7 +2,7 @@
 import AppFrame from './view/frame/Index.vue'
 import GlobalContextMenu from './view/fixed/contextmenu/GlobalContextMenu.vue';
 
-const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+// const ipcHandle = () => window.electron.ipcRenderer.send('ping')
 </script>
 
 <template>

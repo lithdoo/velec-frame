@@ -1,8 +1,6 @@
 import { TabPage } from "@renderer/state/tab";
-import { App, VNode, createApp } from "vue";
-import PageFileEditorVue from './PageFileEditor.vue'
+import {  VNode } from "vue";
 import { fixReactive } from "@renderer/fix";
-import * as monaco from 'monaco-editor';
 import { FileEditorHandler } from "@renderer/components/editor/handler";
 import FileEditor from "@renderer/components/editor/FileEditor.vue";
 

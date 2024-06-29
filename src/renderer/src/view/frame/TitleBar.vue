@@ -10,7 +10,7 @@ const menu = testMenu
 const layer = fixReactive(new PopMenuLayerHandler())
 
 
-const mouseenter = (e: MouseEvent, item: any) => {
+const mouseenter = (e: MouseEvent, _item: any) => {
     setTimeout(() => {
         if (layer.stack[0] && e.target) {
             layer.open({
@@ -20,7 +20,7 @@ const mouseenter = (e: MouseEvent, item: any) => {
         }
     })
 }
-const click = (e: MouseEvent, item: any) => {
+const click = (e: MouseEvent, _item: any) => {
     setTimeout(() => {
         if (layer.stack[0]) {
             layer.clear()

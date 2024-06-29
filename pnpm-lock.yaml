@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@codingame/esbuild-import-meta-url-plugin':
+        specifier: ^1.0.2
+        version: 1.0.2
+      '@codingame/monaco-vscode-files-service-override':
+        specifier: ^6.0.3
+        version: 6.0.3
       '@codingame/monaco-vscode-javascript-default-extension':
         specifier: ^6.0.3
         version: 6.0.3
@@ -52,10 +58,10 @@ importers:
         version: '@codingame/monaco-vscode-editor-api@5.2.0'
       monaco-editor-wrapper:
         specifier: ^5.2.0
-        version: 5.2.0(@codingame/monaco-vscode-editor-api@5.2.0)(monaco-languageclient@8.5.0(@codingame/monaco-vscode-editor-api@5.2.0))
+        version: 5.2.0(@codingame/monaco-vscode-api@5.2.0)(@codingame/monaco-vscode-editor-api@5.2.0)(monaco-languageclient@8.5.0(@codingame/monaco-vscode-api@5.2.0)(@codingame/monaco-vscode-editor-api@5.2.0))
       monaco-languageclient:
         specifier: ^8.5.0
-        version: 8.5.0(@codingame/monaco-vscode-editor-api@5.2.0)
+        version: 8.5.0(@codingame/monaco-vscode-api@5.2.0)(@codingame/monaco-vscode-editor-api@5.2.0)
       request-light:
         specifier: ^0.7.0
         version: 0.7.0
@@ -68,6 +74,9 @@ importers:
       vitepress:
         specifier: ^1.2.2
         version: 1.2.2(@algolia/client-search@4.23.3)(@types/node@18.19.33)(postcss@8.4.38)(sass@1.77.2)(search-insights@2.14.0)(typescript@5.4.5)
+      vscode:
+        specifier: npm:@codingame/monaco-vscode-api@^5.2.0
+        version: '@codingame/monaco-vscode-api@5.2.0'
       vscode-json-languageservice:
         specifier: ^5.4.0
         version: 5.4.0
@@ -456,6 +465,9 @@ packages:
   '@babel/types@7.24.7':
     resolution: {integrity: sha512-XEFXSlxiG5td2EJRe8vOmRbaXVgfcBlszKujvVmWIK/UpywWljQCfzAv3RQCGujWQ1RD4YYWEAqDXfuJiy8f5Q==}
     engines: {node: '>=6.9.0'}
+
+  '@codingame/esbuild-import-meta-url-plugin@1.0.2':
+    resolution: {integrity: sha512-b1PjH6DVdTQd0WLO2R+b9oMlO7REyiAVbcx8weN1ZYiBSROuAy9MJ/j2NI4sxmFv9GK0wM9HRrBg6J2CBZ1xzQ==}
 
   '@codingame/monaco-vscode-api@5.2.0':
     resolution: {integrity: sha512-BUQRd+CDqfCy6ybXIZVFEqmo7S2we8kBhgPZlSUpDKW1uH6SYoWVtdd1EisgjtSHMbk2F0UgHhttjWrGhgflPQ==}
@@ -2439,6 +2451,9 @@ packages:
     version: 3.3.0
     engines: {node: '>=6'}
 
+  import-meta-resolve@4.1.0:
+    resolution: {integrity: sha512-I6fiaX09Xivtk+THaMfAwnA3MVA5Big1WHF1Dfx9hFuvNIWpXnorlkzhcQf6ehrqQiiZECRt1poOAkPmer3ruw==}
+
   imurmurhash@https://r2.cnpmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==, tarball: https://r2.cnpmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz}
     version: 0.1.4
@@ -4081,6 +4096,11 @@ snapshots:
       '@babel/helper-string-parser': 7.24.7
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
+
+  '@codingame/esbuild-import-meta-url-plugin@1.0.2':
+    dependencies:
+      esbuild: 0.20.2
+      import-meta-resolve: 4.1.0
 
   '@codingame/monaco-vscode-api@5.2.0':
     dependencies:
@@ -6225,6 +6245,8 @@ snapshots:
       parent-module: https://r2.cnpmjs.org/parent-module/-/parent-module-1.0.1.tgz
       resolve-from: https://r2.cnpmjs.org/resolve-from/-/resolve-from-4.0.0.tgz
 
+  import-meta-resolve@4.1.0: {}
+
   imurmurhash@https://r2.cnpmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz: {}
 
   inflight@https://r2.cnpmjs.org/inflight/-/inflight-1.0.6.tgz:
@@ -6456,7 +6478,7 @@ snapshots:
 
   mkdirp@https://r2.cnpmjs.org/mkdirp/-/mkdirp-1.0.4.tgz: {}
 
-  monaco-editor-wrapper@5.2.0(@codingame/monaco-vscode-editor-api@5.2.0)(monaco-languageclient@8.5.0(@codingame/monaco-vscode-editor-api@5.2.0)):
+  monaco-editor-wrapper@5.2.0(@codingame/monaco-vscode-api@5.2.0)(@codingame/monaco-vscode-editor-api@5.2.0)(monaco-languageclient@8.5.0(@codingame/monaco-vscode-api@5.2.0)(@codingame/monaco-vscode-editor-api@5.2.0)):
     dependencies:
       '@codingame/monaco-vscode-configuration-service-override': 5.2.0
       '@codingame/monaco-vscode-editor-service-override': 5.2.0
@@ -6479,18 +6501,20 @@ snapshots:
       '@codingame/monaco-vscode-theme-defaults-default-extension': 5.2.0
       '@codingame/monaco-vscode-theme-service-override': 5.2.0
       monaco-editor: '@codingame/monaco-vscode-editor-api@5.2.0'
-      monaco-languageclient: 8.5.0(@codingame/monaco-vscode-editor-api@5.2.0)
+      monaco-languageclient: 8.5.0(@codingame/monaco-vscode-api@5.2.0)(@codingame/monaco-vscode-editor-api@5.2.0)
+      vscode: '@codingame/monaco-vscode-api@5.2.0'
       vscode-languageclient: 9.0.1
       vscode-languageserver-protocol: 3.17.5
       vscode-ws-jsonrpc: 3.3.2
 
-  monaco-languageclient@8.5.0(@codingame/monaco-vscode-editor-api@5.2.0):
+  monaco-languageclient@8.5.0(@codingame/monaco-vscode-api@5.2.0)(@codingame/monaco-vscode-editor-api@5.2.0):
     dependencies:
       '@codingame/monaco-vscode-extensions-service-override': 5.2.0
       '@codingame/monaco-vscode-languages-service-override': 5.2.0
       '@codingame/monaco-vscode-localization-service-override': 5.2.0
       '@codingame/monaco-vscode-model-service-override': 5.2.0
       monaco-editor: '@codingame/monaco-vscode-editor-api@5.2.0'
+      vscode: '@codingame/monaco-vscode-api@5.2.0'
       vscode-languageclient: 9.0.1
 
   ms@2.0.0: {}

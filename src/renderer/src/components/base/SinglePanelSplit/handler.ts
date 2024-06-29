@@ -90,7 +90,7 @@ export class SinglePanelSplitHandler {
             update({ x: screenX, y: screenY })
         }
 
-        const stopDragging = (e: MouseEvent) => {
+        const stopDragging = (_e: MouseEvent) => {
             globalThis.removeEventListener('mousemove', moveDragging)
             globalThis.removeEventListener('mouseup', moveDragging)
         }

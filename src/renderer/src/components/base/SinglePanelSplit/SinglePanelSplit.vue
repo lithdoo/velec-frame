@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { SinglePanelSplitHandler } from './SinglePanelSplitHandler'
-import { defineProps, computed, onMounted, onUnmounted,ref, CSSProperties} from 'vue';
+import { SinglePanelSplitHandler } from './handler'
+import { defineProps, computed, onMounted, onUnmounted, ref } from 'vue';
 
 const props = defineProps<{ handler: SinglePanelSplitHandler }>();
 const handler = computed(() => props.handler)
-const controller = ref<HTMLDivElement|null>(null)
+const controller = ref<HTMLDivElement | null>(null)
 const flexDirection = computed(() => {
     if (handler.value.position === 'left') {
         return 'row'
@@ -47,13 +47,13 @@ const extraStyle = computed(() => {
     }
 })
 
-onMounted(()=>{
-    if(controller.value){
+onMounted(() => {
+    if (controller.value) {
         handler.value.bindController(controller.value)
     }
 })
 
-onUnmounted(()=>{
+onUnmounted(() => {
     handler.value.destroyController?.()
 })
 
@@ -62,7 +62,7 @@ onUnmounted(()=>{
 
 
 <template>
-    <div :style="{flexDirection}" :class="{
+    <div :style="{ flexDirection }" :class="{
         'panel-split': true,
         'panel-split--layout-max': handler.isMax,
     }">
