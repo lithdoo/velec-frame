@@ -34,4 +34,8 @@ export class PageFileEditor implements TabPage {
         this.handler.setContent(content)
     }
 
+    onDestroy(): void {
+        this.handler.destory()
+    }
+
 }

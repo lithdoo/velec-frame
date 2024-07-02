@@ -1,5 +1,5 @@
 <script lang="ts" setup generic="T extends FlatTreeItem">
-import { computed, defineProps } from 'vue';
+import { computed } from 'vue';
 import { FlatTreeHandler, type FlatTreeItem } from './handler'
 import { VxIcon } from '../VxIcon';
 

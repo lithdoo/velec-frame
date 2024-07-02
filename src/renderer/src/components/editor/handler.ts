@@ -67,6 +67,11 @@ export class FileEditorHandler {
         this.content = content
         this.editor?.setValue(this.content)
     }
+
+    destory(){
+        this.editor?.getModel()?.dispose()
+        this.editor?.dispose()
+    }
 }
 
 

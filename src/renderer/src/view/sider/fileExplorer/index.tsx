@@ -6,6 +6,7 @@ import { fixReactive } from "@renderer/fix"
 import { FileType } from "@common/file"
 import { appTab } from "@renderer/state/tab"
 import { PageFileEditor } from "@renderer/view/page/fileEditor"
+import { PageGraphEditor } from "@renderer/view/page/graphEditor"
 
 
 export class SiderFileExplorer implements AppSiderPanel {
@@ -55,6 +56,9 @@ export class SiderFileExplorer implements AppSiderPanel {
                 name:file.name,
                 url:file.url
             },'json'))
+        }
+        if(file.name.indexOf('.md')>0){
+            appTab.addTab(PageGraphEditor.create())
         }
     }
 

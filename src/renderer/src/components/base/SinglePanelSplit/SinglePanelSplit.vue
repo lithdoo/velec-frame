@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { SinglePanelSplitHandler } from './handler'
-import { defineProps, computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 const props = defineProps<{ handler: SinglePanelSplitHandler }>();
 const handler = computed(() => props.handler)

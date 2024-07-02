@@ -37,11 +37,12 @@ const activeTab = (tabId: string) => {
                     : ''
             ]">
                 <VxIcon :name="page.icon"></VxIcon>
-                <div class="frame-task-tab__tab-item-title">{{ page.title }}</div>
+                <div class="frame-task-tab__tab-item-title">{{ page.title || `[无标题]` }}</div>
+                <VxIcon :name="'clear'" @click.native="appTab.removeTab(page.tabId)"></VxIcon>
             </div>
         </div>
-        <div class="frame-task-tab__page-container">
-            <ElementInject v-if="currentPage" :target="currentPage.element" :style="{ 'height': '100%' }" />
+        <div class="frame-task-tab__page-container" v-for="page in appTab.list"  v-show="page === currentPage">
+            <ElementInject :target="page.element" :style="{ 'height': '100%' }" />
         </div>
     </div>
 </template>

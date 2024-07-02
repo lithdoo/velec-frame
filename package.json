@@ -24,6 +24,7 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
+    "@antv/x6": "^2.18.1",
     "@codingame/esbuild-import-meta-url-plugin": "^1.0.2",
     "@codingame/monaco-vscode-files-service-override": "^6.0.3",
     "@codingame/monaco-vscode-javascript-default-extension": "^6.0.3",
@@ -36,9 +37,11 @@
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
     "@popperjs/core": "^2.11.8",
+    "@types/insert-css": "^2.0.3",
     "@vitejs/plugin-vue-jsx": "^4.0.0",
     "electron-updater": "^6.1.7",
     "express": "^4.19.2",
+    "insert-css": "^2.0.0",
     "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@~5.2.0",
     "monaco-editor-wrapper": "^5.2.0",
     "monaco-languageclient": "^8.5.0",
