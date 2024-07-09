@@ -204,7 +204,6 @@ export class GhJsonStructNode extends GhNode<GhJsonModel> {
             ])
         }
 
-
         Shape.HTML.register({
             shape: GhJsonStructNode.type,
             html(cell) {
