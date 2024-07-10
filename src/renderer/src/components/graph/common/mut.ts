@@ -39,8 +39,8 @@ export class MBaseWacher<T> extends MBaseValue<T> {
     this.setValue(this.fn())
   }
 
-  dispose(){
-    this.cancel.forEach(v=>v())
+  dispose() {
+    this.cancel.forEach(v => v())
   }
 
 }
@@ -65,9 +65,11 @@ export class MBaseHandler implements MutValueHandler {
 }
 
 
-interface MBaseRendertNode {
-  node: Node
+interface MBaseRenderNode {
+  dispose(): void
+}
 
+interface MBaseRenderFragment {
   dispose(): void
 }
 
@@ -83,19 +85,96 @@ type MBaseRenderInput = {
 type MBaseDomRender = MutDomRender<MBaseRenderInput>
 
 
-export abstract class MBaseHTMLElementRenderNode<T extends HTMLElement, S extends {}> implements MBaseRendertNode {
-  abstract render: MBaseDomRender
-  abstract watchers: MBaseWacher<unknown>[]
-  abstract childnren: MBaseRendertNode[]
-  abstract node: T
-  
+export class MBaseElementRenderNode<T extends HTMLElement> implements MBaseRenderNode {
+  render: MBaseDomRender
+  watchers: MBaseWacher<unknown>[]
+  node: T
+
+  constructor(render: MBaseDomRender, option: {
+    node: T,
+    className: MBaseWacher<string | string[]> | string | string[],
+    style: MBaseWacher<Partial<CSSStyleDeclaration>> | Partial<CSSStyleDeclaration>,
+    attrStyle: MBaseWacher<{ [key: string]: string | CSSStyleValue }> | { [key: string]: string | CSSStyleValue },
+  }) {
+    const {
+      className, style, attrStyle, node
+    } = option
+
+    this.render = render
+    this.node = this.render.htmlElement(node, {
+      className, style, attrStyle
+    })
+
+    this.watchers = [ className, style, attrStyle].filter(v=>v instanceof MBaseWacher)
+  }
+
   dispose() {
-    this.childnren.forEach(v => v.dispose())
-    this.watchers.forEach(v=>v.dispose())
+    this.watchers.forEach(v => v.dispose())
     this.render.disposeNode(this.node)
   }
 }
 
+
+export class MBaseParentRenderNode<T extends HTMLElement>  implements MBaseRenderNode {
+  render: MBaseDomRender
+  target: MBaseElementRenderNode<T>
+  constructor(render: MBaseDomRender, option: {
+    target: MBaseElementRenderNode<T>,
+  }) {
+    const {
+      target
+    } = option
+
+    this.target = target
+    this.render = render
+  }
+
+  dispose() {
+    // this.watchers.forEach(v => v.dispose())
+    // this.render.disposeNode(this.node)
+  }
+
+}
+
+
+export abstract class MBaseTextRenderNode implements MBaseRenderNode {
+  render: MBaseDomRender
+  watchers: MBaseWacher<unknown>[]
+  node: Text
+
+  constructor(render: MBaseDomRender, option: { content: MBaseWacher<string> }) {
+    this.render = render
+    this.watchers = [option.content]
+    this.node = this.render.textNode(option.content)
+  }
+
+  dispose() {
+    this.watchers.forEach(v => v.dispose())
+    this.render.disposeNode(this.node)
+  }
+}
+
+export abstract class MBaseCondRenderNode implements MBaseRenderNode {
+  abstract render: MBaseDomRender
+  abstract watchers: MBaseWacher<unknown>[]
+  abstract node: Text
+
+  dispose() {
+    this.watchers.forEach(v => v.dispose())
+    this.render.disposeNode(this.node)
+  }
+}
+
+export abstract class MBaseLoopRenderNode implements MBaseRenderNode {
+  abstract render: MBaseDomRender
+  abstract watchers: MBaseWacher<unknown>[]
+  abstract nodes: [string, MBaseRenderNode][]
+
+  dispose() {
+    this.watchers.forEach(v => v.dispose())
+    // this.render.disposeNode(this.node)
+  }
+}
 
 
 
