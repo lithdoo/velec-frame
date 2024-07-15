@@ -108,7 +108,7 @@ export class MutDomRender<Input extends {
         done?.(node)
         return node
     }
-    render(ele: HTMLElement, children: Input['children'] | (Node[]) = []) {
+    setChildren(ele: HTMLElement, children: Input['children'] | (Node[]) = []) {
         if (this.handler.isMutValue(children)) {
             const rawContent = this.handler.getRawValue<(Node)[]>(children)
             this.addNodeDisposeListeners(ele, this.handler.onValueChange(rawContent, () => {
