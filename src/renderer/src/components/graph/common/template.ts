@@ -17,6 +17,7 @@ export enum MBaseTempalteNodeType {
     Text = 'Text',
     Cond = 'Cond',
     Loop = 'Loop',
+    Prop = 'Prop'
 }
 
 export interface MBaseTempalteNode<Scope extends Record<string, unknown>> {
@@ -70,7 +71,8 @@ export interface MBaseLoopTemplateNode<T, Scope extends Record<string, unknown>>
     list: (scope: MBaseRenderScope<Scope>) => MayBeMBase<T[]>
 }
 
-export interface MBaseScopeTemplateNode<Scope extends Record<string, unknown>, Next extends Record<string, unknown>> extends MBaseTempalteParentNode<Scope, Next> {
+export interface MBasePropTemplateNode<Scope extends Record<string, unknown>, Next extends Record<string, unknown>> extends MBaseTempalteParentNode<Scope, Next> {
+    _type: MBaseTempalteNodeType.Prop
     trans: (scope: MBaseTScope<Scope>) => Next
 }
 
