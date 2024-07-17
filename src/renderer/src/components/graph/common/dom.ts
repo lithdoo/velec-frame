@@ -71,8 +71,8 @@ export class MutDomRender<Input extends {
 
         const { className: cls, style, attrStyle, done } = option
         if (this.handler.isMutValue(cls)) {
-            const rawContent = this.handler.getRawValue<string | string[]>(cls)
-            this.addNodeDisposeListeners(node, this.handler.onValueChange(rawContent, () => {
+            this.addNodeDisposeListeners(node, this.handler.onValueChange(cls, () => {
+                const rawContent = this.handler.getRawValue<string | string[]>(cls)
                 node.className = (typeof rawContent === 'string' ? [rawContent] : rawContent).filter(v => !!v).join(' ')
             }, true))
         } else {
@@ -80,8 +80,8 @@ export class MutDomRender<Input extends {
         }
 
         if (this.handler.isMutValue(style)) {
-            const rawContent = this.handler.getRawValue<Partial<CSSStyleDeclaration>>(style)
             this.addNodeDisposeListeners(node, this.handler.onValueChange(style, () => {
+                const rawContent = this.handler.getRawValue<Partial<CSSStyleDeclaration>>(style)
                 Object.entries(rawContent).forEach(([key, value]) => {
                     node.style[key] = value
                 })
@@ -93,8 +93,8 @@ export class MutDomRender<Input extends {
         }
 
         if (this.handler.isMutValue(attrStyle)) {
-            const rawContent = this.handler.getRawValue<any>(attrStyle)
             this.addNodeDisposeListeners(node, this.handler.onValueChange(attrStyle, () => {
+                const rawContent = this.handler.getRawValue<any>(attrStyle)
                 Object.entries(rawContent).forEach(([key, value]) => {
                     node.attributeStyleMap?.set(key, value as any)
                 })
@@ -110,8 +110,8 @@ export class MutDomRender<Input extends {
     }
     setChildren(ele: HTMLElement, children: Input['children'] | (Node[]) = []) {
         if (this.handler.isMutValue(children)) {
-            const rawContent = this.handler.getRawValue<(Node)[]>(children)
-            this.addNodeDisposeListeners(ele, this.handler.onValueChange(rawContent, () => {
+            this.addNodeDisposeListeners(ele, this.handler.onValueChange(children, () => {
+                const rawContent = this.handler.getRawValue<(Node)[]>(children)
                 ele.innerHTML = ''
                 rawContent.forEach(child => ele.appendChild(child))
             }, true))

@@ -1,6 +1,8 @@
-import { MutDomHTMLElementOption, MutDomRender, MutValueHandler } from "./dom"
+import {  MutDomRender, MutValueHandler } from "./dom"
 
 export class MBaseValue<T> {
+
+
   private val: T
   onchangeCall: Map<Symbol, (t: T) => void> = new Map()
   constructor(def: T) {
@@ -28,6 +30,14 @@ export class MBaseValue<T> {
 }
 
 export class MBaseWacher<T> extends MBaseValue<T> {
+  static fromVal<T>(val: MayBeMBase<T>): MBaseWacher<T> {
+    if (val instanceof MBaseValue) {
+      return new MBaseWacher(() => val.getValue(), [val])
+    } else {
+      return new MBaseWacher(() => val, []) as unknown as MBaseWacher<T>
+    }
+  }
+
   fn: () => T
   cancel: (() => void)[]
   constructor(fn: () => T, list: MBaseValue<any>[]) {
@@ -101,6 +111,7 @@ type MBaseRenderInput = {
 
 type MBaseDomRender = MutDomRender<MBaseRenderInput>
 
+export const mbaseDomRedner = new MutDomRender(new MBaseHandler())
 
 export class MBaseElementRenderNode<T extends HTMLElement> extends MBaseRenderNode {
   render: MBaseDomRender
@@ -136,11 +147,12 @@ export class MBaseElementRenderNode<T extends HTMLElement> extends MBaseRenderNo
 export class MBaseParentRenderNode<T extends HTMLElement> extends MBaseRenderNode {
   render: MBaseDomRender
   target: MBaseElementRenderNode<T>
-  children: MBaseWacher<Node[]>
+  // children: MBaseWacher<Node[]>
+  children: MBaseGroupFragment
 
   constructor(render: MBaseDomRender, option: {
     target: MBaseElementRenderNode<T>,
-    children: MBaseWacher<Node[]>
+    children: MBaseGroupFragment
   }) {
     super()
     const {
@@ -151,7 +163,7 @@ export class MBaseParentRenderNode<T extends HTMLElement> extends MBaseRenderNod
     this.render = render
     this.children = children
 
-    this.render.setChildren(this.target.node, this.children)
+    this.render.setChildren(this.target.node, this.children.nodes)
   }
 
   get node() {

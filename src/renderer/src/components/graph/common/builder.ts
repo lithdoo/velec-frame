@@ -1,5 +1,5 @@
 import { MayBeMBase, MBaseValue } from "./mut"
-import { MBaseTempalteNode, Ext, MBaseTempalteParentNode, MBaseRenderScope, MBaseElementTemplateNode, MBaseTextTemplateNode, MBaseCondTemplateNode, MBaseLoopTemplateNode, MBaseTScope, MBasePropTemplateNode, MBaseTempalteNodeType } from "./template"
+import { MBaseTempalteNode, Ext, MBaseTempalteParentNode,MBaseElementTemplateNode, MBaseTextTemplateNode, MBaseCondTemplateNode, MBaseLoopTemplateNode, MBaseTScope, MBasePropTemplateNode, MBaseTempalteNodeType } from "./template"
 
 
 interface TemplateNodeBuilder<S extends Record<string, unknown>, T extends MBaseTempalteNode<S> = MBaseTempalteNode<S>> {
@@ -24,12 +24,12 @@ export interface TemplateParentNodeBuilder<
 }
 
 export interface MTemplate<Scope extends Record<string, unknown>> {
-    div: (className: MayBeStatic<[MBaseRenderScope<Scope>], MayBeMBase<string | string[]>>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLDivElement, Scope>>,
-    span: (className: MayBeStatic<[MBaseRenderScope<Scope>], MayBeMBase<string | string[]>>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLSpanElement, Scope>>,
-    text: (content: MayBeStatic<[MBaseRenderScope<Scope>], MayBeMBase<string>>) => TemplateNodeBuilder<Scope, MBaseTextTemplateNode<Scope>>,
+    div: (className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLDivElement, Scope>>,
+    span: (className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLSpanElement, Scope>>,
+    text: (content: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string>>) => TemplateNodeBuilder<Scope, MBaseTextTemplateNode<Scope>>,
 
-    cond: (cond: (scope: MBaseRenderScope<Scope>) => MayBeMBase<boolean>) => TemplateParentNodeBuilder<Scope, Scope, MBaseCondTemplateNode<Scope>>,
-    loop: <T>(list: (scope: MBaseRenderScope<Scope>) => MayBeMBase<T[]>) => TemplateParentNodeBuilder<Scope, LoopScope<Scope, T>, MBaseLoopTemplateNode<T, Scope>>,
+    cond: (cond: (scope: MBaseTScope<Scope>) => MayBeMBase<boolean>) => TemplateParentNodeBuilder<Scope, Scope, MBaseCondTemplateNode<Scope>>,
+    loop: <T>(list: (scope: MBaseTScope<Scope>) => MayBeMBase<T[]>) => TemplateParentNodeBuilder<Scope, LoopScope<Scope, T>, MBaseLoopTemplateNode<T, Scope>>,
     prop: <Next extends Record<string, unknown>> (trans: (scope: MBaseTScope<Scope>) => Next) => TemplateParentNodeBuilder<Scope, Next, MBasePropTemplateNode<Scope, Next>>
 }
 
@@ -53,7 +53,7 @@ export class MBaseTemplate<Scope extends Record<string, unknown>> implements MTe
         ElementNode extends HTMLElement,
     >(
         createElement: () => ElementNode,
-        className: MayBeStatic<[MBaseRenderScope<Scope>], MayBeMBase<string | string[]>>,
+        className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>,
     ) {
 
         const template: MBaseElementTemplateNode<ElementNode, Scope> = {
@@ -90,18 +90,18 @@ export class MBaseTemplate<Scope extends Record<string, unknown>> implements MTe
     }
 
     span(
-        className: MayBeStatic<[MBaseRenderScope<Scope>], MayBeMBase<string | string[]>>
+        className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>
     ) {
         return this.element<HTMLSpanElement>(() => document.createElement('span'), className)
     }
 
     div(
-        className: MayBeStatic<[MBaseRenderScope<Scope>], MayBeMBase<string | string[]>>
+        className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>
     ) {
         return this.element<HTMLDivElement>(() => document.createElement('div'), className)
     }
 
-    cond(cond: (scope: MBaseRenderScope<Scope>) => MayBeMBase<boolean>) {
+    cond(cond: (scope: MBaseTScope<Scope>) => MayBeMBase<boolean>) {
         const template: MBaseCondTemplateNode<Scope> = {
             _type: MBaseTempalteNodeType.Cond,
             cond,
@@ -111,7 +111,7 @@ export class MBaseTemplate<Scope extends Record<string, unknown>> implements MTe
         return this.createParentBuilder<Scope, MBaseCondTemplateNode<Scope>>(template)
     }
 
-    text(content: MayBeStatic<[MBaseRenderScope<Scope>], MayBeMBase<string>>) {
+    text(content: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string>>) {
 
         const template: MBaseTextTemplateNode<Scope> = {
             _type: MBaseTempalteNodeType.Text,
@@ -125,7 +125,7 @@ export class MBaseTemplate<Scope extends Record<string, unknown>> implements MTe
 
         return builder
     }
-    loop<T>(list: (scope: MBaseRenderScope<Scope>) => MayBeMBase<T[]>) {
+    loop<T>(list: (scope: MBaseTScope<Scope>) => MayBeMBase<T[]>) {
         const template: MBaseLoopTemplateNode<T, Scope> = {
             _type: MBaseTempalteNodeType.Loop,
             list,

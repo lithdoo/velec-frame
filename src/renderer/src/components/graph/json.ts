@@ -1,7 +1,7 @@
 import { Graph, Shape } from "@antv/x6"
 import { GhNode, render, div, text } from "./old"
 import { insertCss } from "insert-css"
-import  {MBaseElementTemplateNode, MBaseTemplate, MTemplate} from './common/index'
+import  {MBaseElementTemplateNode, MBaseTemplate, MTemplate , RenderScope, render as renderTemplate} from './common/index'
 
 
 export enum JsonFieldTypeKey {
@@ -110,13 +110,13 @@ class NodeComponent{
         }
         
         
-        const renderUsage = (t: MTemplate<{ useage: JsonUsage }>) => {
+        const renderUsage = (t: MTemplate<{ usage: JsonUsage }>) => {
             return t.div('gh-json-model__usage-item')(
                 t.div('gh-json-model__usage-title')(t.div('')
-                    (t.text(s => s.get('useage').name))
+                    (t.text(s => s.get('usage').name))
                 ),
                 t.div('gh-json-model__usage-methods')(
-                    t.loop(s => s.get('useage').methods)(t =>
+                    t.loop(s => s.get('usage').methods)(t =>
                         t.div('gh-json-model__usage-method-item')(
                             t.div('gh-json-model__usage-method-name')(t.text(s => s.get('_item').name)),
                             t.div('gh-json-model__usage-method-output')(t.prop(s => ({ type: s.get('_item').output }))(t => renderType(t))
@@ -138,9 +138,9 @@ class NodeComponent{
                         )
                     ),
                     t.div('gh-json-model__usages')(
-                        t.div('gh-json-model__sub-title')(t.text('结构字段')),
+                        t.div('gh-json-model__sub-title')(t.text('用途')),
                         t.loop(s => s.get('model').usages)(
-                            t => t.prop(s => ({ useage: s.get('_item') }))(t => renderUsage(t))
+                            t => t.prop(s => ({ usage: s.get('_item') }))(t => renderUsage(t))
                         )
                     )
                 )
@@ -278,23 +278,33 @@ export class GhJsonStructNode extends GhNode<GhJsonModel> {
             ])
         }
 
+
         Shape.HTML.register({
             shape: GhJsonStructNode.type,
             html(cell) {
                 const data = cell.getData() as GhJsonModel
-                const ele = GhJsonStructNode.elements.get(data) ?? render(div('gh-json-model'), [
-                    render(div('gh-json-model__header'), [text(data.name)]),
-                    render(div('gh-json-model__body'), [
-                        render(div('gh-json-model__struct'), [
-                            render(div('gh-json-model__sub-title'), [text('结构字段')]),
-                            renderStruct(data.struct),
-                        ]),
-                        render(div('gh-json-model__usages'), [
-                            render(div('gh-json-model__sub-title'), [text('用途')]),
-                            ...data.usages.map(usage => renderUsage(usage))
-                        ])
-                    ])
-                ])
+                const scope = RenderScope.create({model:data})
+                const renderNode = renderTemplate<{
+                    model: GhJsonModel;
+                }>(NodeComponent.template,scope)
+
+                const ele = renderNode.nodes.getValue()[0] as HTMLElement
+
+                console.log(renderNode,ele)
+                
+                // const ele = GhJsonStructNode.elements.get(data) ?? render(div('gh-json-model'), [
+                //     render(div('gh-json-model__header'), [text(data.name)]),
+                //     render(div('gh-json-model__body'), [
+                //         render(div('gh-json-model__struct'), [
+                //             render(div('gh-json-model__sub-title'), [text('结构字段')]),
+                //             renderStruct(data.struct),
+                //         ]),
+                //         render(div('gh-json-model__usages'), [
+                //             render(div('gh-json-model__sub-title'), [text('用途')]),
+                //             ...data.usages.map(usage => renderUsage(usage))
+                //         ])
+                //     ])
+                // ])
                 GhJsonStructNode.elements.set(data, ele)
                 ele.ondblclick = () => {
                     console.log('dblclick')
