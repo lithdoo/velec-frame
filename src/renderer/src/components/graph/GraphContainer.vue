@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { GraphView } from './handler'
+import type { GraphView } from './view'
 
 const props = defineProps<{ view: GraphView }>()
 

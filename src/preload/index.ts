@@ -2,10 +2,11 @@ import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { explorerApi } from './explorer'
 import { editorApi } from './editor'
+import { sqliteApi } from './sqlite'
 
 // Custom APIs for renderer
 const api = {
-  
+
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -17,6 +18,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('api', api)
     contextBridge.exposeInMainWorld('explorerApi', explorerApi)
     contextBridge.exposeInMainWorld('editorApi', editorApi)
+    contextBridge.exposeInMainWorld('sqliteApi', sqliteApi)
   } catch (error) {
     console.error(error)
   }

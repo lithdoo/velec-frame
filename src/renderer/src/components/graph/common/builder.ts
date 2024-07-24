@@ -1,5 +1,5 @@
 import { MayBeMBase, MBaseValue } from "./mut"
-import { MBaseTempalteNode, Ext, MBaseTempalteParentNode,MBaseElementTemplateNode, MBaseTextTemplateNode, MBaseCondTemplateNode, MBaseLoopTemplateNode, MBaseTScope, MBasePropTemplateNode, MBaseTempalteNodeType } from "./template"
+import { MBaseTempalteNode, Ext, MBaseTempalteParentNode, MBaseElementTemplateNode, MBaseTextTemplateNode, MBaseCondTemplateNode, MBaseLoopTemplateNode, MBaseTScope, MBasePropTemplateNode, MBaseTempalteNodeType } from "./template"
 
 
 interface TemplateNodeBuilder<S extends Record<string, unknown>, T extends MBaseTempalteNode<S> = MBaseTempalteNode<S>> {
@@ -7,9 +7,9 @@ interface TemplateNodeBuilder<S extends Record<string, unknown>, T extends MBase
     build(): T
 }
 
-function isBuilder <S extends Record<string, unknown>, T extends MBaseTempalteNode<S> = MBaseTempalteNode<S>>(node: any): node is TemplateNodeBuilder<S, T> {
+function isBuilder<S extends Record<string, unknown>, T extends MBaseTempalteNode<S> = MBaseTempalteNode<S>>(node: any): node is TemplateNodeBuilder<S, T> {
     return !!node['__TemplateNodeBuilder__']
- }
+}
 
 
 type LoopScope<S extends Record<string, unknown>, T> = Ext<S, { _index: number, _item: T }>
@@ -23,14 +23,17 @@ export interface TemplateParentNodeBuilder<
     (...children: TemplateBuilderChildren<C>[]): TemplateParentNodeBuilder<S, C, T>
 }
 
-export interface MTemplate<Scope extends Record<string, unknown>> {
-    div: (className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLDivElement, Scope>>,
-    span: (className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLSpanElement, Scope>>,
-    text: (content: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string>>) => TemplateNodeBuilder<Scope, MBaseTextTemplateNode<Scope>>,
+type TemplateElementOption<Scope extends Record<string, unknown>, T extends HTMLElement> = {
+    created?: (scope: MBaseTScope<Scope>, element: T) => void
+}
 
+export interface MTemplate<Scope extends Record<string, unknown>> {
+    div: (className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>, option?: TemplateElementOption<Scope, HTMLDivElement>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLDivElement, Scope>>,
+    span: (className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>, option?: TemplateElementOption<Scope, HTMLSpanElement>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLSpanElement, Scope>>,
+    text: (content: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string>>) => TemplateNodeBuilder<Scope, MBaseTextTemplateNode<Scope>>,
     cond: (cond: (scope: MBaseTScope<Scope>) => MayBeMBase<boolean>) => TemplateParentNodeBuilder<Scope, Scope, MBaseCondTemplateNode<Scope>>,
     loop: <T>(list: (scope: MBaseTScope<Scope>) => MayBeMBase<T[]>) => TemplateParentNodeBuilder<Scope, LoopScope<Scope, T>, MBaseLoopTemplateNode<T, Scope>>,
-    prop: <Next extends Record<string, unknown>> (trans: (scope: MBaseTScope<Scope>) => Next) => TemplateParentNodeBuilder<Scope, Next, MBasePropTemplateNode<Scope, Next>>
+    prop: <Next extends Record<string, unknown>>(trans: (scope: MBaseTScope<Scope>) => Next) => TemplateParentNodeBuilder<Scope, Next, MBasePropTemplateNode<Scope, Next>>
 }
 
 type MayBeStatic<Argu extends any[], Res> = Res extends Function
@@ -54,11 +57,17 @@ export class MBaseTemplate<Scope extends Record<string, unknown>> implements MTe
     >(
         createElement: () => ElementNode,
         className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>,
+        option: TemplateElementOption<Scope, ElementNode> = {}
     ) {
+        const { created } = option
 
         const template: MBaseElementTemplateNode<ElementNode, Scope> = {
             _type: MBaseTempalteNodeType.Element,
-            createElement,
+            createElement: !created ? createElement : (scope: MBaseTScope<Scope>) => {
+                const element = createElement()
+                created(scope, element)
+                return element
+            },
             className: MBaseTemplate.toGenerate(className),
             style: () => new MBaseValue({}),
             attrStyle: () => new MBaseValue({}),
@@ -75,9 +84,9 @@ export class MBaseTemplate<Scope extends Record<string, unknown>> implements MTe
 
         const append: TemplateParentNodeBuilder<Scope, Next, TemplateNode> = Object.assign((...children: TemplateBuilderChildren<Next>[]) => {
             const list = children.map(v => {
-                if(isBuilder(v)){
+                if (isBuilder(v)) {
                     return v.build()
-                }else{
+                } else {
                     return v(new MBaseTemplate()).build()
                 }
             })
@@ -90,15 +99,17 @@ export class MBaseTemplate<Scope extends Record<string, unknown>> implements MTe
     }
 
     span(
-        className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>
+        className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>,
+        option: TemplateElementOption<Scope, HTMLSpanElement> = {}
     ) {
-        return this.element<HTMLSpanElement>(() => document.createElement('span'), className)
+        return this.element<HTMLSpanElement>(() => document.createElement('span'), className, option)
     }
 
     div(
-        className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>
+        className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>,
+        option: TemplateElementOption<Scope, HTMLDivElement> = {}
     ) {
-        return this.element<HTMLDivElement>(() => document.createElement('div'), className)
+        return this.element<HTMLDivElement>(() => document.createElement('div'), className, option)
     }
 
     cond(cond: (scope: MBaseTScope<Scope>) => MayBeMBase<boolean>) {

@@ -1,162 +1,8 @@
 import { Graph, Shape } from "@antv/x6"
-import { GhNode, render, div, text } from "./old"
+import { GhNode} from "./old"
 import { insertCss } from "insert-css"
-import  {MBaseElementTemplateNode, MBaseTemplate, MTemplate , RenderScope, render as renderTemplate} from './common/index'
-
-
-export enum JsonFieldTypeKey {
-    String = 'String',
-    Integer = 'Integer',
-    Number = 'Number',
-    Boolean = 'Boolean',
-    Null = 'Null',
-    Array = 'Array',
-    Object = 'Object',
-    Anyone = 'Anyone',
-}
-
-export interface JsonStruct {
-    fields: { name: string, type: JsonType }[]
-}
-
-export interface JsonField {
-    name: string
-    type: JsonType
-}
-
-export interface JsonType {
-    key: JsonFieldTypeKey
-}
-
-export interface JsonUsage {
-    name: string,
-    methods: {
-        name: string,
-        input: JsonStruct
-        output: JsonType
-    }[],
-}
-
-export class GhJsonModel {
-    modelId: string
-    name: string = 'Test'
-    struct: JsonStruct = {
-        fields: []
-    }
-    usages: JsonUsage[] = []
-    constructor(modelId: string) {
-        this.modelId = modelId
-        this.struct.fields = [
-            { name: 'test1', type: { key: JsonFieldTypeKey.String } },
-            { name: 'test2', type: { key: JsonFieldTypeKey.String } },
-            { name: 'test3', type: { key: JsonFieldTypeKey.String } },
-            { name: 'test4', type: { key: JsonFieldTypeKey.String } },
-            { name: 'test5', type: { key: JsonFieldTypeKey.String } },
-        ]
-
-        this.usages = [
-            {
-                name: 'usage1', methods: [{
-                    name: 'method1', input: {
-                        fields: [
-                            { name: 'test1', type: { key: JsonFieldTypeKey.String } },
-                        ]
-                    },
-                    output: { key: JsonFieldTypeKey.Null }
-                }, {
-                    name: 'method2', input: {
-                        fields: [
-                            { name: 'test1', type: { key: JsonFieldTypeKey.String } },
-                            { name: 'test2', type: { key: JsonFieldTypeKey.String } },
-                        ]
-                    },
-                    output: { key: JsonFieldTypeKey.Null }
-                }, {
-                    name: 'method3', input: {
-                        fields: [
-                            { name: 'test1', type: { key: JsonFieldTypeKey.String } },
-                            { name: 'test2', type: { key: JsonFieldTypeKey.String } },
-                            { name: 'test3', type: { key: JsonFieldTypeKey.String } }
-                        ]
-                    },
-                    output: { key: JsonFieldTypeKey.Null }
-                },]
-            }
-        ]
-    }
-}
-
-
-class NodeComponent{
-    static template:MBaseElementTemplateNode<HTMLDivElement, {
-        model: GhJsonModel;
-    }>
-    static {
-        const renderType = (t: MTemplate<{ type: JsonType }>) => {
-            return t.text((s) => s.get('type').key)
-        }
-        
-        const renderStruct = (t: MTemplate<{ struct: JsonStruct }>) => {
-            return t.div('gh-json-model__fields')(
-                t.loop((s) => s.get('struct').fields)(
-                    t => t.div('gh-json-model__field-item')(
-                        t.div('gh-json-model__field-name')(t.text((s) => s.get('_item').name)),
-                        t.prop(s => ({ type: s.get('_item').type }))(t =>
-                            renderType(t)
-                        )
-                    )
-                )
-            )
-        }
-        
-        
-        const renderUsage = (t: MTemplate<{ usage: JsonUsage }>) => {
-            return t.div('gh-json-model__usage-item')(
-                t.div('gh-json-model__usage-title')(t.div('')
-                    (t.text(s => s.get('usage').name))
-                ),
-                t.div('gh-json-model__usage-methods')(
-                    t.loop(s => s.get('usage').methods)(t =>
-                        t.div('gh-json-model__usage-method-item')(
-                            t.div('gh-json-model__usage-method-name')(t.text(s => s.get('_item').name)),
-                            t.div('gh-json-model__usage-method-output')(t.prop(s => ({ type: s.get('_item').output }))(t => renderType(t))
-                            )
-                        ),
-                    )
-                )
-            )
-        }
-        
-        const renderModel = (t: MTemplate<{ model: GhJsonModel }>) => {
-            return t.div('gh-json-model')(
-                t.div('gh-json-model__header')(t.text(s => s.get('model').name)),
-                t.div('gh-json-model__body')(
-                    t.div('gh-json-model__struct')(
-                        t.div('gh-json-model__sub-title')(t.text('结构字段')),
-                        t.prop(s => ({ struct: s.get('model').struct }))(
-                            t => renderStruct(t)
-                        )
-                    ),
-                    t.div('gh-json-model__usages')(
-                        t.div('gh-json-model__sub-title')(t.text('用途')),
-                        t.loop(s => s.get('model').usages)(
-                            t => t.prop(s => ({ usage: s.get('_item') }))(t => renderUsage(t))
-                        )
-                    )
-                )
-            )
-        }
-    
-        NodeComponent.template = renderModel(new MBaseTemplate()).build()
-
-        
-    }
-
-}
-
-console.log(NodeComponent.template)
-
-
+import { GhJsonModel } from "./json/structs"
+import { GhJsonStructNodeComponent } from "./json/componets"
 
 export class GhJsonStructNode extends GhNode<GhJsonModel> {
     static elements: WeakMap<GhJsonModel, HTMLElement> = new WeakMap()
@@ -248,69 +94,14 @@ export class GhJsonStructNode extends GhNode<GhJsonModel> {
             }
             `)
 
-        const renderType = (type: JsonType) => {
-            return text(type.key)
-        }
-
-        const renderStruct = (struct: JsonStruct) => {
-            return render(div('gh-json-model__fields'), [
-                ...struct.fields.map(field =>
-                    render(div('gh-json-model__field-item'), [
-                        render(div('gh-json-model__field-name'), [text(field.name)]),
-                        render(div('gh-json-model__field-type'), [renderType(field.type)]),
-                    ]))
-            ])
-        }
-
-        const renderUsage = (usage: JsonUsage) => {
-            return render(div('gh-json-model__usage-item'), [
-                render(div('gh-json-model__usage-title'), [
-                    render(div(), [text(usage.name)])
-                ]),
-                render(div('gh-json-model__usage-methods'), [
-                    ...usage.methods.map(method => {
-                        return render(div('gh-json-model__usage-method-item'), [
-                            render(div('gh-json-model__usage-method-name'), [text(method.name)]),
-                            render(div('gh-json-model__usage-method-output'), [renderType(method.output)])
-                        ])
-                    })
-                ]),
-            ])
-        }
-
-
         Shape.HTML.register({
             shape: GhJsonStructNode.type,
             html(cell) {
                 const data = cell.getData() as GhJsonModel
-                const scope = RenderScope.create({model:data})
-                const renderNode = renderTemplate<{
-                    model: GhJsonModel;
-                }>(NodeComponent.template,scope)
 
-                const ele = renderNode.nodes.getValue()[0] as HTMLElement
+                const components = GhJsonStructNodeComponent.finder.get(data) ?? new GhJsonStructNodeComponent(data)
 
-                console.log(renderNode,ele)
-                
-                // const ele = GhJsonStructNode.elements.get(data) ?? render(div('gh-json-model'), [
-                //     render(div('gh-json-model__header'), [text(data.name)]),
-                //     render(div('gh-json-model__body'), [
-                //         render(div('gh-json-model__struct'), [
-                //             render(div('gh-json-model__sub-title'), [text('结构字段')]),
-                //             renderStruct(data.struct),
-                //         ]),
-                //         render(div('gh-json-model__usages'), [
-                //             render(div('gh-json-model__sub-title'), [text('用途')]),
-                //             ...data.usages.map(usage => renderUsage(usage))
-                //         ])
-                //     ])
-                // ])
-                GhJsonStructNode.elements.set(data, ele)
-                ele.ondblclick = () => {
-                    console.log('dblclick')
-                    ele.attributeStyleMap.set('--gh-json-model--theme-color', 'red')
-                }
-                return ele
+                return components.element
             },
         })
     }

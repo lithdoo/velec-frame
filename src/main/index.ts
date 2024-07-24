@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { ExplorerService } from './explorer'
 import { EditorService } from './editor'
+import { SqliteService } from './sqlite'
 
 Menu.setApplicationMenu(null)
 
@@ -74,6 +75,7 @@ app.whenReady().then(() => {
 
   ExplorerService.install()
   EditorService.install()
+  SqliteService.install()
 
   createWindow()
 

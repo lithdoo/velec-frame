@@ -7,6 +7,7 @@ import { FileType } from "@common/file"
 import { appTab } from "@renderer/state/tab"
 import { PageFileEditor } from "@renderer/view/page/fileEditor"
 import { PageGraphEditor } from "@renderer/view/page/graphEditor"
+import { PageSqlErdEditor } from "@renderer/view/page/sqlErd"
 
 
 export class SiderFileExplorer implements AppSiderPanel {
@@ -59,6 +60,10 @@ export class SiderFileExplorer implements AppSiderPanel {
         }
         if(file.name.indexOf('.md')>0){
             appTab.addTab(PageGraphEditor.create())
+        }
+        
+        if(file.name.indexOf('.db')>0){
+            appTab.addTab(PageSqlErdEditor.create(file.url))
         }
     }
 

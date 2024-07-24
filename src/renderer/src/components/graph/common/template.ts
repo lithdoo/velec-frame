@@ -28,9 +28,10 @@ export interface MBaseTempalteParentNode<Scope extends Record<string, unknown>, 
     children: MBaseTempalteNode<ChildScope>[]
 }
 
+
 export interface MBaseElementTemplateNode<T extends HTMLElement, Scope extends Record<string, unknown>> extends MBaseTempalteParentNode<Scope> {
     _type: MBaseTempalteNodeType.Element
-    createElement: () => T
+    createElement: (scope: MBaseTScope<Scope>) => T
     className: (scope: MBaseTScope<Scope>) => MayBeMBase<string | string[]>
     style: (scope: MBaseTScope<Scope>) => MayBeMBase<Partial<CSSStyleDeclaration>>
     attrStyle: (scope: MBaseTScope<Scope>) => MayBeMBase<{ [key: string]: string | CSSStyleValue }>
@@ -84,8 +85,8 @@ export function isMBasePropsTempalteNode<Scope extends Record<string, unknown>, 
 
 export class RenderScope<T extends Record<string, unknown>> implements MBaseTScope<T> {
 
-    static create<T extends Record<string, unknown>>(t:T){
-        return new RenderScope(null,t)
+    static create<T extends Record<string, unknown>>(t: T) {
+        return new RenderScope(null, t)
     }
 
     table: Map<keyof T, unknown> = new Map()
@@ -120,13 +121,13 @@ export function render<Scope extends Record<string, unknown>>(template: MBaseTem
     } else if (isMBaseElementTempalteNode<HTMLElement, Scope>(template)) {
         const attrStyle = MBaseWacher.fromVal(template.attrStyle(scope))
         const style = MBaseWacher.fromVal(template.style(scope))
-        const node = template.createElement()
+        const node = template.createElement(scope)
         const className = MBaseWacher.fromVal<string | string[]>(template.className(scope))
         const renderNode = new MBaseElementRenderNode(mbaseDomRedner, {
             node,
             attrStyle,
             className,
-            style
+            style,
         })
         if (!template.children.length) {
             return renderNode
@@ -153,8 +154,8 @@ export function render<Scope extends Record<string, unknown>>(template: MBaseTem
 
         return renderNode
     } else if (isMBasePropsTempalteNode<Scope, Record<string, unknown>>(template)) {
-        const childScope = new RenderScope(null,template.trans(scope))
-        const renderNode = renderChildren(template.children,childScope)
+        const childScope = new RenderScope(null, template.trans(scope))
+        const renderNode = renderChildren(template.children, childScope)
         return renderNode
     }
 

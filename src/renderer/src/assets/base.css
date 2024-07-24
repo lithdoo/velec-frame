@@ -43,7 +43,7 @@ ul {
   list-style: none;
 }
 
-body {
+html > body {
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);

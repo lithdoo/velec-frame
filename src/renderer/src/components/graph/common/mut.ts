@@ -1,4 +1,4 @@
-import {  MutDomRender, MutValueHandler } from "./dom"
+import { MutDomRender, MutValueHandler } from "./dom"
 
 export class MBaseValue<T> {
 
@@ -21,7 +21,7 @@ export class MBaseValue<T> {
 
   setValue(t: T) {
     this.val = t
-    Array.from(Object.values(this.onchangeCall)).map(v => v())
+    Array.from(this.onchangeCall.values()).map(v => v(this.val))
   }
 
   getValue() {
@@ -44,7 +44,9 @@ export class MBaseWacher<T> extends MBaseValue<T> {
     super(fn())
     this.fn = fn
     this.cancel = list.map(v => {
-      const key = v.addListener(() => this.update())
+      const key = v.addListener(() => {
+        this.update()
+      })
       return () => v.removeListener(key)
     })
   }
@@ -78,9 +80,7 @@ export class MBaseHandler implements MutValueHandler {
   }
 }
 
-export type MayBeMBase<T> = T extends MBaseValue<infer S>
-  ? (MBaseValue<S> | S)
-  : (MBaseValue<T> | T)
+export type MayBeMBase<T> = MBaseValue<T> | T
 
 type MayBeMBaseWatch<T> = MBaseWacher<T> | T
 
@@ -117,12 +117,13 @@ export class MBaseElementRenderNode<T extends HTMLElement> extends MBaseRenderNo
   render: MBaseDomRender
   watchers: MBaseWacher<unknown>[]
   node: T
+  // created?: (node: T) => void
 
   constructor(render: MBaseDomRender, option: {
     node: T,
     className: MayBeMBaseWatch<string | string[]>,
     style: MayBeMBaseWatch<Partial<CSSStyleDeclaration>>,
-    attrStyle: MayBeMBaseWatch<{ [key: string]: string | CSSStyleValue }>,
+    attrStyle: MayBeMBaseWatch<{ [key: string]: string | CSSStyleValue }>
   }) {
     super()
     const {
@@ -261,7 +262,7 @@ export class MBaseCondRenderNode implements MBaseRenderFragment {
     if (!this.current) {
       this.nodes.setValue([])
     } else {
-      this.nodes.setValue(this.nodes.getValue())
+      this.nodes.setValue(this.current.fragment.nodes.getValue())
     }
   }
 
