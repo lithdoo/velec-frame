@@ -8,6 +8,9 @@ import { appTab } from "@renderer/state/tab"
 import { PageFileEditor } from "@renderer/view/page/fileEditor"
 import { PageGraphEditor } from "@renderer/view/page/graphEditor"
 import { PageSqlErdEditor } from "@renderer/view/page/sqlErd"
+import { contextMenu } from "@renderer/view/fixed/contextmenu"
+import { PopMenuBuilder } from "@renderer/components/base/PopMenu"
+import { PageSqlEditor } from "@renderer/view/page/sqlEditor"
 
 
 export class SiderFileExplorer implements AppSiderPanel {
@@ -45,31 +48,34 @@ export class SiderFileExplorer implements AppSiderPanel {
     }
 
 
-    openFile(file:FileTreeItem){
-        if(file.name.indexOf('.ts')>0){
+    fileOpen(file: FileTreeItem) {
+        if (file.name.indexOf('.ts') > 0) {
             appTab.addTab(PageFileEditor.create({
-                name:file.name,
-                url:file.url
+                name: file.name,
+                url: file.url
             }))
         }
-        if(file.name.indexOf('.json')>0){
+        if (file.name.indexOf('.json') > 0) {
             appTab.addTab(PageFileEditor.create({
-                name:file.name,
-                url:file.url
-            },'json'))
+                name: file.name,
+                url: file.url
+            }, 'json'))
         }
-        if(file.name.indexOf('.md')>0){
+        if (file.name.indexOf('.md') > 0) {
             appTab.addTab(PageGraphEditor.create())
         }
-        
-        if(file.name.indexOf('.db')>0){
+
+        if (file.name.indexOf('.db') > 0) {
             appTab.addTab(PageSqlErdEditor.create(file.url))
         }
     }
 
+
+
+
 }
 
-interface FileTreeItem extends FlatTreeItem {
+export interface FileTreeItem extends FlatTreeItem {
     name: string
     url: string
     type: FileType
@@ -85,7 +91,7 @@ class ExplorerWrokspace {
     tree: FlatTreeHandler<FileTreeItem>
     constructor(rootUrl: string) {
         this.rootUrl = rootUrl
-        this.tree = new FlatTreeHandler<FileTreeItem>()
+        this.tree = fixReactive(new FlatTreeHandler<FileTreeItem>())
         this.tree.onload = async (node) => {
             const list = await window.explorerApi.readDir(node.url)
             this.tree.data = this.tree.data.concat(list.map(v => ({
@@ -97,6 +103,13 @@ class ExplorerWrokspace {
             })))
             return true
         }
+
+        this.tree.onItemContextMenu = (item, ev) => {
+            setTimeout(() => {
+                this.tree.selectedKeys = [item.id]
+                this.fileConextmenu(item, ev)
+            })
+        }
     }
 
     async fetchRoots() {
@@ -107,6 +120,25 @@ class ExplorerWrokspace {
             isLeaf: v.type === FileType.File,
             loaded: v.type === FileType.File ? true : false,
         }))
+    }
+
+    fileConextmenu(file: FileTreeItem, ev: MouseEvent) {
+        if (/.db$/.test(file.name)) {
+            contextMenu.open(
+                PopMenuBuilder.create()
+                    .button('openErd', '打开 ER 图', () => {
+                        appTab.addTab(PageSqlErdEditor.create(file.url))
+                    })
+                    .button('openEditor', '打开 SQL 编辑器', () => {
+                        appTab.addTab(PageSqlEditor.create({
+                            title: `查询窗口 [ ${file.name} ]`,
+                            connection: { sqlite: file.url }
+                        }))
+                    })
+                    .build(),
+                ev
+            )
+        }
     }
 }
 

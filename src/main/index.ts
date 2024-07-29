@@ -59,9 +59,11 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  console.log(app.getAppPath())
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -73,9 +75,9 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
-  ExplorerService.install()
-  EditorService.install()
-  SqliteService.install()
+  await ExplorerService.install()
+  await EditorService.install()
+  await SqliteService.install()
 
   createWindow()
 

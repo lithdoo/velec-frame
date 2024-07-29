@@ -63,13 +63,15 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
     $emitLeave(item: T) {
         this.onItemLeave?.(item)
     }
-    $emitContextMenu(item: T) {
-        this.onItemContextMenu?.(item)
+    $emitContextMenu(item: T,ev:MouseEvent) {
+        console.log({item,ev})
+        console.log(this.onItemContextMenu)
+        this.onItemContextMenu?.(item,ev)
     }
     onItemSelect: (item: T) => boolean | void = () => { }
     onItemLeave: (item: T) => boolean | void = () => { }
     onItemHover: (item: T) => boolean | void = () => { }
-    onItemContextMenu: (item: T) => boolean | void = () => { }
+    onItemContextMenu: (item: T,ev:MouseEvent) => boolean | void = () => { }
 
 
     async open(id) {

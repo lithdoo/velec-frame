@@ -3,7 +3,8 @@ import { fixReactive } from "@renderer/fix";
 class ContextMenu {
     ev: MouseEvent | null = null
 
-    open(list: PopMenuListHandler) {
+    open(list: PopMenuListHandler,ev?:MouseEvent) {
+        this.ev = ev ?? null
         this.$emitOpen?.(list)
     }
     $emitOpen?: (list: any) => void

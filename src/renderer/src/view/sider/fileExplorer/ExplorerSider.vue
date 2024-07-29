@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { FlatTreeHandler, FlatTreeItem, FlatTree } from '@renderer/components/base/FlatTree';
 import { computed, ref } from 'vue';
-import { contextMenu } from '@renderer/view/fixed/contextmenu';
-import { testMenu } from '@renderer/components/base/PopMenu';
-import type { SiderFileExplorer } from '.';
+import { SiderFileExplorer } from '.';
 
 const props = defineProps<{
     handler: SiderFileExplorer
@@ -11,16 +9,6 @@ const props = defineProps<{
 
 const handler = computed(() => props.handler)
 
-const fileTree = ref(new FlatTreeHandler<FlatTreeItem & {
-    name: string
-}>())
-
-fileTree.value.onItemContextMenu = (item) => {
-    setTimeout(() => {
-        fileTree.value.selectedKeys = [item.id]
-        contextMenu.open(testMenu)
-    })
-}
 
 const addWorkspace = () => handler.value.addExplorerWrokspace()
 
@@ -41,7 +29,7 @@ const addWorkspace = () => handler.value.addExplorerWrokspace()
             <div class="explorer-sider-panel__tree" v-for="(ws, idx) in handler.list" :key="idx">
                 <FlatTree :handler="ws.tree">
                     <template #item="{ item }">
-                        <div @dblclick="() => handler.openFile(item)">
+                        <div @dblclick="() => handler.fileOpen(item)">
                             {{ item.name }}
                         </div>
                     </template>

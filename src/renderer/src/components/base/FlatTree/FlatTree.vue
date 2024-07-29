@@ -64,7 +64,7 @@ const toggle = (id, e: Event) => {
       <div :class="{ 'flat-tree__item': true, 'flat-tree__item--selected': selectKeysSet.has(v.id) }"
         v-for="v in listToRender" :key="v.id" :style="{ paddingLeft: v.deep * 16 + 'px' }"
         @mouseover="() => handler.$emitHover(v.data)" @mouseleave="() => handler.$emitLeave(v.data)"
-        @click="() => handler.$emitSelect(v.data)" @contextmenu="() => handler.$emitContextMenu(v.data)">
+        @click="() => handler.$emitSelect(v.data)" @contextmenu="(ev) => handler.$emitContextMenu(v.data,ev)">
 
         <div
           :class="['flat-tree__item-open-icon', v.id === handler.loadingId ? 'flat-tree__item-open-icon--loading' : '']"
