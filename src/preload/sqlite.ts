@@ -12,5 +12,9 @@ export const sqliteApi = {
 
     getRawData: async (url:string)=>{
         return ipcRenderer.invoke('@sqlite/erd/rawData', url) as Promise<RawData>
+    },
+
+    sqlSelectAll: async(url:string,sql:string)=>{
+        return ipcRenderer.invoke('@sqlite/sql/selectAll',url,sql) as Promise<any[]>
     }
 }

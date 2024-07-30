@@ -27,16 +27,7 @@ const install = async () => {
 
     await initWebSocketAndStartClient('ws://localhost:30001/typescript', ['typescript']);
     await initWebSocketAndStartClient('ws://localhost:30001/json', ['json']);
-    await initWebSocketAndStartClient('ws://localhost:30001/sql', ['sql'], (client) => {
-        client.sendRequest('workspace/configuration', {
-            connections: [{
-                "name": "sqlite3-project",
-                "adapter": "sqlite3",
-                "filename": "/Users/joe-re/src/sql-language-server/packages/server/test.sqlite3",
-                "projectPaths": ["/Users/joe-re/src/sqlite2_project"]
-            }]
-        })
-    });
+    await initWebSocketAndStartClient('ws://localhost:30001/sql', ['sql']);
 
     monaco.languages.register({
         id: 'typescript',
@@ -153,8 +144,7 @@ function createLanguageClient(transports: MessageTransports, languageIds: string
             errorHandler: {
                 error: () => ({ action: ErrorAction.Continue }),
                 closed: () => ({ action: CloseAction.DoNotRestart })
-            },
-            workspaceFolder: `C:\\Users\\mini\\Documents\\GitHub\\velec-frame`
+            }
         },
         // create a language client connection from the JSON RPC connection on demand
         connectionProvider: {

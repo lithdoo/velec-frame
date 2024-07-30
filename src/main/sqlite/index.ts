@@ -8,10 +8,16 @@ export class SqliteService {
             const connection = SqliteService.connection(url)
             return await connection.getAllTables()
         })
-
+ 
         ipcMain.handle('@sqlite/erd/rawData', async (_, url: string) => {
             const connection = SqliteService.connection(url)
             return await getRawData(connection)
+        })
+
+        
+        ipcMain.handle('@sqlite/sql/selectAll', async (_, url: string,sql:string) => {
+            const connection = SqliteService.connection(url)
+            return await connection.runSelectAll(sql)
         })
     }
 

@@ -84,5 +84,12 @@ export class SqliteConection {
             return rows
         })
     }
+
+    async runSelectAll(sql:string) {
+        return this.requset(async () => {
+            const res = await this.sql.all<any[]>(sql)
+            return res
+        })
+    }
 }
 
