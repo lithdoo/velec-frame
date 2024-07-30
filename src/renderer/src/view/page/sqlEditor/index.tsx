@@ -1,8 +1,9 @@
-import { TabPage } from "@renderer/state/tab";
+import { appTab, TabPage } from "@renderer/state/tab";
 import { VNode } from "vue";
 import { fixReactive } from "@renderer/fix";
 import { TextEditorHandler } from "@renderer/components/editor/handler";
 import PageSqlEditorVue from "./PageSqlEditor.vue"
+import { PageDataView } from "../dataView";
 
 
 export interface SqlConnectOption {
@@ -29,6 +30,7 @@ export class PageSqlEditor implements TabPage {
     icon = 'del'
     title = ''
     editorHandler: TextEditorHandler
+    dataView?: PageDataView
 
     constructor(option: PageSqlEditorOption) {
         this.title = option.title
@@ -46,10 +48,16 @@ export class PageSqlEditor implements TabPage {
         const sql = this.editorHandler.editor?.getValue()
         if (!sql) return
         const url = this.connection.sqlite
+        const data = window.sqliteApi.sqlSelectAll(url, sql)
 
-        const res =  await window.sqliteApi.sqlSelectAll(url, sql)
+        if (!this.dataView || (PageDataView.finder.get(this.dataView.finderId) !== this.dataView)) {
+            this.dataView = PageDataView.create({ title: this.title })
+            appTab.addTab(this.dataView)
+        }
+        this.dataView.load(data)
+        appTab.active(this.dataView.tabId)
+        console.log(this.dataView)
 
-        console.log(res)
     }
 
 }
