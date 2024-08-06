@@ -1,22 +1,15 @@
 
-import { EdgeViewData, NodeMetaData, NodeViewData } from "./state"
+import { EdgeViewData, NodeData, NodeMetaData, NodeViewData } from "./state"
 import { GhSqlErdNodeComponent } from './component'
-import { Shape, Edge, Graph, Node, Point, EdgeView } from "@antv/x6"
+import { Shape, Edge, Graph, Point, EdgeView } from "@antv/x6"
+import { SqlErdGraphView } from "./view"
 
 
 // 路由参数
 
+function erRouter(_vertices: Point.PointLike[], _args: unknown, view: EdgeView): Point.PointLike[] {
 
-type BBox = {
-    minX: number,
-    maxX: number,
-    minY: number,
-    maxY: number,
-}
 
-function erRouter(_vertices: Point.PointLike[], _args: unknown, view: EdgeView): Point.PointLike[]  {
-
-    
     const edge: { view: EdgeViewData } = view.cell.getData()
 
     const sourceBBox = {
@@ -83,7 +76,7 @@ function erRouter(_vertices: Point.PointLike[], _args: unknown, view: EdgeView):
                 targetBBox.maxY - (targetBBox.maxY - targetBBox.minY) * sourceOffSet,
             ]
         }
-        return [sourcePoint.pos, sourcePoint.connect, [targetPoint.connect[0], sourcePoint.connect[1]], targetPoint.connect, targetPoint.pos].map(([x,y])=>({x,y}))
+        return [sourcePoint.pos, sourcePoint.connect, [targetPoint.connect[0], sourcePoint.connect[1]], targetPoint.connect, targetPoint.pos].map(([x, y]) => ({ x, y }))
     } else {
         const connect = (bbox: IBBox, offset: number, cLen: number): PointConnect => {
             const top: ConnectPostion = {
@@ -227,50 +220,49 @@ function erRouter(_vertices: Point.PointLike[], _args: unknown, view: EdgeView):
 
         const route = choose(sourceConnection, targetConnection)
 
-        return route.map(([x,y])=>({x,y}))
+        return route.map(([x, y]) => ({ x, y }))
     }
 }
 
 Graph.registerRouter('sql-er-router', erRouter)
 
 export class GhSqlErdNode {
-    static html(data: { id: string, meta: NodeMetaData, view: NodeViewData }) {
+    static html(data: NodeData) {
         const node = GhSqlErdNode.finder.get(data) ?? new GhSqlErdNode(data)
         return node.component.element
     }
-    static finder: WeakMap<{ id: string, meta: NodeMetaData, view: NodeViewData }, GhSqlErdNode> = new WeakMap()
+    static finder: WeakMap<NodeData, GhSqlErdNode> = new WeakMap()
     static {
 
         Shape.HTML.register({
             shape: 'GH_SQLERD_ENTITY_NODE',
             html(cell) {
-                const data = cell.getData() as { id: string, meta: NodeMetaData, view: NodeViewData }
+                const data = cell.getData() as NodeData
                 const node = GhSqlErdNode.finder.get(data) ?? new GhSqlErdNode(data)
-                const element = node.component.element
-                const rect = element.getBoundingClientRect()
-                console.log({ cell, rect, this: this })
                 return node.component.element
             },
         })
     }
-
-
-    id: string
-    view: NodeViewData
-    meta: NodeMetaData
-    component: GhSqlErdNodeComponent
-
-    constructor(node: {
-        id: string
-        view: NodeViewData,
-        meta: NodeMetaData
-    }) {
-        this.id = node.id
-        this.meta = node.meta
-        this.view = node.view
-        this.component = new GhSqlErdNodeComponent(this.meta)
+    readonly component: GhSqlErdNodeComponent
+    readonly nodeData: NodeData
+    constructor(node: NodeData) {
         GhSqlErdNode.finder.set(node, this)
+        this.nodeData = node
+        this.component = new GhSqlErdNodeComponent(this.nodeData.meta)
+        this.component.oncontextmenu = (event) => {
+            const view = this.findView()
+            view.onNodeConnectMenu?.({ event, data: this.nodeData })
+        }
     }
+
+
+    findView() {
+        const view = SqlErdGraphView.finder.get(this.nodeData._viewId)
+        if (!view) throw new Error('view is not found!')
+        return view
+    }
+
+
 }
 
 export class GhSqlErdEdge {
@@ -279,11 +271,6 @@ export class GhSqlErdEdge {
         class ErdEdge extends Edge {
             getSourcePoint() {
                 const point = super.getSourcePoint()
-                console.log({
-                    point,
-                    target: this.getTarget(),
-                    source: this.getSource()
-                })
                 return point
             }
         }

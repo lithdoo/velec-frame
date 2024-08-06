@@ -1,8 +1,6 @@
 import { insertCss } from "insert-css";
 import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate, render, RenderScope } from "../common";
 import type { NodeMetaData } from "./state";
-import { contextMenu } from "@renderer/view/fixed/contextmenu";
-import { Menu, PopMenuListHandler } from "@renderer/components/base/PopMenu";
 
 interface GhJsonStructNodeState {
     isSelected: MBaseValue<boolean>
@@ -114,10 +112,8 @@ export class GhSqlErdNodeComponent {
         const scope = RenderScope.create({ meta, state: this.state })
         const renderNode = render<Props>(this.template, scope)
         this.element = renderNode.nodes.getValue()[0] as HTMLElement
-        this.element.oncontextmenu = (ev) => {
-            contextMenu.open(PopMenuListHandler.create([
-                Menu.button({ icon: 'del', key: '3', label: '撤销', action: () => { alert('打开文件') } })
-            ]),ev)
-        }
+        this.element.oncontextmenu = (ev) => { this.oncontextmenu?.(ev) }
     }
+
+    oncontextmenu?: (ev: MouseEvent) => void
 }

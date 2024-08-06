@@ -5,12 +5,12 @@ import { VNode } from "vue"
 import { fixReactive } from "@renderer/fix"
 import { FileType } from "@common/file"
 import { appTab } from "@renderer/state/tab"
-import { PageFileEditor } from "@renderer/view/page/fileEditor"
-import { PageGraphEditor } from "@renderer/view/page/graphEditor"
-import { PageSqlErdEditor } from "@renderer/view/page/sqlErd"
+import { PageFileEditor } from "@renderer/page/fileEditor"
+import { PageGraphEditor } from "@renderer/page/graphEditor"
+import { PageSqlErd } from "@renderer/page/sqlErd"
 import { contextMenu } from "@renderer/view/fixed/contextmenu"
 import { PopMenuBuilder } from "@renderer/components/base/PopMenu"
-import { PageSqlEditor } from "@renderer/view/page/sqlEditor"
+import { PageSqlEditor } from "@renderer/page/sqlEditor"
 
 
 export class SiderFileExplorer implements AppSiderPanel {
@@ -40,7 +40,6 @@ export class SiderFileExplorer implements AppSiderPanel {
             return
         }
         this.list = this.list.concat([workspace])
-        console.log(this.list)
     }
 
     init() {
@@ -66,7 +65,7 @@ export class SiderFileExplorer implements AppSiderPanel {
         }
 
         if (file.name.indexOf('.db') > 0) {
-            appTab.addTab(PageSqlErdEditor.create(file.url))
+            appTab.addTab(PageSqlErd.sqlite(file.url))
         }
     }
 
@@ -94,6 +93,10 @@ class ExplorerWrokspace {
         this.tree = fixReactive(new FlatTreeHandler<FileTreeItem>())
         this.tree.onload = async (node) => {
             const list = await window.explorerApi.readDir(node.url)
+            if(!list){
+                this.tree.data = []
+                return true
+            }
             this.tree.data = this.tree.data.concat(list.map(v => ({
                 ...v,
                 id: v.url,
@@ -114,6 +117,10 @@ class ExplorerWrokspace {
 
     async fetchRoots() {
         const list = await window.explorerApi.readDir(this.rootUrl)
+        if(!list){
+            this.tree.data = []
+            return
+        }
         this.tree.data = list.map(v => ({
             ...v,
             id: v.url,
@@ -127,7 +134,7 @@ class ExplorerWrokspace {
             contextMenu.open(
                 PopMenuBuilder.create()
                     .button('openErd', '打开 ER 图', () => {
-                        appTab.addTab(PageSqlErdEditor.create(file.url))
+                        appTab.addTab(PageSqlErd.sqlite(file.url))
                     })
                     .button('openEditor', '打开 SQL 编辑器', () => {
                         appTab.addTab(PageSqlEditor.create({

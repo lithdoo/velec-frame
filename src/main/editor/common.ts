@@ -104,16 +104,16 @@ export class LanguageServerCenter {
         if (serverConnection) {
             forward(socketConnection, serverConnection, message => {
                 if (Message.isRequest(message)) {
-                    console.log(`${serverName} Server received:`);
-                    console.log(message);
+                    // console.log(`${serverName} Server received:`);
+                    // console.log(message);
                     if (message.method === InitializeRequest.type.method) {
                         const initializeParams = message.params as InitializeParams;
                         initializeParams.processId = process.pid;
                     }
                 }
                 if (Message.isResponse(message)) {
-                    console.log(`${serverName} Server sent:`);
-                    console.log(message);
+                    // console.log(`${serverName} Server sent:`);
+                    // console.log(message);
                 }
                 return message;
             });

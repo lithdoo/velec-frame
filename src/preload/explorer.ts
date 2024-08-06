@@ -10,6 +10,12 @@ export const explorerApi = {
             name: string,
             url: string,
             type: FileType,
-        }[]>
+        }[] | null>
+    },
+    readJson: async (filename: string) => {
+        return await ipcRenderer.invoke('@explorer/json/read', filename) as Promise<any>
+    },
+    saveJson: async (filename: string, json: any) => {
+        return await ipcRenderer.invoke('@explorer/json/write', filename, json) as Promise<void>
     }
 }

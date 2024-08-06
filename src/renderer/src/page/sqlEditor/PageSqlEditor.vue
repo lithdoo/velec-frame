@@ -36,6 +36,7 @@ const toolbar = ToolBarBuilder.create()
 
 .page-sql-editor__toolbar{
     flex: 0 0 auto;
+    border-bottom: 1px solid #666;
 }
 
 .page-sql-editor__editor{

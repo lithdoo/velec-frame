@@ -16,5 +16,9 @@ export const sqliteApi = {
 
     sqlSelectAll: async(url:string,sql:string)=>{
         return ipcRenderer.invoke('@sqlite/sql/selectAll',url,sql) as Promise<any[]>
-    }
+    },
+
+    sqlRun: async(url:string,sql:string)=>{
+        return ipcRenderer.invoke('@sqlite/sql/run',url,sql) as Promise<any[]>
+    },
 }

@@ -56,7 +56,6 @@ export class PageSqlEditor implements TabPage {
         }
         this.dataView.load(data)
         appTab.active(this.dataView.tabId)
-        console.log(this.dataView)
 
     }
 

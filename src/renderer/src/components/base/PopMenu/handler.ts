@@ -71,7 +71,6 @@ export class PopMenuLayerHandler {
         })
     }
     remove({ current, after }: { current?: string, after?: string }) {
-        console.log('remove', { current, after })
         if (current) {
             const index = this.stack.findIndex(v => v.menu.id === current)
             if (index >= 0) {

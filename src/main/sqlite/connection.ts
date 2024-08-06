@@ -5,6 +5,7 @@ const sqlite3 = verbose()
 
 interface SqlMethods {
     all: <T = any>(sql: string) => Promise<T[]>;
+    run: (sql: string) => Promise<void>
 }
 
 export class SqliteConection {
@@ -19,7 +20,6 @@ export class SqliteConection {
 
     constructor(url: string) {
         const path = fileURLToPath(url)
-        console.log(url, path)
         this.url = url
         this.path = path
         this.db = new sqlite3.Database(this.path)
@@ -34,7 +34,15 @@ export class SqliteConection {
                 else res(rows)
             })
         })
-        return { all }
+
+        const run = (sql: string) => new Promise<void>((res, rej) => {
+            this.db.run(sql, (error) => {
+                if (error) rej(error)
+                else res()
+            })
+        })
+
+        return { all, run }
     }
 
     async requset<T>(fn: (sql: SqlMethods) => Promise<T>) {
@@ -55,7 +63,7 @@ export class SqliteConection {
         try {
             this.db.close()
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
         this.onDestroy()
     }
@@ -73,7 +81,6 @@ export class SqliteConection {
     }
 
     async getAllTables() {
-        console.log('getAllTables')
         return this.requset(async () => {
             const rowNameArr = await this.sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' order by name;`)
             const rows = await Promise.all(rowNameArr.map(async ({ name }) => {
@@ -85,10 +92,16 @@ export class SqliteConection {
         })
     }
 
-    async runSelectAll(sql:string) {
+    async runSelectAll(sql: string) {
         return this.requset(async () => {
             const res = await this.sql.all<any[]>(sql)
             return res
+        })
+    }
+
+    async run(sql: string) {
+        return this.requset(async () => {
+            await this.sql.run(sql)
         })
     }
 }

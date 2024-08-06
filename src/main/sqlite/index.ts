@@ -19,6 +19,11 @@ export class SqliteService {
             const connection = SqliteService.connection(url)
             return await connection.runSelectAll(sql)
         })
+
+        ipcMain.handle('@sqlite/sql/run', async (_, url: string,sql:string) => {
+            const connection = SqliteService.connection(url)
+            return await connection.run(sql)
+        })
     }
 
     static connections: Map<string, SqliteConection> = new Map()

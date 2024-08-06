@@ -13,7 +13,6 @@ export class ToolBarHandler {
     }
 
     emit(key: string) {
-        console.log(key)
         const button = this.list
             .filter(v => v.type === 'button')
             .find(v => v.key === key)

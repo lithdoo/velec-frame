@@ -3,8 +3,8 @@ import './assets/iconfont.js';
 
 import { createApp } from 'vue'
 import App from './App.vue'
-import { SiderFileExplorer } from './view/sider/fileExplorer/index';
-import { SiderBgTask } from './view/sider/bgTask';
+import { SiderFileExplorer } from './sider/fileExplorer/index';
+import { SiderBgTask } from './sider/bgTask';
 
 createApp(App).mount('#app')
 

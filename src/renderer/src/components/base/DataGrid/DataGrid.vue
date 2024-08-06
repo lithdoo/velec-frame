@@ -9,23 +9,48 @@ const props = defineProps<{
 
 
 const dataSource = computed(() => {
-    console.log(props.handler)
     return props.handler.grid.list as any[]
 })
 
 const columns = computed(() => {
-    console.log(props.handler.fields)
     return props.handler.fields.map((field) => {
         return {
             title: field.name,
             dataIndex: field.fieldKey,
             key: field.fieldKey,
-            align: field.align
+            align: field.align,
+            width: 120
         } as any
     })
 })
 </script>
 
 <template>
-    <AntTable :data-source="dataSource" :columns="columns"></AntTable>
+    <AntTable class="data-grid" size="small" :scroll="{y:'100%'}"  :pagination="false" :data-source="dataSource" :columns="columns"></AntTable>
 </template>
+
+<style>
+.data-grid .ant-table,
+.data-grid .ant-spin-nested-loading,
+.data-grid .ant-spin-container,
+.data-grid .ant-table-container,
+.data-grid .ant-table-content,
+.data-grid .ant-table-content > table{
+    height: 100%;
+}
+
+
+.data-grid .ant-table-container{
+    display: flex;
+    flex-direction: column;
+}
+.data-grid .ant-table-header{
+    flex: 0 0 auto;
+}
+
+.data-grid .ant-table-body{
+    flex: 1 1 0;
+    height: 0;
+}
+
+</style>

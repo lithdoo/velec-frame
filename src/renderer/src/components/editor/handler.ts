@@ -69,7 +69,6 @@ export class TextEditorHandler {
 
     initEditor(element: HTMLElement) {
         const { value, language, uri } = this.createModel()
-        console.log({ model: this.createModel() })
         this.editor = markRaw(monaco.editor.create(element, {
             model: monaco.editor.createModel(value, language, uri),
             automaticLayout: true,

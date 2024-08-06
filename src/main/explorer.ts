@@ -1,6 +1,8 @@
 import { FileType } from "@common/file"
 import { dialog, ipcMain } from "electron"
-import fs from 'fs/promises'
+import { promises as fsp } from 'fs'
+import { existsSync } from 'fs'
+import * as fs from 'fs'
 import path from 'path';
 import { pathToFileURL } from 'node:url'
 
@@ -17,7 +19,10 @@ export class ExplorerService {
         })
 
         ipcMain.handle('@explorer/dir/read', async (_, fileUrl: string) => {
-            const list = await fs.readdir(new URL(fileUrl), { withFileTypes: true })
+            if (!existsSync(new URL(fileUrl))) {
+                return null
+            }
+            const list = await fsp.readdir(new URL(fileUrl), { withFileTypes: true })
             return list.filter(v => v.isDirectory || v.isFile).map(val => {
                 return {
                     name: val.name,
@@ -25,6 +30,29 @@ export class ExplorerService {
                     type: val.isDirectory() ? FileType.Directory : FileType.File
                 }
             })
+        })
+
+        ipcMain.handle('@explorer/json/read', async (_, fileUrl: string) => {
+            if (!existsSync(new URL(fileUrl))) {
+                return null
+            }
+
+            try {
+                const content = fs.readFileSync(new URL(fileUrl))
+                const text = content.toString()
+                const json = JSON.parse(text)
+                return json
+            } catch (_e) {
+                return null
+            }
+        })
+
+        ipcMain.handle('@explorer/json/write', async (_, fileUrl: string, content: any) => {
+            try {
+                const text = JSON.stringify(content)
+                fs.writeFileSync(new URL(fileUrl), text)
+            } catch (_e) {
+            }
         })
     }
 

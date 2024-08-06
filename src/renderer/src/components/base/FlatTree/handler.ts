@@ -64,8 +64,6 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
         this.onItemLeave?.(item)
     }
     $emitContextMenu(item: T,ev:MouseEvent) {
-        console.log({item,ev})
-        console.log(this.onItemContextMenu)
         this.onItemContextMenu?.(item,ev)
     }
     onItemSelect: (item: T) => boolean | void = () => { }
