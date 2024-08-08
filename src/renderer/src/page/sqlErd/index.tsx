@@ -7,37 +7,31 @@ import { nanoid } from "nanoid";
 import { contextMenu } from "@renderer/view/fixed/contextmenu";
 import { Menu, PopMenuListHandler } from "@renderer/components/base/PopMenu";
 import { PageDataView } from "../dataView";
-import { SqliteDriver } from "@renderer/tools/sqilite";
-
-type Connection = {
-    driver: 'sqlite',
-    url: string
-}
+import { SqliteConnect } from "@renderer/tools/sqilite";
+import {PageSqlAddTable} from "../sqlForm/";
 
 
 export class PageSqlErd implements TabPage {
 
     static sqlite(url: string) {
-        const page = fixReactive(new PageSqlErd({
-            driver: 'sqlite', url
-        }))
+        const connection = new SqliteConnect(url)
+        const page = fixReactive(new PageSqlErd(connection))
         page.init()
         return page
     }
     readonly tabId: string = nanoid()
     readonly element: VNode
     readonly icon = 'del'
-    readonly title = ''
+    readonly title: string
     readonly view: SqlErdGraphView
-    readonly driver: SqliteDriver
+    readonly connection : SqliteConnect
 
-    readonly connection: Connection
 
-    constructor(connection: Connection) {
-        this.connection = connection
+    constructor(connection: SqliteConnect) {
         this.view = new SqlErdGraphView()
         this.element = <PageSqlErdVue page={this}></PageSqlErdVue>
-        this.driver = new SqliteDriver(this.connection.url)
+        this.connection = connection
+        this.title = connection.label
         this.initView()
     }
 
@@ -46,14 +40,14 @@ export class PageSqlErd implements TabPage {
     }
 
     async init() {
-        const raw = await this.driver.erdData()
+        const raw = await this.connection.erdData()
         const cache = await window.explorerApi.readJson(this.cacheFilePath())
         this.view.load(raw, cache ?? null)
     }
 
-    async reload(){
-        const raw = await this.driver.erdData()
-        console.log({raw})
+    async reload() {
+        const raw = await this.connection.erdData()
+        console.log({ raw })
         this.view.load(raw)
     }
 
@@ -73,7 +67,7 @@ export class PageSqlErd implements TabPage {
                         // const sql = `select * from ${data.meta.name}`
                         // const url = this.connection.url
                         // const sqlData = window.sqliteApi.sqlSelectAll(url, sql) 
-                        const sqlData = this.driver.searchTable(data.meta.name)
+                        const sqlData = this.connection.searchTable(data.meta.name)
                         const dataView = PageDataView.create({ title: `${data.meta.name}[${this.title}]` })
                         dataView.load(sqlData)
                         appTab.addTab(dataView)
@@ -86,8 +80,8 @@ export class PageSqlErd implements TabPage {
                     }
                 }),
                 Menu.button({
-                    icon: 'del', key: 'deleteTable', label: '删除表', action: async() => {
-                        await this.driver.deleteTable(data.meta.name)
+                    icon: 'del', key: 'deleteTable', label: '删除表', action: async () => {
+                        await this.connection.deleteTable(data.meta.name)
                         await this.reload()
                     }
                 })
@@ -95,6 +89,12 @@ export class PageSqlErd implements TabPage {
 
         }
 
+    }
+
+    addTable(){
+        const tab =  PageSqlAddTable.create(this.connection)
+        appTab.addTab(tab)
+        appTab.active(tab.tabId)
     }
 
 }

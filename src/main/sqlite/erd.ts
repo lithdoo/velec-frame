@@ -1,6 +1,5 @@
 import { SqliteConection } from "./connection";
 
-
 type RawTable = {
     name: string;
     originalKey: string;
@@ -12,6 +11,8 @@ type RawTable = {
         type: string;                // 类型
         foreignKey: boolean        // 是否外键
         primaryKey: boolean        // 是否主键
+        unique: boolean;
+        notNull: boolean;
     }[],
 }
 
@@ -62,6 +63,7 @@ export const getRawData = async (connect: SqliteConection) => {
                 // on_update: "NO ACTION"
                 seq: 0
             }[] = await sql.all(`pragma foreign_key_list(${name})`)
+
             return { name, fields, foreignKeys }
         }))
         return rows
@@ -79,7 +81,9 @@ export const getRawData = async (connect: SqliteConection) => {
                 label: '',
                 type: field.type,                // 类型
                 foreignKey: false,        // 是否外键
-                primaryKey: !!field.pk        // 是否主键
+                primaryKey: !!field.pk,        // 是否主键
+                notNull: !!field.notnull,
+                unique: false,
             }))
         }
         return rawTable

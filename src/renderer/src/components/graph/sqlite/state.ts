@@ -10,6 +10,8 @@ type RawTable = {
         type: string;                // 类型
         foreignKey: boolean        // 是否外键
         primaryKey: boolean        // 是否主键
+        unique: boolean;
+        notNull: boolean;
     }[],
 }
 
@@ -63,6 +65,8 @@ export interface NodeMetaData {
         type: string;                // 类型
         foreignKey: boolean        // 是否外键
         primaryKey: boolean        // 是否主键
+        unique: boolean;
+        notNull: boolean;
     }[],
 }
 

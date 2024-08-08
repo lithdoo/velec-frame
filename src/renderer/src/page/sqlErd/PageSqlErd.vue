@@ -15,6 +15,7 @@ const toolbar = ToolBarBuilder.create()
         props.page.reload()
     }, { icon: 'del' })
     .button('createTable', '新建表', () => {
+        props.page.addTable()
     }, { icon: 'del' })
     .build()
 

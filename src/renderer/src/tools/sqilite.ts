@@ -1,4 +1,7 @@
 
+
+
+
 export interface FieldInfo<DataType extends string> {
     name: string;
     label: string;
@@ -24,11 +27,13 @@ export enum SqliteDataType {
     NUMERIC = 'NUMERIC'
 }
 
-export class SqliteDriver {
+export class SqliteConnect {
 
+    label: string
     readonly url: string
     constructor(url: string) {
         this.url = url
+        this.label = decodeURIComponent(url.split('/').reverse()[0])
     }
 
 
@@ -64,7 +69,9 @@ export class SqliteDriver {
         ${pks}
         );
         `
-        return sql
+
+        console.log(sql)
+        return window.sqliteApi.sqlRun(this.url, sql)
     }
 
     renameTable(oldName: string, newName: string) {

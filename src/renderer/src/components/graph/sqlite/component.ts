@@ -80,11 +80,13 @@ export class GhSqlErdNodeComponent {
                 type: string;                // 类型
                 foreignKey: boolean        // 是否外键
                 primaryKey: boolean        // 是否主键
+                notNull: boolean  
+                unique: boolean
             }
         }>) => {
             return t.div('gh-sql-erd__field')(
                 t.div('gh-sql-erd__field-name')(t.text(s => s.get('field').name)),
-                t.div('gh-sql-erd__field-type')(t.text(s => s.get('field').type))
+                t.div('gh-sql-erd__field-type')(t.text(s => `${s.get('field').type}${s.get('field').unique?' UNIQUE':''}${s.get('field').notNull?' NOT NULL':''}`))
             )
         }
 
