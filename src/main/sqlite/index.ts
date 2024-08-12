@@ -4,10 +4,6 @@ import { getRawData } from "./erd"
 
 export class SqliteService {
     static install() {
-        ipcMain.handle('@sqlite/table/all', async (_, url: string) => {
-            const connection = SqliteService.connection(url)
-            return await connection.getAllTables()
-        })
  
         ipcMain.handle('@sqlite/erd/rawData', async (_, url: string) => {
             const connection = SqliteService.connection(url)
@@ -24,6 +20,21 @@ export class SqliteService {
             const connection = SqliteService.connection(url)
             return await connection.run(sql)
         })
+
+        ipcMain.handle('@sqlite/table/all', async (_, url: string) => {
+            const connection = SqliteService.connection(url)
+            return await connection.getAllTables()
+        })
+
+        ipcMain.handle('@sqlite/table/info', async (_, url: string,name:string) => {
+            const connection = SqliteService.connection(url)
+            return await connection.getTableInfo(name)
+        })
+
+        // ipcMain.handle('@sqlite/table/data', async (_, url: string,sql:string) => {
+        //     const connection = SqliteService.connection(url)
+        //     return await connection.run(sql)
+        // })
     }
 
     static connections: Map<string, SqliteConection> = new Map()

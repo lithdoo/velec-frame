@@ -59,10 +59,10 @@ export abstract class GridRequset<ListData> {
 
     queryParams(
         page: { current: number, pageSize: number },
-        option: {
-            sort?: { field: string, order: 'desc' | 'asc' },
-            filter?: never,
-        } = {},
+        // option: {
+        //     sort?: { field: string, order: 'desc' | 'asc' },
+        //     filter?: never,
+        // } = {},
     ) {
         return {
             pageNo: page.current,

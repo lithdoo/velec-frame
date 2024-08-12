@@ -52,6 +52,7 @@ export const getRawData = async (connect: SqliteConection) => {
                 notnull: number
                 pk: number
                 type: string
+                label: string
             }[] = await sql.all(`pragma table_info(${name})`)
             const foreignKeys: {
                 from: string
@@ -63,7 +64,6 @@ export const getRawData = async (connect: SqliteConection) => {
                 // on_update: "NO ACTION"
                 seq: 0
             }[] = await sql.all(`pragma foreign_key_list(${name})`)
-
             return { name, fields, foreignKeys }
         }))
         return rows

@@ -4,7 +4,7 @@ import { contextMenu } from './index'
 import { PopMenuLayerHandler, PopMenuListHandler, PopMenuLayer } from '@renderer/components/base/PopMenu';
 import { fixReactive } from '@renderer/fix';
 
-document.addEventListener('contextmenu', (ev) => {
+document.addEventListener('contextmenu', (_ev) => {
     // contextMenu.ev = ev
 })
 

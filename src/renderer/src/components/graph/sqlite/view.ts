@@ -74,6 +74,13 @@ export class SqlErdGraphView extends GraphView {
         )
     }
 
+    updateLabels(nodeId:string,labels: Record<string,string>){
+        const node = this.state.nodes.find(v=>v.id === nodeId)
+        if(node){
+            node.view.labels = labels
+        }
+    }
+
     onNodeConnectMenu?: (_option: {
         event: MouseEvent,
         data: NodeData

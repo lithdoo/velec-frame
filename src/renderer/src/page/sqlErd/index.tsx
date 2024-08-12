@@ -2,13 +2,38 @@ import { appTab, TabPage } from "@renderer/state/tab";
 import { VNode } from "vue";
 import { fixReactive } from "@renderer/fix";
 import { default as PageSqlErdVue } from "./PageSqlErd.vue";
-import { SqlErdGraphView } from "@renderer/components/graph/sqlite/index";
+import { NodeData, SqlErdGraphView } from "@renderer/components/graph/sqlite/index";
 import { nanoid } from "nanoid";
 import { contextMenu } from "@renderer/view/fixed/contextmenu";
 import { Menu, PopMenuListHandler } from "@renderer/components/base/PopMenu";
 import { PageDataView } from "../dataView";
 import { SqliteConnect } from "@renderer/tools/sqilite";
-import {PageSqlAddTable} from "../sqlForm/";
+import { PageSqlAddTable, PageSqlEditLabel, PageSqlViewData } from "../sqlForm/";
+import { TableInfo, SqliteDataType } from "@common/sql";
+
+
+const node2table = (node: NodeData) => {
+
+    const table: TableInfo<SqliteDataType> = {
+        name: node.meta.name,
+        label: node.meta.label,
+        fieldList: node.meta.fieldList.map(field => {
+            return {
+                name: field.name,
+                label: field.label,
+                type: field.type as SqliteDataType,    // 类型
+
+                primaryKey: field.primaryKey,
+                unique: field.unique,
+                notNull: field.notNull,
+            }
+
+        })
+    }
+
+    return table
+
+}
 
 
 export class PageSqlErd implements TabPage {
@@ -24,7 +49,7 @@ export class PageSqlErd implements TabPage {
     readonly icon = 'del'
     readonly title: string
     readonly view: SqlErdGraphView
-    readonly connection : SqliteConnect
+    readonly connection: SqliteConnect
 
 
     constructor(connection: SqliteConnect) {
@@ -67,9 +92,7 @@ export class PageSqlErd implements TabPage {
                         // const sql = `select * from ${data.meta.name}`
                         // const url = this.connection.url
                         // const sqlData = window.sqliteApi.sqlSelectAll(url, sql) 
-                        const sqlData = this.connection.searchTable(data.meta.name)
-                        const dataView = PageDataView.create({ title: `${data.meta.name}[${this.title}]` })
-                        dataView.load(sqlData)
+                        const dataView = PageSqlViewData.create(this.connection,node2table(data))
                         appTab.addTab(dataView)
                         appTab.active(dataView.tabId)
                     }
@@ -77,6 +100,22 @@ export class PageSqlErd implements TabPage {
                 Menu.button({
                     icon: 'del', key: 'insertTable', label: '添加数据', action: () => {
 
+                    }
+                }),
+                Menu.button({
+                    icon: 'del', key: 'editLabel', label: '修改注释', action: () => {
+                        const connection = this.connection
+                        const tab = PageSqlEditLabel.create(
+                            connection,
+                            node2table(data),
+                            data.view.labels,
+                            (labels) => {
+                                this.view.updateLabels(data.id,labels)
+                                this.view.refresh()
+                            }
+                        )
+                        appTab.addTab(tab)
+                        appTab.active(tab.tabId)
                     }
                 }),
                 Menu.button({
@@ -91,8 +130,8 @@ export class PageSqlErd implements TabPage {
 
     }
 
-    addTable(){
-        const tab =  PageSqlAddTable.create(this.connection)
+    addTable() {
+        const tab = PageSqlAddTable.create(this.connection)
         appTab.addTab(tab)
         appTab.active(tab.tabId)
     }

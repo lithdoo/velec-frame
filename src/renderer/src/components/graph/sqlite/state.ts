@@ -48,7 +48,7 @@ export interface NodeData {
 export interface EdgeData {
     id: string
     view: EdgeViewData,
-    meta: EdgeMetaData
+    meta: EdgeMetaData,
     _viewId: string
 }
 
@@ -93,6 +93,7 @@ export interface NodeViewData {
     zIndex: number,
     height: number;
     width: number;
+    labels: Record<string, string>
     x: number,
     y: number,
 }
@@ -139,7 +140,7 @@ export class SqlErdState {
         nodes: NodeData[]
         edges: EdgeData[]
     } | null = null) {
-        
+
         const temp = cache || {
             nodes: this.nodes,
             edges: this.edges,
@@ -189,6 +190,7 @@ export class SqlErdState {
                 x: cache?.view.x ?? idx * 500,
                 shape: "GH_SQLERD_ENTITY_NODE",
                 zIndex: 1,
+                labels: cache?.view.labels ?? {},
                 width: cache?.view.width ?? 300,
                 height: cache?.view.height ?? defNodeHeight(table)
             }
@@ -235,6 +237,7 @@ export class SqlErdState {
 
     save() {
         const { nodes, edges } = this
+        console.log({ nodes, edges })
         return { nodes, edges }
     }
 

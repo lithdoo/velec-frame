@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { FlatTreeHandler, FlatTreeItem, FlatTree } from '@renderer/components/base/FlatTree';
-import { computed, ref } from 'vue';
+import { FlatTree } from '@renderer/components/base/FlatTree';
+import { computed } from 'vue';
 import { SiderFileExplorer } from '.';
 
 const props = defineProps<{

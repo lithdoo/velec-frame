@@ -3,6 +3,10 @@ import { Menu, MenuButton, MenuDivide } from "../PopMenu";
 
 export interface ToolButton extends MenuButton { }
 
+function isToolButton(obj: any): obj is ToolButton {
+    return obj.type === 'button'
+}
+
 export interface ToolDivide extends MenuDivide { }
 
 export class ToolBarHandler {
@@ -14,9 +18,9 @@ export class ToolBarHandler {
 
     emit(key: string) {
         const button = this.list
-            .filter(v => v.type === 'button')
-            .find(v => v.key === key)
-        if (button) {
+            .filter(v => isToolButton(v))
+            .find(v => (v as ToolButton).key === key)
+        if (button && isToolButton(button)) {
             button.action?.()
         }
     }

@@ -1,6 +1,6 @@
 import { insertCss } from "insert-css";
 import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate, render, RenderScope } from "../common";
-import type { NodeMetaData } from "./state";
+import type { NodeMetaData, NodeViewData } from "./state";
 
 interface GhJsonStructNodeState {
     isSelected: MBaseValue<boolean>
@@ -10,6 +10,7 @@ interface GhJsonStructNodeState {
 type Props = {
     meta: NodeMetaData;
     state: GhJsonStructNodeState;
+    view: NodeViewData;
 }
 
 export class GhSqlErdNodeComponent {
@@ -61,13 +62,21 @@ export class GhSqlErdNodeComponent {
     static {
 
         const renderHeader = (t: MTemplate<Props>) => {
-            return t.div('gh-sql-erd__header')(t.text(s => s.get('meta').name))
+            return t.div('gh-sql-erd__header')(t.text(s => {
+                const name = s.get('meta').name
+                const label = s.get('view').labels?.[`${name}`] ?? ''
+                return name + (label ? ` ( ${label} )` : '')
+            }))
         }
 
         const renderBody = (t: MTemplate<Props>) => {
             return t.div('gh-sql-erd__body')(
                 t.loop(s => s.get('meta').fieldList)(t =>
-                    t.prop(s => ({ field: s.get('_item') }))(t => renderField(t))
+                    t.prop(s => ({
+                        field: s.get('_item'),
+                        view: s.get('view'),
+                        meta: s.get('meta')
+                    }))(t => renderField(t))
                 )
             )
         }
@@ -80,13 +89,20 @@ export class GhSqlErdNodeComponent {
                 type: string;                // 类型
                 foreignKey: boolean        // 是否外键
                 primaryKey: boolean        // 是否主键
-                notNull: boolean  
+                notNull: boolean
                 unique: boolean
-            }
+            },
+            meta: NodeMetaData
+            view: NodeViewData
         }>) => {
             return t.div('gh-sql-erd__field')(
-                t.div('gh-sql-erd__field-name')(t.text(s => s.get('field').name)),
-                t.div('gh-sql-erd__field-type')(t.text(s => `${s.get('field').type}${s.get('field').unique?' UNIQUE':''}${s.get('field').notNull?' NOT NULL':''}`))
+                t.div('gh-sql-erd__field-name')(t.text(s => {
+                    const name = s.get('field').name
+                    const table = s.get('meta').name
+                    const label = s.get('view').labels?.[`${table}.${name}`] ?? ''
+                    return name + (label ? ` ( ${label} )` : '')
+                })),
+                t.div('gh-sql-erd__field-type')(t.text(s => `${s.get('field').type}${s.get('field').unique ? ' UNIQUE' : ''}${s.get('field').notNull ? ' NOT NULL' : ''}`))
             )
         }
 
@@ -102,16 +118,18 @@ export class GhSqlErdNodeComponent {
 
     template = GhSqlErdNodeComponent.template
     meta: NodeMetaData
+    view: NodeViewData
     state: GhJsonStructNodeState
     element: HTMLElement
 
-    constructor(meta: NodeMetaData) {
+    constructor(meta: NodeMetaData, view: NodeViewData) {
         this.meta = meta
+        this.view = view
         this.state = {
             isSelected: new MBaseValue(false),
             highlightFields: new MBaseValue(new Set())
         }
-        const scope = RenderScope.create({ meta, state: this.state })
+        const scope = RenderScope.create({ meta, state: this.state, view: this.view })
         const renderNode = render<Props>(this.template, scope)
         this.element = renderNode.nodes.getValue()[0] as HTMLElement
         this.element.oncontextmenu = (ev) => { this.oncontextmenu?.(ev) }

@@ -80,17 +80,6 @@ export class SqliteConection {
         this.destory()
     }
 
-    async getAllTables() {
-        return this.requset(async () => {
-            const rowNameArr = await this.sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' order by name;`)
-            const rows = await Promise.all(rowNameArr.map(async ({ name }) => {
-                const fields = await this.sql.all(`pragma table_info(${name})`)
-                const foreignKeys = await this.sql.all(`pragma foreign_key_list(${name})`)
-                return { name, fields, foreignKeys }
-            }))
-            return rows
-        })
-    }
 
     async runSelectAll(sql: string) {
         return this.requset(async () => {
@@ -102,6 +91,65 @@ export class SqliteConection {
     async run(sql: string) {
         return this.requset(async () => {
             await this.sql.run(sql)
+        })
+    }
+
+    async getAllTables() {
+        return this.requset(async () => {
+            const rowNameArr = await this.sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' order by name;`)
+            const rows = await Promise.all(rowNameArr.map(async ({ name }) => {
+                const fields: {
+                    cid: number
+                    dflt_value: any
+                    name: string
+                    notnull: number
+                    pk: number
+                    type: string
+                    label: string
+                }[] = await this.sql.all(`pragma table_info(${name})`)
+                return {
+                    name, label: '', fieldList: fields.map(field => {
+                        return {
+                            name: field.name,
+                            label: '',
+                            type: field.type,     
+                            primaryKey: !!field.pk,     
+                            unique: false,
+                            notNull: !!field.notnull,
+                        }
+                    })
+                }
+            }))
+            return rows
+        })
+    }
+    async getTableInfo(name: string) {
+        return this.requset(async () => {
+            const rowNameArr = await this.sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' and name = '${name}'`)
+            const rows = await Promise.all(rowNameArr.map(async ({ name }) => {
+                const fields: {
+                    cid: number
+                    dflt_value: any
+                    name: string
+                    notnull: number
+                    pk: number
+                    type: string
+                    label: string
+                }[] = await this.sql.all(`pragma table_info(${name})`)
+                return {
+                    name, label: '', fieldList: fields.map(field => {
+                        return {
+                            name: field.name,
+                            label: '',
+                            type: field.type,     
+                            primaryKey: !!field.pk,     
+                            unique: false,
+                            notNull: !!field.notnull,
+                        }
+                    })
+                }
+            }))
+            return rows[0] ?? null
         })
     }
 }

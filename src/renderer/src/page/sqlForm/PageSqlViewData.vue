@@ -1,12 +1,23 @@
 <script lang="ts" setup>
-import type { PageDataView } from './index';
+import { ToolBarBuilder,ToolBar } from '@renderer/components/base/ToolBar';
+import type { PageSqlViewData } from './index';
 import { DataGrid, GridPager } from '@renderer/components/base/DataGrid'
-
-
+import { computed } from 'vue';
 
 const props = defineProps<{
-    page: PageDataView
+    page: PageSqlViewData
 }>()
+
+const page = computed(() => props.page)
+
+const toolbar = ToolBarBuilder.create()
+    .button('refresh', '刷新', async () => {
+        await page.value.refresh()
+    }, { icon: 'del' })
+    .button('update', '添加数据', () => {
+        // page.value.addField()
+    }, { icon: 'del' })
+    .build()
 
 </script>
 
@@ -14,11 +25,10 @@ const props = defineProps<{
     <div class="page-data-view">
         <div class="page-data-view__array-view">
             <div class="page-data-view__array-view-header">
-                <div class="page-data-view__array-view-title">{{ "<root>" }}</div>
-                <GridPager class="page-data-view__array-view-pager" :handler="props.page.dataHandler" />
+                <div class="page-data-view__array-view-title"><ToolBar :handler="toolbar"></ToolBar></div>
+                <GridPager class="page-data-view__array-view-pager" :handler="props.page.gridHandler" />
             </div>
-
-            <DataGrid class="page-data-view__array-view-grid" :handler="props.page.dataHandler"></DataGrid>
+            <DataGrid class="page-data-view__array-view-grid" :handler="props.page.gridHandler"></DataGrid>
         </div>
     </div>
 </template>

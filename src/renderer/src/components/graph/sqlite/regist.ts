@@ -1,5 +1,5 @@
 
-import { EdgeViewData, NodeData, NodeMetaData, NodeViewData } from "./state"
+import { EdgeViewData, NodeData } from "./state"
 import { GhSqlErdNodeComponent } from './component'
 import { Shape, Edge, Graph, Point, EdgeView } from "@antv/x6"
 import { SqlErdGraphView } from "./view"
@@ -248,7 +248,7 @@ export class GhSqlErdNode {
     constructor(node: NodeData) {
         GhSqlErdNode.finder.set(node, this)
         this.nodeData = node
-        this.component = new GhSqlErdNodeComponent(this.nodeData.meta)
+        this.component = new GhSqlErdNodeComponent(this.nodeData.meta, this.nodeData.view)
         this.component.oncontextmenu = (event) => {
             const view = this.findView()
             view.onNodeConnectMenu?.({ event, data: this.nodeData })

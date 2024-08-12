@@ -13,22 +13,15 @@ export abstract class GhNode<T> {
         this.id = id ?? Math.random().toString()
     }
 
-    static create(state: { type: string }) {
+    static create(_state: { type: string }) {
 
     }
 }
 
 
 export abstract class GhEdge {
-
-
-
-
     abstract edgeType: string
-
-    static create(state: { type: string }) {
-
-    }
+    static create(_state: { type: string }) {}
 }
 
 

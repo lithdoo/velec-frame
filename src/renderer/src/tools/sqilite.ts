@@ -1,31 +1,4 @@
-
-
-
-
-export interface FieldInfo<DataType extends string> {
-    name: string;
-    label: string;
-    type: DataType;                // 类型
-
-    primaryKey: boolean        // 是否主键
-    unique: boolean;
-    notNull: boolean;
-}
-
-export interface TableInfo<DataType extends string> {
-    name: string
-    label: string;
-    fieldList: FieldInfo<DataType>[],
-}
-
-
-
-
-export enum SqliteDataType {
-    INTEGER = "INTEGER",
-    TEXT = 'TEXT',
-    NUMERIC = 'NUMERIC'
-}
+import { TableInfo, SqliteDataType } from '@common/sql'
 
 export class SqliteConnect {
 
@@ -50,6 +23,18 @@ export class SqliteConnect {
         return this.all(sql)
     }
 
+    private lableSql(table: TableInfo<SqliteDataType>) {
+        let sql = `COMMENT ON TABLE ${table.name} IS '${table.label}';`
+
+        table.fieldList.forEach(field => {
+            sql += `
+            COMMENT ON COLUMN ${table.name}.${field.name} IS '${field.label}';
+            `
+        })
+
+        return sql
+    }
+
     createTable(table: TableInfo<SqliteDataType>) {
         const rows = table.fieldList
             .map(field => `${field.name
@@ -68,9 +53,8 @@ export class SqliteConnect {
         ${rows}
         ${pks}
         );
-        `
+        `+ this.lableSql(table)
 
-        console.log(sql)
         return window.sqliteApi.sqlRun(this.url, sql)
     }
 
@@ -82,6 +66,15 @@ export class SqliteConnect {
     deleteTable(name: string) {
         const sql = `DROP TABLE ${name};`
         return window.sqliteApi.sqlRun(this.url, sql)
+    }
+
+    commonOnTable(table: TableInfo<SqliteDataType>) {
+        const sql = this.lableSql(table)
+        return window.sqliteApi.sqlRun(this.url, sql)
+    }
+
+    tableInfo(name:string){
+        return window.sqliteApi.getTableInfo(this.url,name)
     }
 
     insertToTable() {

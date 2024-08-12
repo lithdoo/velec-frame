@@ -20,7 +20,7 @@ export enum MBaseTempalteNodeType {
     Prop = 'Prop'
 }
 
-export interface MBaseTempalteNode<Scope extends Record<string, unknown>> {
+export interface MBaseTempalteNode<_Scope extends Record<string, unknown>> {
     _type: MBaseTempalteNodeType
 }
 
@@ -150,7 +150,7 @@ export function render<Scope extends Record<string, unknown>>(template: MBaseTem
                 _index, _item
             }) as RenderScope<any>
             return new MBaseGroupFragment(template.children.map(template => render(template, childScope)))
-        }, (item: unknown, idx: number) => Math.random().toString())
+        }, (_item: unknown, _idx: number) => Math.random().toString())
 
         return renderNode
     } else if (isMBasePropsTempalteNode<Scope, Record<string, unknown>>(template)) {
