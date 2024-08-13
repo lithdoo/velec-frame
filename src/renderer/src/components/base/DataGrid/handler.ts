@@ -1,10 +1,14 @@
+import { nanoid } from "nanoid"
+
 export enum GridStatus {
     error = "error",
     loaded = 'loaded',
     loading = 'loading'
 }
 
-export type GridField = {
+export type GridField<T> = DataField | ActionField<T>
+
+export interface DataField {
     name: string,
     fieldKey: string,
     sortable: boolean,
@@ -12,19 +16,9 @@ export type GridField = {
     width?: string | number,
     minWidth?: string | number,
     ellipsis?: boolean,
-
-    // fixed?: 'left' | 'right',
-    // antv?: any,
-    // filter?: {
-    //     type: 'keyword'
-    // } | {
-    //     type: 'radio' | 'checkbox',
-    //     options: { text: string, value: string }[]
-    // }
-
 }
 
-export const field = (option: Partial<GridField> = {}): GridField => {
+export const field = (option: Partial<DataField> = {}): DataField => {
     return {
         name: 'id',
         fieldKey: 'id',
@@ -32,6 +26,54 @@ export const field = (option: Partial<GridField> = {}): GridField => {
         ...option
     }
 }
+
+
+interface ActionBtn<T> {
+    title: string,
+    key: string,
+    disabled?: boolean,
+    action: (e:MouseEvent) => void | Promise<void>,
+}
+
+export interface ActionField<T> {
+    _type: 'action',
+    key: string,
+    btns: (record: T) => ActionBtn<T>[],
+    width: () => number
+}
+
+
+export class ActionFieldBuilder<T> {
+    key = nanoid()
+    btns: (record: T) => ActionBtn<T>[] = () => []
+    width: () => number = () => 120
+
+    actions(fn: (record: T) => ActionBtn<T>[]) {
+        this.btns = fn
+        return this
+    }
+
+    build(): ActionField<T> {
+        return {
+            _type: 'action',
+            key: this.key,
+            btns: this.btns,
+            width: this.width
+        }
+    }
+}
+
+export function isActionField<T>(field: GridField<T>): field is ActionField<T> {
+    return (field as any)._type === 'action'
+}
+
+export function isDataField<T>(field: GridField<T>): field is DataField {
+    return (field as any)._type !== 'action'
+
+}
+
+
+
 export type GridRenderData<ListData> = {
     current: number,
     pageSize: number | null,
@@ -108,10 +150,9 @@ export abstract class GridRequset<ListData> {
     }
 }
 
-
 export class DataGridHandler<T = any, Request extends GridRequset<T> = GridRequset<any>> {
 
-    fields: GridField[] = []
+    fields: GridField<T>[] = []
     antTableBind: any = {}
 
     grid: GridRenderData<T> = {

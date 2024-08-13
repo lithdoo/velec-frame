@@ -73,15 +73,41 @@ export class SqliteConnect {
         return window.sqliteApi.sqlRun(this.url, sql)
     }
 
-    tableInfo(name:string){
-        return window.sqliteApi.getTableInfo(this.url,name)
+    tableInfo(name: string) {
+        return window.sqliteApi.getTableInfo(this.url, name)
     }
 
-    insertToTable() {
+    insertToTable(table: TableInfo<SqliteDataType>, records: Record<string, string>[], type: 'INSERT' | 'REPLACE' | 'INSERT OR REPLACE' = 'INSERT') {
 
+
+        const sql = `
+        ${type} INTO ${table.name} (${table.fieldList.map(v => v.name).join(', ')}) 
+           VALUES ${records.map(record => `(${table.fieldList.map(v => value(v.type, record[v.name]))})`).join(', ')}
+        `
+        return window.sqliteApi.sqlRun(this.url, sql)
     }
 
-    removeFromTable() {
+    updateToTable(table: TableInfo<SqliteDataType>, record: Record<string, string>, newone: Record<string, string>) {
+        const pks = table.fieldList.filter(v => v.primaryKey)
+        const where = pks.length ? pks : table.fieldList
+
+        const sql = `
+        UPDATE ${table.name}
+        SET ${table.fieldList.map(v => `${v.name} = ${value(v.type, newone[v.name])}`).join(', ')}
+        WHERE ${where.map(v => `${v.name} = ${value(v.type, record[v.name])}`).join(' and ')};
+        `
+        return window.sqliteApi.sqlRun(this.url, sql)
+    }
+
+    removeFromTable(table: TableInfo<SqliteDataType>, record: Record<string, string>) {
+        const pks = table.fieldList.filter(v => v.primaryKey)
+        const where = pks.length ? pks : table.fieldList
+
+        const sql = `
+        DELETE FROM ${table.name}
+        WHERE ${where.map(v => `${v.name} = ${value(v.type, record[v.name])}`).join(' and ')};
+        `
+        return window.sqliteApi.sqlRun(this.url, sql)
     }
 }
 
@@ -90,4 +116,15 @@ export class SqliteConnect {
 export interface SqliteTableInfo {
     name: string,
 
+}
+
+function value(type: SqliteDataType, value?: string) {
+    if (!value) return 'NULL'
+    if (type === SqliteDataType.TEXT) return `"${value.replaceAll('\\', '\\\\')
+        .replaceAll('"', '\\"')
+        }"`
+    if (type === SqliteDataType.INTEGER) return value
+    if (type === SqliteDataType.NUMERIC) return value
+
+    throw new Error()
 }
