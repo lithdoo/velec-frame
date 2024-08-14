@@ -310,7 +310,19 @@ class DataInsertHandler extends DataGridHandler<any, DataViewRequset> {
         this.fields = table.fieldList.map<GridField<Record<string, string>>>(fieldInfo => field({
             name: `${fieldInfo.name} (${fieldInfo.type})`,
             fieldKey: fieldInfo.name
-        }))
+        })).concat([
+            new ActionFieldBuilder<Record<string, string>>()
+                .actions((record) => {
+                    return[
+                            {
+                                title: '删除', key: 'cancel', action: () => {
+                                    this.request.data = this.request.data.filter(v=>v === record)
+                                }
+                            },
+                        ]
+                })
+                .build()
+        ])
     }
 
 }

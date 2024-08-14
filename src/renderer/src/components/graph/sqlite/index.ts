@@ -1,2 +1,3 @@
+import './regist'
 export * from './view'
-export * from './state'
+export * from './common'

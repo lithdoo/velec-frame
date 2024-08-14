@@ -1,16 +1,11 @@
-
-import { EdgeViewData, NodeData } from "./state"
-import { GhSqlErdNodeComponent } from './component'
-import { Shape, Edge, Graph, Point, EdgeView } from "@antv/x6"
-import { SqlErdGraphView } from "./view"
-
-
 // 路由参数
+
+import { EdgeView, Graph, Point } from "@antv/x6"
+import type { EdgeViewData } from "../common"
 
 function erRouter(_vertices: Point.PointLike[], _args: unknown, view: EdgeView): Point.PointLike[] {
 
-
-    const edge: { view: EdgeViewData } = view.cell.getData()
+    const edge: { view: EdgeViewData<any> } = view.cell.getData()
 
     const sourceBBox = {
         minX: view.sourceBBox.left,
@@ -225,75 +220,3 @@ function erRouter(_vertices: Point.PointLike[], _args: unknown, view: EdgeView):
 }
 
 Graph.registerRouter('sql-er-router', erRouter)
-
-export class GhSqlErdNode {
-    static html(data: NodeData) {
-        const node = GhSqlErdNode.finder.get(data) ?? new GhSqlErdNode(data)
-        return node.component.element
-    }
-    static finder: WeakMap<NodeData, GhSqlErdNode> = new WeakMap()
-    static {
-
-        Shape.HTML.register({
-            shape: 'GH_SQLERD_ENTITY_NODE',
-            html(cell) {
-                const data = cell.getData() as NodeData
-                const node = GhSqlErdNode.finder.get(data) ?? new GhSqlErdNode(data)
-                return node.component.element
-            },
-        })
-    }
-    readonly component: GhSqlErdNodeComponent
-    readonly nodeData: NodeData
-    constructor(node: NodeData) {
-        GhSqlErdNode.finder.set(node, this)
-        this.nodeData = node
-        this.component = new GhSqlErdNodeComponent(this.nodeData.meta, this.nodeData.view)
-        this.component.oncontextmenu = (event) => {
-            const view = this.findView()
-            view.onNodeConnectMenu?.({ event, data: this.nodeData })
-        }
-    }
-
-
-    findView() {
-        const view = SqlErdGraphView.finder.get(this.nodeData._viewId)
-        if (!view) throw new Error('view is not found!')
-        return view
-    }
-
-
-}
-
-export class GhSqlErdEdge {
-    static {
-
-        class ErdEdge extends Edge {
-            getSourcePoint() {
-                const point = super.getSourcePoint()
-                return point
-            }
-        }
-
-        ErdEdge.config({
-            attrs: {
-                wrap: {
-                    connection: true,
-                    strokeWidth: 10,
-                    strokeLinejoin: 'round',
-                },
-                line: {
-                    connection: true,
-                    stroke: '#999',
-                    strokeWidth: 2,
-                    strokeLinejoin: 'round',
-                    // targetMarker: {
-                    //     tagName: 'path',
-                    //     d: 'M 10 -5 0 0 10 5 z',
-                    // },
-                },
-            },
-        })
-        Graph.registerEdge('GH_SQLERD_RELATIONSHIP_EDGE', ErdEdge)
-    }
-}

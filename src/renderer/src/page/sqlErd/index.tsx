@@ -6,7 +6,6 @@ import { NodeData, SqlErdGraphView } from "@renderer/components/graph/sqlite/ind
 import { nanoid } from "nanoid";
 import { contextMenu } from "@renderer/view/fixed/contextmenu";
 import { Menu, PopMenuListHandler } from "@renderer/components/base/PopMenu";
-import { PageDataView } from "../dataView";
 import { SqliteConnect } from "@renderer/tools/sqilite";
 import { PageSqlAddTable, PageSqlEditLabel, PageSqlViewData } from "../sqlForm/";
 import { TableInfo, SqliteDataType } from "@common/sql";
@@ -79,6 +78,7 @@ export class PageSqlErd implements TabPage {
     async saveCache() {
         const filePath = this.cacheFilePath()
         const content = this.view.save()
+        console.log(content)
         await window.explorerApi.saveJson(filePath, content)
     }
 
@@ -105,12 +105,13 @@ export class PageSqlErd implements TabPage {
                 Menu.button({
                     icon: 'del', key: 'editLabel', label: '修改注释', action: () => {
                         const connection = this.connection
+                        
                         const tab = PageSqlEditLabel.create(
                             connection,
                             node2table(data),
-                            data.view.labels,
+                            this.view.getNodeLabels(node2table(data)),
                             (labels) => {
-                                this.view.updateLabels(data.id,labels)
+                                this.view.updateLabels(labels)
                                 this.view.refresh()
                             }
                         )
