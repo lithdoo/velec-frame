@@ -63,7 +63,51 @@ export class GraphStateCenter<S extends { [key: string]: StateExtend<any, any> }
     }
 
     getEdges() {
-        return this.list.reduce<EdgeData[]>((res, state) => state.getEdges(res), [])
+        const edges = this.list.reduce<EdgeData[]>((res, state) => state.getEdges(res), [])
+        this.resetEdgeOffset(edges)
+        return edges
+    }
+
+
+    private resetEdgeOffset(edges:EdgeData[]) {
+
+        const indexTable: Map<string, number> = new Map()
+        const self = edges.filter(v => v.view.source === v.view.target)
+        self.forEach(edge => {
+            const nodeId = edge.view.source
+            const lastIdx = indexTable.get(nodeId)
+            const currentIdx = lastIdx ? lastIdx + 1 : 1
+            indexTable.set(nodeId, currentIdx)
+            edge.view.sourcePortIndex = currentIdx
+            edge.view.targetPortIndex = currentIdx
+        })
+
+        const other = edges.filter(v => v.view.source !== v.view.target)
+
+        other.forEach(edge => {
+            const sId = edge.view.source
+            const sLastIdx = indexTable.get(sId)
+            const sCurrentIdx = sLastIdx ? sLastIdx + 1 : 1
+            indexTable.set(sId, sCurrentIdx)
+            edge.view.sourcePortIndex = sCurrentIdx
+
+            const tId = edge.view.target
+            const tLastIdx = indexTable.get(tId)
+            const tCurrentIdx = tLastIdx ? tLastIdx + 1 : 1
+            indexTable.set(tId, tCurrentIdx)
+            edge.view.targetPortIndex = tCurrentIdx
+        })
+
+
+        edges.forEach(edge => {
+            const sId = edge.view.source
+            const sLastIdx = indexTable.get(sId) ?? 0
+            edge.view.sourcePortLen = sLastIdx + 1
+
+            const tId = edge.view.target
+            const tLastIdx = indexTable.get(tId) ?? 0
+            edge.view.targetPortLen = tLastIdx + 1
+        })
     }
 
 }
