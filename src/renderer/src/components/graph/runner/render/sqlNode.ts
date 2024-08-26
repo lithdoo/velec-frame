@@ -40,6 +40,7 @@ export class GhRunnerSqlComponent {
             width: 6px;
             background: #ccc;
             cursor: nwse-resize;
+            border-radius: 50%;
         }
         .gh-runner-sql__header{
             display:flex;
