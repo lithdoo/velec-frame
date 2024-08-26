@@ -26,7 +26,6 @@ const node2table = (node: NodeData) => {
                 unique: field.unique,
                 notNull: field.notNull,
             }
-
         })
     }
 

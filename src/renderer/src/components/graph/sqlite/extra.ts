@@ -1,5 +1,5 @@
-import { isBaseNodeData } from "../base/state"
-import { EdgeData, EdgeShapeKey, ErdStateKey, NodeData, NodeShapeKey, RawData, StateExtend } from "../common"
+import { isBaseNodeData } from "./base"
+import { ErdStateKey, NodeData, NodeShapeKey, RawData, ErdStateExtend } from "./state"
 
 
 interface VFKey {
@@ -17,7 +17,7 @@ interface VFKey {
  * 1. 虚拟外键（不产生实际约束，但是可以根据此过滤脏数据）
  * 2. 注释（表，字段，虚拟外键）
  */
-export class LabelState extends StateExtend<{}, { labels: Record<string, string> }> {
+export class LabelState extends ErdStateExtend<{}, { labels: Record<string, string> }> {
     private labels: Record<string, string> = {}
     readonly key = ErdStateKey.Label
 
@@ -26,7 +26,7 @@ export class LabelState extends StateExtend<{}, { labels: Record<string, string>
         return { labels }
     }
 
-    load(_: RawData, cache: { labels: Record<string, string> } | null) {
+    load(cache: { labels: Record<string, string> } | null, _: RawData,) {
         if (cache) {
             this.labels = cache.labels
         }
@@ -34,10 +34,10 @@ export class LabelState extends StateExtend<{}, { labels: Record<string, string>
 
 
     getNodes(res: NodeData[]): NodeData<NodeShapeKey, any>[] {
-        res.forEach(v=>{
-            if(!isBaseNodeData(v)) return
+        res.forEach(v => {
+            if (!isBaseNodeData(v)) return
             v.meta.label = this.get(v.meta.name)
-            v.meta.fieldList.forEach(field=>{
+            v.meta.fieldList.forEach(field => {
                 const key = `${v.meta.name}.${field.name}`
                 field.label = this.get(key)
             })
@@ -54,13 +54,13 @@ export class LabelState extends StateExtend<{}, { labels: Record<string, string>
         }
     }
 
-    get(name:string){
+    get(name: string) {
         return this.labels[name] ?? ''
     }
 }
 
 
-export class VFkeyState extends StateExtend<{}, { vfkeys: VFKey[] }> {
+export class VFkeyState extends ErdStateExtend<{}, { vfkeys: VFKey[] }> {
     readonly key = ErdStateKey.VFkey
     vfkeys: VFKey[] = []
 
@@ -69,11 +69,10 @@ export class VFkeyState extends StateExtend<{}, { vfkeys: VFKey[] }> {
         return { vfkeys }
     }
 
-    load(_: RawData, cache: { vfkeys: VFKey[] } | null) {
+    load(cache: { vfkeys: VFKey[] } | null, _: RawData,) {
         if (cache) {
             this.vfkeys = cache.vfkeys
         }
-
     }
 
 }

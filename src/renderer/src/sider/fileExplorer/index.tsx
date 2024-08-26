@@ -11,6 +11,7 @@ import { PageSqlErd } from "@renderer/page/sqlErd"
 import { contextMenu } from "@renderer/view/fixed/contextmenu"
 import { PopMenuBuilder } from "@renderer/components/base/PopMenu"
 import { PageSqlEditor } from "@renderer/page/sqlEditor"
+import { PageRunner } from "@renderer/page/runner"
 
 
 export class SiderFileExplorer implements AppSiderPanel {
@@ -141,6 +142,17 @@ class ExplorerWrokspace {
                             title: `查询窗口 [ ${file.name} ]`,
                             connection: { sqlite: file.url }
                         }))
+                    })
+                    .build(),
+                ev
+            )
+        }
+
+        if (/.run$/.test(file.name)) {
+            contextMenu.open(
+                PopMenuBuilder.create()
+                    .button('open', '打开', () => {
+                        appTab.addTab(PageRunner.create(file.url))
                     })
                     .build(),
                 ev

@@ -5,6 +5,9 @@ export const explorerApi = {
     addWorkspace: async () => {
         return ipcRenderer.invoke('@explorer/workspace/open') as Promise<string>
     },
+    selectFile: async (option: { extensions?: string[] } = {}) => {
+        return ipcRenderer.invoke('@explorer/file/select', option) as Promise<string>
+    },
     readDir: async (filename: string) => {
         return await ipcRenderer.invoke('@explorer/dir/read', filename) as Promise<{
             name: string,

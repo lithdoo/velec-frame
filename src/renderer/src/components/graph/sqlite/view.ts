@@ -2,13 +2,13 @@ import { Graph } from "@antv/x6"
 import { GraphView } from "../view"
 import './regist'
 import { nanoid } from "nanoid"
-import { GraphStateCenter, NodeData, RawData } from "./common"
-import { BaseState } from "./base/state"
-import { LabelState, VFkeyState } from "./extra/state"
+import { ErdGraphStateCenter, NodeData, RawData } from "./state"
+import { BaseState } from "./base"
+import { LabelState, VFkeyState } from "./extra"
 import { SqliteDataType, TableInfo } from "@common/sql"
 
-export const state = (viewId: string) => {
-    return new GraphStateCenter({}, [])
+const state = (viewId: string) => {
+    return new ErdGraphStateCenter({}, [])
         .extends({ base: new BaseState(viewId) })
         .extends({ label: new LabelState(viewId) })
         .extends({ vfkey: new VFkeyState(viewId) })
@@ -19,22 +19,13 @@ export class SqlErdGraphView extends GraphView {
     static finder: Map<string, SqlErdGraphView> = new Map()
 
     readonly viewId: string = nanoid()
+    private readonly state = state(this.viewId)
     constructor() {
         super()
         SqlErdGraphView.finder.set(this.viewId, this)
     }
-
-    dispose() {
-        SqlErdGraphView.finder.delete(this.viewId)
-    }
-
-    protected iniGraph(): Graph {
-        const element = this.container
-        const container = document.createElement('div')
-        element.style.display = 'flex'
-        element.style.height = '100%'
-        container.style.flex = '1'
-        element.appendChild(container)
+    protected initGraph(): Graph {
+        const container = this.inner
         const graph: Graph = new Graph({
             container,
             connecting: {
@@ -65,11 +56,13 @@ export class SqlErdGraphView extends GraphView {
         return graph
     }
 
-    private readonly state = state(this.viewId)
+    dispose() {
+        SqlErdGraphView.finder.delete(this.viewId)
+    }
 
     load(raw: RawData, cache: any = null) {
         this.state.list.forEach(state => {
-            state.load(raw, cache?.[state.key] ?? null)
+            state.load(cache?.[state.key] ?? null, raw)
         })
         this.refresh()
     }
@@ -82,7 +75,6 @@ export class SqlErdGraphView extends GraphView {
     }
 
     refresh() {
-        console.log(this.state)
         this.graph?.removeCells(this.graph.getCells())
 
         this.graph?.addNodes(this.state.getNodes()
@@ -95,16 +87,12 @@ export class SqlErdGraphView extends GraphView {
 
     updateLabels(labels: Record<string, string>) {
         this.state.states.label.update(labels)
-        // const node = this.state.getNodes().find(v => v.id === nodeId)
-        // if (node) {
-        //     node.view.labels = labels
-        // }
     }
 
     getNodeLabels(table: TableInfo<SqliteDataType>) {
         const res: Record<string, string> = {}
         res[table.name] = this.state.states.label.get(table.name)
-        table.fieldList.forEach(field=>{
+        table.fieldList.forEach(field => {
             const key = `${table.name}.${field.name}`
             res[key] = this.state.states.label.get(key)
         })

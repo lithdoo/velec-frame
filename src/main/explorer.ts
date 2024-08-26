@@ -18,6 +18,20 @@ export class ExplorerService {
             }
         })
 
+        ipcMain.handle('@explorer/file/select', async (_, options: { extensions?: string[] }) => {
+            const data = await dialog.showOpenDialog({
+                properties: ['openFile'],
+                filters: [
+                    { name: 'Files', extensions: options.extensions ?? ['*'] }
+                ]
+            })
+            if (!data.canceled && data.filePaths[0]) {
+                return pathToFileURL(data.filePaths[0]).toString()
+            } else {
+                return ''
+            }
+        })
+
         ipcMain.handle('@explorer/dir/read', async (_, fileUrl: string) => {
             if (!existsSync(new URL(fileUrl))) {
                 return null

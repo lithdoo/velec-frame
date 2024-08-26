@@ -117,10 +117,10 @@ export class GhJsonView {
 
     loadContainer(container: HTMLElement) {
         this.container = container
-        this.iniGraph()
+        this.initGraph()
     }
 
-    protected iniGraph(): Graph {
+    protected initGraph(): Graph {
         const element = this.container
         const container = document.createElement('div')
         element.style.display = 'flex'

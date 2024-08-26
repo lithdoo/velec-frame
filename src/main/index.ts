@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { ExplorerService } from './explorer'
 import { EditorService } from './editor'
 import { SqliteService } from './sqlite'
+import { RunnerService } from './runner'
 
 Menu.setApplicationMenu(null)
 
@@ -78,6 +79,7 @@ app.whenReady().then(async () => {
   await ExplorerService.install()
   await EditorService.install()
   await SqliteService.install()
+  await RunnerService.install()
 
   createWindow()
 

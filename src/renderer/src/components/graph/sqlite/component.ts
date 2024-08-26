@@ -1,6 +1,7 @@
 import { insertCss } from "insert-css";
-import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate, render, RenderScope } from "../../common";
-import type { BaseNodeData } from "./state";
+import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate, render, RenderScope } from "../common";
+import type { BaseNodeData } from "./base";
+
 
 interface GhJsonStructNodeState {
     isSelected: MBaseValue<boolean>

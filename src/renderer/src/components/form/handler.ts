@@ -16,8 +16,6 @@ export class CommonFormHandler<Form extends FormBase> {
     constructor(list: Field<FormKey, unknown>[]) {
         this.list = list
     }
-
-
     async emitValidate(keyName: string) {
         const field = this.list.find(v => v.keyName === keyName)
         if (!field) {
@@ -67,11 +65,11 @@ export class CommonFormBuilder<Form extends FormBase> {
         return new CommonFormBuilder<FromExtend<Form, Key, Value>>(this.list.concat([field as any]))
     }
 
-    selector<Key extends string>(keyName: Key, option: Partial<
-        OptionField<Key>
+    selector<Key extends string, T extends string = string>(keyName: Key, option: Partial<
+        OptionField<Key, T>
     >) {
 
-        const field: OptionField<Key> = Object.assign({
+        const field: OptionField<Key, T> = Object.assign({
             keyName,
             title: '',
             label: '',
@@ -125,6 +123,23 @@ export class CommonFormBuilder<Form extends FormBase> {
         return this.add(field)
     }
 
+    fileUrl<Key extends string>(keyName: Key, option: Partial<FileUrlField<Key>>) {
+        const field: FileUrlField<Key> = Object.assign({
+            keyName,
+            title: '',
+            label: '',
+            required: false,
+            render: '',
+            value: '',
+            blank: '',
+            transfer: (text: string) => text.trim(),
+            extensions: ['*'],
+        }, option, {
+            keyName, render: 'file'
+        })
+        return this.add(field)
+    }
+
     build() {
         return new CommonFormHandler<Form>(this.list)
     }
@@ -142,7 +157,7 @@ export interface Field<Key extends FormKey, Value = any> {
     transfer?: (val: Value) => Value
 }
 
-export interface OptionField<Key extends FormKey> extends Field<Key, string> {
+export interface OptionField<Key extends FormKey, T extends string = string> extends Field<Key, T> {
     options: { key: string, title: string }[]
     multi: boolean
     stringify: boolean
@@ -161,6 +176,14 @@ export interface TextField<Key extends FormKey> extends Field<Key, string> {
     min: number
 }
 
+export interface FileUrlField<Key extends FormKey> extends Field<Key, string> {
+    render: 'file',
+    extensions: string[]
+}
+
+
+// export interface 
+
 export function isOptionField<Key extends FormKey>(item: Field<Key, any>): item is OptionField<Key> {
     return item.render === 'selector' || item.render === 'checkbox' || item.render === 'radio'
 }
@@ -171,6 +194,10 @@ export function isTextField<Key extends FormKey>(item: Field<Key, any>): item is
 
 export function isSwitchField<Key extends FormKey>(item: Field<Key, any>): item is SwitchField<Key> {
     return item.render === 'switch'
+}
+
+export function isFileUrlField<Key extends FormKey>(item: Field<Key, any>): item is FileUrlField<Key> {
+    return item.render === 'file'
 }
 
 

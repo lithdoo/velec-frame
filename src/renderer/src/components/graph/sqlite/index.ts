@@ -1,3 +1,3 @@
 import './regist'
 export * from './view'
-export * from './common'
+export * from './state'

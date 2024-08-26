@@ -2,7 +2,6 @@
 import { Table as AntTable } from 'ant-design-vue'
 import { DataGridHandler, isActionField, isDataField } from './handler';
 import { computed } from 'vue';
-import ActionBtns from './ActionBtns.vue'
 
 const props = defineProps<{
     handler: DataGridHandler<T>

@@ -28,6 +28,7 @@ type TemplateElementOption<Scope extends Record<string, unknown>, T extends HTML
 }
 
 export interface MTemplate<Scope extends Record<string, unknown>> {
+    pre: (className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>, option?: TemplateElementOption<Scope, HTMLPreElement>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLPreElement, Scope>>,
     div: (className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>, option?: TemplateElementOption<Scope, HTMLDivElement>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLDivElement, Scope>>,
     span: (className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>, option?: TemplateElementOption<Scope, HTMLSpanElement>) => TemplateParentNodeBuilder<Scope, Scope, MBaseElementTemplateNode<HTMLSpanElement, Scope>>,
     text: (content: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string>>) => TemplateNodeBuilder<Scope, MBaseTextTemplateNode<Scope>>,
@@ -110,6 +111,13 @@ export class MBaseTemplate<Scope extends Record<string, unknown>> implements MTe
         option: TemplateElementOption<Scope, HTMLDivElement> = {}
     ) {
         return this.element<HTMLDivElement>(() => document.createElement('div'), className, option)
+    }
+
+    pre(
+        className: MayBeStatic<[MBaseTScope<Scope>], MayBeMBase<string | string[]>>,
+        option: TemplateElementOption<Scope, HTMLPreElement> = {}
+    ) {
+        return this.element<HTMLPreElement>(() => document.createElement('pre'), className, option)
     }
 
     cond(cond: (scope: MBaseTScope<Scope>) => MayBeMBase<boolean>) {

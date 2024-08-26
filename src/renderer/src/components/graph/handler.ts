@@ -9,10 +9,10 @@ export class GraphView {
 
     loadContainer(container: HTMLElement) {
         this.container = container
-        this.graph = this.iniGraph()
+        this.graph = this.initGraph()
     }
 
-    protected iniGraph(): Graph {
+    protected initGraph(): Graph {
         const element = this.container
         const container = document.createElement('div')
         element.style.display = 'flex'

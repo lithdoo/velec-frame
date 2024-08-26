@@ -1,7 +1,7 @@
 // 路由参数
 
 import { EdgeView, Graph, Point } from "@antv/x6"
-import type { EdgeViewData } from "../common"
+import type { EdgeViewData } from "../state"
 
 function erRouter(_vertices: Point.PointLike[], _args: unknown, view: EdgeView): Point.PointLike[] {
 

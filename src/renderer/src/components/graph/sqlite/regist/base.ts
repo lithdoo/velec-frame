@@ -1,6 +1,6 @@
 
-import type { BaseNodeData } from "../base/state"
-import { GhSqlErdNodeComponent } from '../base/component'
+import type { BaseNodeData } from "../base"
+import { GhSqlErdNodeComponent } from '../component'
 import { Shape, Edge, Graph } from "@antv/x6"
 import { SqlErdGraphView } from "../view"
 

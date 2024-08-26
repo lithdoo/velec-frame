@@ -20,10 +20,10 @@ class AppTab {
         return this.list.find(tab => tab.tabId === this.currentId) ?? null
     }
 
-    addTab(tab: TabPage) {
+    addTab(tab: TabPage, focus: boolean = true) {
         this.removeTab(tab.tabId)
         this.list = this.list.filter(v => v.tabId !== tab.tabId).concat([tab])
-        if (!this.currentId) this.active(tab.tabId)
+        if (focus || !this.currentId) this.active(tab.tabId)
     }
 
     async removeTab(id: string) {

@@ -1,4 +1,4 @@
-import { EdgeData, EdgeShapeKey, EdgeViewData, ErdStateKey, NodeData, NodeShapeKey, NodeViewData, RawData, RawTable, StateExtend } from "../common";
+import { EdgeData, EdgeShapeKey, EdgeViewData, ErdStateKey, NodeData, NodeShapeKey, NodeViewData, RawData, RawTable, ErdStateExtend } from "./state";
 
 export type BaseNodeData = NodeData<NodeShapeKey.GH_SQLERD_ENTITY_NODE, NodeMetaData>
 
@@ -50,7 +50,7 @@ export const isBaseNodeData = (node:NodeData):node is BaseNodeData=>{
     return node.view.shape === NodeShapeKey.GH_SQLERD_ENTITY_NODE
 }
 
-export class BaseState extends StateExtend<{}, {
+export class BaseState extends ErdStateExtend<{}, {
     nodes: BaseNodeData[],
     edges: BaseEdgeData[],
 }> {
@@ -59,10 +59,10 @@ export class BaseState extends StateExtend<{}, {
     nodes: BaseNodeData[] = []
     edges: BaseEdgeData[] = []
     // 从后台数据中增量更新节点
-    load(raw: RawData, cache: {
+    load( cache: {
         nodes: BaseNodeData[]
         edges: BaseEdgeData[]
-    } | null = null) {
+    } | null,raw: RawData) {
 
         const temp = cache || {
             nodes: this.nodes,

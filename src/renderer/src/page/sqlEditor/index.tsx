@@ -14,6 +14,7 @@ interface PageSqlEditorOption {
     title: string,
     connection?: SqlConnectOption
     content?: string
+    save?: (content: string) => Promise<void> | void
 }
 
 export class PageSqlEditor implements TabPage {
@@ -31,10 +32,14 @@ export class PageSqlEditor implements TabPage {
     title = ''
     editorHandler: TextEditorHandler
     dataView?: PageDataView
+    save: () => Promise<void> | void
 
     constructor(option: PageSqlEditorOption) {
         this.title = option.title
         this.connection = option.connection
+        this.save = async () => {
+            await option.save?.(this.editorHandler.editor?.getValue() ?? '')
+        }
         this.editorHandler = new TextEditorHandler(option.content ?? '', 'sql')
         this.element = <PageSqlEditorVue page={this}></PageSqlEditorVue>
     }
@@ -56,7 +61,6 @@ export class PageSqlEditor implements TabPage {
         }
         this.dataView.load(data)
         appTab.active(this.dataView.tabId)
-
     }
 
 }

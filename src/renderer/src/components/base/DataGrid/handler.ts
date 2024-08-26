@@ -28,7 +28,7 @@ export const field = (option: Partial<DataField> = {}): DataField => {
 }
 
 
-interface ActionBtn<T> {
+interface ActionBtn<_T> {
     title: string,
     key: string,
     disabled?: boolean,
