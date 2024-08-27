@@ -2,6 +2,7 @@
 import type { PageRunner } from './index';
 import { ToolBarBuilder, ToolBar } from '@renderer/components/base/ToolBar';
 import { GraphContainer } from "@renderer/components/graph";
+import { onMounted } from 'vue';
 
 const props = defineProps<{
     page: PageRunner
@@ -14,13 +15,25 @@ const toolbar = ToolBarBuilder.create()
     .button('update', '更新', () => {
         // props.page.reload()
     }, { icon: 'del' })
-    .button('createTable', '添加 SQL 节点', async () => {
+    .button('addSqlNode', '添加 SQL 节点', async () => {
         const fileUrl = await window.explorerApi.selectFile({extensions:['db']})
         if(fileUrl) {
             props.page.view.addSqlNode(fileUrl)
         }
     }, { icon: 'del' })
+    .button('addJsonNode', '添加 Json 节点', async () => {
+        props.page.view.addJsonNode('')
+    }, { icon: 'del' })
+    .button('addFlowNode', '添加 Flow 节点', async () => {
+        props.page.view.addFlowNode('')
+    }, { icon: 'del' })
     .build()
+
+onMounted(()=>{
+    setTimeout(()=>{
+        props.page.view.fitView()
+    },1000)
+})
 
 </script>
 

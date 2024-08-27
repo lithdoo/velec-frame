@@ -1,25 +1,23 @@
 import { insertCss } from "insert-css";
 import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate, render, RenderScope } from "../../common";
-import { NodeShapeKey, type SqlNodeData } from "../state";
+import { type JsonNodeData, NodeShapeKey } from "../state";
 import { RunnerGraphView } from "../view";
 import { Shape } from "@antv/x6";
 import { initArch } from "../../addon/resizeNode";
 
-
-
-interface GhRunnerSqlNodeState {
+interface GhRunnerJsonNodeState {
     isSelected: MBaseValue<boolean>
 }
 
 type Props = {
-    data: SqlNodeData
-    state: GhRunnerSqlNodeState;
+    data: JsonNodeData
+    state: GhRunnerJsonNodeState;
 }
 
-export class GhRunnerSqlComponent {
+export class GhRunnerJsonComponent {
     static {
         insertCss(/*css*/`
-        .gh-runner-sql{
+        .gh-runner-json{
             border: 2px solid #4d4E53;
             border-radius: 4px;
             background: #2F3035;
@@ -31,7 +29,7 @@ export class GhRunnerSqlComponent {
             position: relative;
         }
 
-        .gh-runner-sql__resize{
+        .gh-runner-json__resize{
             position: absolute;
             z-index: 1;
             right: 0;
@@ -42,13 +40,14 @@ export class GhRunnerSqlComponent {
             cursor: nwse-resize;
             border-radius: 50%;
         }
-        .gh-runner-sql__header{
+
+        .gh-runner-json__header{
             display:flex;
             align-items: center;    
             justify-content: center;
             height: 24px;
             line-height: 18px;
-            background: #2B334B;
+            background: #a6915c;
             font-size: 12px;
             padding: 0 4px;
             color: rgba(255,255,255,0.85);
@@ -57,29 +56,22 @@ export class GhRunnerSqlComponent {
             border-radius: 2px 2px 0 0 ;
         }
 
-        .gh-runner-sql__name{
+        .gh-runner-json__name{
             flex: 1 1 0;
             width: 0;
         }
         
-        .gh-runner-sql__type{
-            flex: 0 0 auto;
-            background:rgba(255,255,255,0.1);
-            padding: 0 8px;
-            border-radius: 4px;
-        }
-
-        .gh-runner-sql__body{
+        .gh-runner-json__body{
             flex: 1 1 0;
             height: 0;
             overflow: auto;
             position: relative;
         }
-        .gh-runner-sql__code{
+        .gh-runner-json__code{
             padding: 4px;
             line-height: 1.5;
         }
-        .gh-runner-sql__blank{
+        .gh-runner-json__blank{
             position: absolute;
             top: 0;
             left: 0;
@@ -97,31 +89,30 @@ export class GhRunnerSqlComponent {
     static template: MBaseElementTemplateNode<HTMLDivElement, Props>
     static {
         const renderHeader = (t: MTemplate<Props>) => {
-            return t.div('gh-runner-sql__header')(
-                t.div('gh-runner-sql__name')(
+            return t.div('gh-runner-json__header')(
+                t.div('gh-runner-json__name')(
                     t.text(s => {
-                        const name = s.get('data').meta.fileUrl.split('/').pop() ?? ''
-                        const label = s.get('data').meta.label ?? ''
-                        return name + (label ? ` ( ${label} )` : '')
+                        const label = s.get('data').meta.label || '<未命名数据>'
+                        return label
                     })
-                ),
-                t.div('gh-runner-sql__type')(
-                    t.text(s => s.get('data').meta.type)
                 )
             )
         }
 
         const renderBody = (t: MTemplate<Props>) => {
-            return t.div('gh-runner-sql__body')(
+            return t.div('gh-runner-json__body')(
 
-                t.cond(s => !!s.get('data').meta.sql)(
-                    t.pre('gh-runner-sql__code')(
-                        t.text(s => s.get('data').meta.sql)
+                t.cond(s => !s.get('data').meta.isBlank)(
+                    t.pre('gh-runner-json__code')(
+                        t.text(s => s.get('data').meta.data === null
+                            ? 'null'
+                            : JSON.stringify(s.get('data').meta.data, null, 2)
+                        )
                     )
                 ),
-                t.cond(s => !s.get('data').meta.sql)(
-                    t.div('gh-runner-sql__blank')(
-                        t.text('No SQL')
+                t.cond(s => !!s.get('data').meta.isBlank)(
+                    t.div('gh-runner-json__blank')(
+                        t.text('No Data')
                     )
                 )
 
@@ -130,21 +121,21 @@ export class GhRunnerSqlComponent {
 
 
         const renderNode = (t: MTemplate<Props>) => {
-            return t.div('gh-runner-sql')(
+            return t.div('gh-runner-json')(
                 renderHeader(t),
                 renderBody(t),
-                t.div('gh-runner-sql__resize')
+                t.div('gh-runner-json__resize')
             )
         }
-        GhRunnerSqlComponent.template = renderNode(new MBaseTemplate()).build()
+        GhRunnerJsonComponent.template = renderNode(new MBaseTemplate()).build()
     }
 
-    template = GhRunnerSqlComponent.template
-    data: SqlNodeData
-    state: GhRunnerSqlNodeState
+    template = GhRunnerJsonComponent.template
+    data: JsonNodeData
+    state: GhRunnerJsonNodeState
     element: HTMLElement
 
-    constructor(data: SqlNodeData) {
+    constructor(data: JsonNodeData) {
         this.data = data
         this.state = {
             isSelected: new MBaseValue(false),
@@ -154,7 +145,7 @@ export class GhRunnerSqlComponent {
         this.element = renderNode.nodes.getValue()[0] as HTMLElement
         this.element.oncontextmenu = (ev) => { this.oncontextmenu?.(ev) }
 
-        const resize = this.element.querySelector('.gh-runner-sql__resize')
+        const resize = this.element.querySelector('.gh-runner-json__resize')
 
         if (resize instanceof HTMLElement) {
 
@@ -191,28 +182,28 @@ export class GhRunnerSqlComponent {
 }
 
 
-export class GhRunnerSqlNode {
-    static html(data: SqlNodeData) {
-        const node = GhRunnerSqlNode.finder.get(data) ?? new GhRunnerSqlNode(data)
+export class GhRunnerJsonNode {
+    static html(data: JsonNodeData) {
+        const node = GhRunnerJsonNode.finder.get(data) ?? new GhRunnerJsonNode(data)
         return node.component.element
     }
-    static finder: WeakMap<SqlNodeData, GhRunnerSqlNode> = new WeakMap()
+    static finder: WeakMap<JsonNodeData, GhRunnerJsonNode> = new WeakMap()
     static {
         Shape.HTML.register({
-            shape: NodeShapeKey.GH_RUNNER_SQL_NODE,
+            shape: NodeShapeKey.GH_RUNNER_JSON_NODE,
             html(cell) {
-                const data = cell.getData() as SqlNodeData
-                const node = GhRunnerSqlNode.finder.get(data) ?? new GhRunnerSqlNode(data)
+                const data = cell.getData() as JsonNodeData
+                const node = GhRunnerJsonNode.finder.get(data) ?? new GhRunnerJsonNode(data)
                 return node.component.element
             },
         })
     }
-    readonly component: GhRunnerSqlComponent
-    readonly nodeData: SqlNodeData
-    constructor(node: SqlNodeData) {
-        GhRunnerSqlNode.finder.set(node, this)
+    readonly component: GhRunnerJsonComponent
+    readonly nodeData: JsonNodeData
+    constructor(node: JsonNodeData) {
+        GhRunnerJsonNode.finder.set(node, this)
         this.nodeData = node
-        this.component = new GhRunnerSqlComponent(this.nodeData)
+        this.component = new GhRunnerJsonComponent(this.nodeData)
         this.component.oncontextmenu = (event) => {
             const view = this.findView()
             view.onNodeContextMenu?.({ event, data: this.nodeData })

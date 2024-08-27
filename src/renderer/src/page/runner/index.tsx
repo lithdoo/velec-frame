@@ -31,7 +31,7 @@ export class PageRunner implements TabPage {
 
     async init() {
         const cache = await window.explorerApi.readJson(this.fileUrl)
-        this.view.load( cache ?? null)
+        this.view.load( cache ?? null);
     }
 
 
@@ -41,7 +41,7 @@ export class PageRunner implements TabPage {
         console.log({content})
         await window.explorerApi.saveJson(filePath, content)
     }
-    
+
     private initView() {
     }
 

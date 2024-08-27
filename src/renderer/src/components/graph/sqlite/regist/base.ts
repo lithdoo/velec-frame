@@ -28,7 +28,7 @@ export class GhSqlErdNode {
         this.component = new GhSqlErdNodeComponent(this.nodeData)
         this.component.oncontextmenu = (event) => {
             const view = this.findView()
-            view.onNodeConnectMenu?.({ event, data: this.nodeData })
+            view.onNodeContextMenu?.({ event, data: this.nodeData })
         }
     }
 

@@ -1,5 +1,5 @@
 import { Graph } from "@antv/x6"
-import { AllNodeData, isSqlNodeData, RunnerGraphStateCenter, RunnerSqlState } from "./state"
+import { AllNodeData, isFlowNodeData, isJsonNodeData, isSqlNodeData, RunnerFlowState, RunnerGraphStateCenter, RunnerJsonState, RunnerSqlState } from "./state"
 import { GraphView } from "../view"
 import { nanoid } from "nanoid"
 import { contextMenu } from "@renderer/view/fixed/contextmenu"
@@ -12,6 +12,8 @@ import { PageDataForm } from "@renderer/page/dataForm"
 const state = (viewId: string) => {
     return new RunnerGraphStateCenter({}, [])
         .extends({ sql: new RunnerSqlState(viewId) })
+        .extends({ json: new RunnerJsonState(viewId) })
+        .extends({ flow: new RunnerFlowState(viewId) })
         .init()
 }
 
@@ -64,6 +66,8 @@ export class RunnerGraphView extends GraphView {
     refresh() {
         this.graph?.removeCells(this.graph.getCells())
 
+        console.log(this.state.getNodes())
+
         this.graph?.addNodes(this.state.getNodes()
             .map(node => Object.assign({}, node.view, { data: node }))
         )
@@ -91,7 +95,7 @@ export class RunnerGraphView extends GraphView {
         this.refresh()
     }
 
-    onNodeConnectMenu({
+    onNodeContextMenu({
         event, data
     }: {
         event: MouseEvent,
@@ -147,6 +151,58 @@ export class RunnerGraphView extends GraphView {
                 }),
             ]), event)
         }
+
+        if (isJsonNodeData(data)) {
+            contextMenu.open(PopMenuListHandler.create([
+                Menu.button({
+                    icon: 'del', key: 'editAttr', label: '修改注释', action: () => {
+                        const form = CommonFormBuilder.create()
+                            .input('label', {
+                                label: '注释', value: data.meta.label
+                            })
+                            .build()
+
+                        appTab.addTab(PageDataForm.create({
+                            form,
+                            title: `Runner<${data.meta.label || '未命名数据'}>`,
+                            onsubmit: (value) => {
+                                const { label } = value
+                                data.meta.label = label
+                                this.refreshNode(data)
+                            }
+                        }))
+                    }
+                })
+            ]), event)
+        }
+
+        if (isFlowNodeData(data)) {
+            contextMenu.open(PopMenuListHandler.create([
+                Menu.button({
+                    icon: 'del', key: 'editAttr', label: '修改属性', action: () => {
+                        const form = CommonFormBuilder.create()
+                            .input('name', {
+                                label: '名字', value: data.meta.name
+                            })
+                            .input('label', {
+                                label: '注释', value: data.meta.label
+                            })
+                            .build()
+
+                        appTab.addTab(PageDataForm.create({
+                            form,
+                            title: `Runner<${data.meta.label || '未命名数据'}>`,
+                            onsubmit: (value) => {
+                                const { label, name } = value
+                                data.meta.name = name
+                                data.meta.label = label
+                                this.refreshNode(data)
+                            }
+                        }))
+                    }
+                })
+            ]), event)
+        }
     }
 
     addSqlNode(fileUrl: string) {
@@ -154,9 +210,18 @@ export class RunnerGraphView extends GraphView {
         this.refresh()
     }
 
+    addJsonNode(label: string = '') {
+        this.state.states.json.addNode(label)
+        this.refresh()
+    }
+
+    addFlowNode(name: string = '') {
+        this.state.states.flow.addNode(name)
+        this.refresh()
+    }
 
     setNodeSize(id: string, size: { height: number; width: any }): void {
-        super.setNodeSize(id,size)
-        this.state.setNodeSize(id,size)
+        super.setNodeSize(id, size)
+        this.state.setNodeSize(id, size)
     }
 }

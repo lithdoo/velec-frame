@@ -99,7 +99,7 @@ export class SqlErdGraphView extends GraphView {
         return res
     }
 
-    onNodeConnectMenu?: (_option: {
+    onNodeContextMenu?: (_option: {
         event: MouseEvent,
         data: NodeData
     }) => void

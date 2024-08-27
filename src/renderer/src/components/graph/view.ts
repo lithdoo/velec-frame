@@ -34,4 +34,8 @@ export abstract class GraphView {
         this.graph = this.initGraph()
         this.refresh()
     }
+
+    fitView(){
+        this.graph?.zoomToFit()
+    }
 }

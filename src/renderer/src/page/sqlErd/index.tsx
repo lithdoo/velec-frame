@@ -82,7 +82,7 @@ export class PageSqlErd implements TabPage {
     }
 
     private initView() {
-        this.view.onNodeConnectMenu = ({
+        this.view.onNodeContextMenu = ({
             event, data
         }) => {
             contextMenu.open(PopMenuListHandler.create([
