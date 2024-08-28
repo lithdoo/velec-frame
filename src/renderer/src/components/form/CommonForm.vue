@@ -66,8 +66,8 @@ const selectFile = async (field: FileUrlField<string>) => {
                     </template>
                     <AntInput :value="field.value" :readonly="true" @change="handler.emitValidate(field.keyName)">
                         <template #addonAfter>
-                            <a-button type="primary" :style="{ 'cursor': 'pointer' }"
-                                @click="selectFile(field)">选择文件</a-button>
+                            <div type="primary" :style="{ 'cursor': 'pointer' }"
+                                @click="selectFile(field)">选择文件</div>
                         </template>
                     </AntInput>
                 </AntFormItem>

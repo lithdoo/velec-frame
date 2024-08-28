@@ -1,6 +1,6 @@
 import { Graph } from "@antv/x6"
-import { AllNodeData, isFlowNodeData, isJsonNodeData, isSqlNodeData, RunnerFlowState, RunnerGraphStateCenter, RunnerJsonState, RunnerSqlState } from "./state"
-import { GraphView } from "../view"
+import { AllEdgeData, AllNodeData, isFlowNodeData, isJsonNodeData, isSqlNodeData, RunnerFlowState, RunnerGraphStateCenter, RunnerJsonState, RunnerSqlState } from "./state"
+import { GraphStateView, GraphView } from "../view"
 import { nanoid } from "nanoid"
 import { contextMenu } from "@renderer/view/fixed/contextmenu"
 import { Menu, PopMenuListHandler } from "@renderer/components/base/PopMenu"
@@ -17,10 +17,10 @@ const state = (viewId: string) => {
         .init()
 }
 
-export class RunnerGraphView extends GraphView {
+export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
     static finder: Map<string, RunnerGraphView> = new Map()
     readonly viewId: string = nanoid()
-    private readonly state = state(this.viewId)
+    readonly state = state(this.viewId)
     constructor() {
         super()
         RunnerGraphView.finder.set(this.viewId, this)
@@ -60,20 +60,6 @@ export class RunnerGraphView extends GraphView {
     }
     dispose() {
         RunnerGraphView.finder.delete(this.viewId)
-    }
-
-
-    refresh() {
-        this.graph?.removeCells(this.graph.getCells())
-
-        console.log(this.state.getNodes())
-
-        this.graph?.addNodes(this.state.getNodes()
-            .map(node => Object.assign({}, node.view, { data: node }))
-        )
-        this.graph?.addEdges(this.state.getEdges()
-            .map(edge => Object.assign({}, edge.view, { data: edge }))
-        )
     }
 
     save() {
@@ -158,7 +144,7 @@ export class RunnerGraphView extends GraphView {
                     icon: 'del', key: 'editAttr', label: '修改注释', action: () => {
                         const form = CommonFormBuilder.create()
                             .input('label', {
-                                label: '注释', value: data.meta.label
+                                title: '注释', value: data.meta.label
                             })
                             .build()
 
@@ -182,10 +168,10 @@ export class RunnerGraphView extends GraphView {
                     icon: 'del', key: 'editAttr', label: '修改属性', action: () => {
                         const form = CommonFormBuilder.create()
                             .input('name', {
-                                label: '名字', value: data.meta.name
+                                title: '名字', value: data.meta.name
                             })
                             .input('label', {
-                                label: '注释', value: data.meta.label
+                                title: '注释', value: data.meta.label
                             })
                             .build()
 
@@ -218,6 +204,64 @@ export class RunnerGraphView extends GraphView {
     addFlowNode(name: string = '') {
         this.state.states.flow.addNode(name)
         this.refresh()
+    }
+
+    addFlowEdge() {
+        const form = CommonFormBuilder.create()
+            .selector<'flowId', string>('flowId', {
+                title: '流程节点',
+                value: this.nodes.find(v => isFlowNodeData(v))?.id ?? '',
+                options: this.nodes.filter(v => {
+                    return isFlowNodeData(v)
+                }).map(node => ({
+                    key: node.id,
+                    title: node.meta.name + (node.meta.label ? `(${node.meta.label})` : '')
+                }))
+            })
+            .selector<'source', string>('source', {
+                title: '流程节点',
+                value: '',
+                options: this.nodes
+                    .filter(v => v.meta.label)
+                    .map(node => ({
+                        title: node.meta.label,
+                        key: node.id
+                    }))
+            })
+            .selector<'target', string>('target', {
+                title: '目标节点',
+                value: '',
+                options: this.nodes
+                    .filter(v => !isFlowNodeData(v))
+                    .filter(v => v.meta.label)
+                    .map(node => ({
+                        title: node.meta.label,
+                        key: node.id
+                    }))
+            })
+            .build()
+
+        appTab.addTab(PageDataForm.create({
+            form,
+            title: `Runner Flow`,
+            onsubmit: (value) => {
+                // const { label, type } = value
+                // data.meta.label = label
+                // data.meta.type = type
+                // this.refreshNode(data)
+
+                const { flowId, source, target } = value
+
+                if (!flowId) return
+                if (source === target) return
+
+                this.state.states.flow.addEdge(flowId, {
+                    source, target
+                })
+
+                this.refresh()
+            }
+        }))
     }
 
     setNodeSize(id: string, size: { height: number; width: any }): void {

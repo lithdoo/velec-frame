@@ -68,7 +68,15 @@ export type SqlNodeData = NodeData<NodeShapeKey.GH_RUNNER_SQL_NODE, SqlMetaData>
 export type FlowNodeData = NodeData<NodeShapeKey.GH_RUNNER_FLOW_NODE, FlowMetaData>
 
 export type AllNodeData = JsonNodeData | SqlNodeData | FlowNodeData
-export type AllEdgeData = EdgeData<EdgeShapeKey, any>
+
+
+export interface FlowLinkData {
+    flowId: string
+}
+
+export type FlowEdgeData = EdgeData<EdgeShapeKey.GH_RUNNER_FLOW_EDGE, FlowLinkData>
+
+export type AllEdgeData = FlowEdgeData
 
 
 export const isSqlNodeData = (node: AllNodeData): node is SqlNodeData => {
@@ -271,17 +279,20 @@ export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData
 
 }
 
-export class RunnerFlowState extends RunnerStateExtend<{}, { nodes: FlowNodeData[] }> {
+export class RunnerFlowState extends RunnerStateExtend<{}, { nodes: FlowNodeData[], edges: FlowEdgeData[] }> {
     readonly key = RunnerStateKey.FLOW
     nodes: FlowNodeData[] = []
+    edges: FlowEdgeData[] = []
 
     constructor(viewId: string) {
         super(viewId)
     }
 
-    load(cache: { nodes: FlowNodeData[] } | null) {
+    load(cache: { nodes: FlowNodeData[], edges: FlowEdgeData[] } | null) {
         const nodes = cache?.nodes ?? []
+        const edges = cache?.edges ?? []
         this.nodes = nodes
+        this.edges = edges
         this.nodes.forEach(node => {
             node._viewId = this.viewId
         })
@@ -290,7 +301,7 @@ export class RunnerFlowState extends RunnerStateExtend<{}, { nodes: FlowNodeData
     addNode(name: string) {
         const meta: FlowMetaData = {
             name,
-            label : '',
+            label: '',
         }
         const id = nanoid()
 
@@ -311,12 +322,48 @@ export class RunnerFlowState extends RunnerStateExtend<{}, { nodes: FlowNodeData
         this.nodes.push(node)
     }
 
+    addEdge(flowId: string, option: {
+        source: string, target: string
+    }) {
+        if (this.nodes.findIndex(v => v.id === flowId) < 0) {
+            return
+        }
+
+        const meta: FlowLinkData = {
+            flowId
+        }
+
+        const id = nanoid()
+
+        const view: FlowEdgeData['view'] = {
+            shape: EdgeShapeKey.GH_RUNNER_FLOW_EDGE,
+            id,
+            zIndex: 0,
+            sourcePortIndex: 0,
+            sourcePortLen: 1,
+            targetPortIndex: 0,
+            targetPortLen: 1,
+            source: option.source,
+            target: option.target,
+        }
+
+        const edge: FlowEdgeData = {
+            id, view, meta, _viewId: this.viewId
+        }
+
+        this.edges = this.edges.concat(edge)
+    }
+
     save() {
-        return { nodes: this.nodes }
+        return { nodes: this.nodes, edges: this.edges }
     }
 
     getNodes(res: AllNodeData[]): AllNodeData[] {
         return res.concat(this.nodes)
+    }
+
+    getEdges(res: AllEdgeData[]): AllEdgeData[] {
+        return res.concat(this.edges)
     }
 
     update(node: AllNodeData) {

@@ -1,9 +1,17 @@
 import { Graph, Node } from "@antv/x6"
+import { GraphStateCenter } from "./common"
+
+
+export interface WithViewData {
+    view: any
+}
+
 
 export abstract class GraphView {
     outer: HTMLElement = document.createElement('div')
     inner: HTMLElement = document.createElement('div')
     graph?: Graph
+
 
     protected abstract initGraph(): Graph
     abstract refresh(): void
@@ -18,9 +26,9 @@ export abstract class GraphView {
 
     setNodeSize(id: string, size: { height: number, width }) {
         const node = this.graph?.getCellById(id)
-        if(node instanceof Node){
+        if (node instanceof Node) {
             node.setSize(size)
-        } 
+        }
     }
 
     loadContainer(outer: HTMLElement) {
@@ -35,7 +43,37 @@ export abstract class GraphView {
         this.refresh()
     }
 
-    fitView(){
+    fitView() {
         this.graph?.zoomToFit()
     }
+}
+
+
+export abstract class GraphStateView<
+    NodeType extends WithViewData,
+    EdgeType extends WithViewData
+> extends GraphView {
+    nodes: NodeType[] = []
+    edges: EdgeType[] = []
+
+    abstract readonly state: GraphStateCenter<
+        any,
+        NodeType,
+        EdgeType, any, any
+    >
+
+    refresh() {
+        this.graph?.removeCells(this.graph.getCells())
+
+        this.nodes = this.state.getNodes()
+        this.edges = this.state.getEdges()
+
+        this.graph?.addNodes(this.nodes
+            .map(node => Object.assign({}, node.view, { data: node }))
+        )
+        this.graph?.addEdges(this.edges
+            .map(edge => Object.assign({}, edge.view, { data: edge }))
+        )
+    }
+
 }

@@ -1,8 +1,8 @@
 import { insertCss } from "insert-css";
 import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate, render, RenderScope } from "../../common";
-import { FlowNodeData, NodeShapeKey, type SqlNodeData } from "../state";
+import { EdgeShapeKey, type FlowNodeData, NodeShapeKey } from "../state";
 import { RunnerGraphView } from "../view";
-import { Shape } from "@antv/x6";
+import { Edge, Graph, Shape } from "@antv/x6";
 import { initArch } from "../../addon/resizeNode";
 
 
@@ -201,4 +201,47 @@ export class GhRunnerFlowNode {
     }
 
 
+}
+
+
+
+
+export class GhSqlErdEdge {
+    static {
+
+        class ErdEdge extends Edge {
+            // getSourcePoint() {
+            //     const point = super.getSourcePoint()
+            //     return point
+            // }
+        }
+
+        ErdEdge.config({
+            attrs: {
+                wrap: {
+                    connection: true,
+                    strokeWidth: 10,
+                    strokeLinejoin: 'round',
+                },
+                line: {
+                    connection: true,
+                    stroke: '#999',
+                    strokeWidth: 2,
+                    strokeLinejoin: 'round',
+                    sourceMarker: {
+                        name: 'ellipse',
+                        rx: 5,
+                        ry: 5,
+                    },
+                    targetMarker: {
+                        name: 'block',
+                        width:10,
+                        height:10,
+                    },
+
+                },
+            },
+        })
+        Graph.registerEdge(EdgeShapeKey.GH_RUNNER_FLOW_EDGE, ErdEdge)
+    }
 }

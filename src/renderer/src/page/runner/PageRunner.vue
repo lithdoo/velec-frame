@@ -27,12 +27,15 @@ const toolbar = ToolBarBuilder.create()
     .button('addFlowNode', '添加 Flow 节点', async () => {
         props.page.view.addFlowNode('')
     }, { icon: 'del' })
+    .button('addFlowEdge', '添加 Flow 流程', async () => {
+        props.page.view.addFlowEdge()
+    }, { icon: 'del' })
     .build()
 
 onMounted(()=>{
     setTimeout(()=>{
         props.page.view.fitView()
-    },1000)
+    },100)
 })
 
 </script>
