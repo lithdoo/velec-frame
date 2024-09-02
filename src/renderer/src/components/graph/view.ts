@@ -1,5 +1,6 @@
 import { Graph, Node } from "@antv/x6"
 import { GraphStateCenter } from "./common"
+import { markRaw } from "vue"
 
 
 export interface WithViewData {
@@ -61,6 +62,11 @@ export abstract class GraphStateView<
         NodeType,
         EdgeType, any, any
     >
+
+    constructor(){
+        super()
+        markRaw(this)
+    }
 
     refresh() {
         this.graph?.removeCells(this.graph.getCells())

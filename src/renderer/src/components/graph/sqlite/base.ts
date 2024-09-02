@@ -150,6 +150,10 @@ export class BaseState extends ErdStateExtend<{}, {
 
     }
 
+    setNodeSize(_id: string, _size: { width: number; height: number; }) {
+        
+    }
+
 
     save() {
         const { nodes, edges } = this

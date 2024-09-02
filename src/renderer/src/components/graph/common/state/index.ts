@@ -82,8 +82,6 @@ export class GraphStateCenter<
 
     getEdges() {
         const edges = this.list.reduce<EdgeData[]>((res, state) => state.getEdges(res), [])
-
-        console.log('edges', edges)
         return edges
     }
 }

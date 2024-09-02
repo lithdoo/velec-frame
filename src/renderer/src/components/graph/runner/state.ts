@@ -158,7 +158,6 @@ export class RunnerSqlState extends RunnerStateExtend<{}, { nodes: SqlNodeData[]
     }
 
     addNode(fileUrl: string) {
-        console.log('add node', fileUrl)
         const meta: SqlMetaData = {
             fileUrl,
             sql: ``,

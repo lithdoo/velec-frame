@@ -3,6 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 import { explorerApi } from './explorer'
 import { editorApi } from './editor'
 import { sqliteApi } from './sqlite'
+import { runnerApi } from './runner'
 
 // Custom APIs for renderer
 const api = {
@@ -19,6 +20,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('explorerApi', explorerApi)
     contextBridge.exposeInMainWorld('editorApi', editorApi)
     contextBridge.exposeInMainWorld('sqliteApi', sqliteApi)
+    contextBridge.exposeInMainWorld('runnerApi', runnerApi)
   } catch (error) {
     console.error(error)
   }

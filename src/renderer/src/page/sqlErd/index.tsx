@@ -70,14 +70,12 @@ export class PageSqlErd implements TabPage {
 
     async reload() {
         const raw = await this.connection.erdData()
-        console.log({ raw })
         this.view.load(raw)
     }
 
     async saveCache() {
         const filePath = this.cacheFilePath()
         const content = this.view.save()
-        console.log(content)
         await window.explorerApi.saveJson(filePath, content)
     }
 

@@ -104,7 +104,12 @@ export abstract class ErdStateExtend<
     RawData,
     Upper,
     File
-> { }
+> { 
+
+    setNodeSize(_id: string, _size: { width: number; height: number }) {
+        
+    }
+}
 
 
 export class ErdGraphStateCenter<S extends { [key: string]: ErdStateExtend<any, any> }> extends GraphStateCenter<ErdStateKey,

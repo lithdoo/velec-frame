@@ -33,4 +33,5 @@ export class BaseState extends RunnerStateExtend<{}, {
             this.edges = cache.edges
         }
     }
+    setNodeSize(){}
 }

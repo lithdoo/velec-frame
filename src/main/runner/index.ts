@@ -1,4 +1,4 @@
-import { RunnerClientStatus } from "@common/runner"
+import { RunnerClientStatus, RunnerTaskConfig } from "@common/runner"
 import { ipcMain } from "electron"
 import { uuid } from "uuidv4"
 
@@ -15,11 +15,25 @@ export class RunnerService {
         ipcMain.handle('@runner/client/dispose', async (_, clientId: string) => {
             return RunnerClient.dispose(clientId)
         })
+
+        ipcMain.handle('@runner/client/run', async (_, clientId: string, config: RunnerTaskConfig) => {
+            console.log(JSON.stringify({ clientId, config }, null, 2))
+        })
     }
 }
 
 
-class RunnerClient {
+export abstract class RunnerWorker<Option> {
+    abstract readonly keyName: string
+    abstract run(option: Option, argus: any[]): {
+        process: Promise<{
+            result: any
+        }>
+    }
+}
+
+
+export class RunnerClient {
     static all: Map<string, RunnerClient> = new Map()
 
     static checkTimeout() {
@@ -36,7 +50,7 @@ class RunnerClient {
         if (client) {
             return client.status()
         } else {
-            return RunnerClientStatus.Disposed
+            return RunnerClientStatus.Offline
         }
     }
 
@@ -47,39 +61,42 @@ class RunnerClient {
         }
     }
 
-
-
     static timeout = 1000 * 60 * 10
     private lastRequestTime: number = new Date().getTime()
     private updateRequestTime() { this.lastRequestTime = new Date().getTime() }
 
     readonly id = uuid()
 
-    current: any = null
-    tasks: any[] = []
+    current: RunnerTask | null = null
 
     constructor() {
         RunnerClient.all.set(this.id, this)
     }
 
 
-    dispose() {
 
+    dispose() {
+        this.stopTask()
+    }
+
+    stopTask() {
+        if (this.current) {
+            this.current.stop()
+            this.current = null
+        }
     }
 
     status() {
         this.updateRequestTime()
-        if (this.current || this.tasks.length) {
+        if (this.current) {
             return RunnerClientStatus.Procesing
         } else {
             return RunnerClientStatus.Free
         }
     }
 
-
-
     chechTimeout() {
-        if (this.current || this.tasks.length) {
+        if (this.current) {
             return
         }
 
@@ -88,5 +105,45 @@ class RunnerClient {
         }
 
         this.dispose()
+    }
+}
+
+
+export class RunnerTask {
+    readonly config: RunnerTaskConfig
+    readonly workers: Map<string, RunnerWorker<unknown>> = new Map()
+    constructor(config: RunnerTaskConfig, workers: RunnerWorker<unknown>[]) {
+        this.config = config
+        this.workers = new Map(workers.map(w => [w.keyName, w]))
+    }
+    private current: number = -1
+    private working: boolean = true
+
+    async next(argus: any[]) {
+        if (!this.working) {
+            return null
+        }
+        this.current++
+        const step = this.config.steps[this.current]
+        if (!step) {
+            return null
+        }
+        const worker = this.workers.get(step.worker)
+        if (!worker) {
+            return null
+        }
+
+        const { process } = worker.run(step.option, argus)
+
+        try {
+            const { result } = await process
+            return this.next([result])
+        } catch (e) {
+            return null
+        }
+    }
+
+    stop() {
+        this.working = false
     }
 }

@@ -14,7 +14,6 @@ class AppTab {
     list: TabPage[] = []
     currentId: string | null = null
 
-
     currentPage() {
         if (!this.currentId) return null
         return this.list.find(tab => tab.tabId === this.currentId) ?? null

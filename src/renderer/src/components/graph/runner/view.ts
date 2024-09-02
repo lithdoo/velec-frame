@@ -1,6 +1,6 @@
 import { Graph } from "@antv/x6"
-import { AllEdgeData, AllNodeData, isFlowNodeData, isJsonNodeData, isSqlNodeData, RunnerFlowState, RunnerGraphStateCenter, RunnerJsonState, RunnerSqlState } from "./state"
-import { GraphStateView, GraphView } from "../view"
+import { AllEdgeData, AllNodeData, FlowNodeData, isFlowNodeData, isJsonNodeData, isSqlNodeData, RunnerFlowState, RunnerGraphStateCenter, RunnerJsonState, RunnerSqlState } from "./state"
+import { GraphStateView } from "../view"
 import { nanoid } from "nanoid"
 import { contextMenu } from "@renderer/view/fixed/contextmenu"
 import { Menu, PopMenuListHandler } from "@renderer/components/base/PopMenu"
@@ -8,6 +8,7 @@ import { appTab } from "@renderer/state/tab"
 import { PageSqlEditor } from "@renderer/page/sqlEditor"
 import { CommonFormBuilder } from "@renderer/components/form"
 import { PageDataForm } from "@renderer/page/dataForm"
+import { RunnerTaskConfig, RunnerTaskStep, SqliteRunnerStep } from "@common/runner"
 
 const state = (viewId: string) => {
     return new RunnerGraphStateCenter({}, [])
@@ -21,8 +22,10 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
     static finder: Map<string, RunnerGraphView> = new Map()
     readonly viewId: string = nanoid()
     readonly state = state(this.viewId)
-    constructor() {
+    readonly clientId: string
+    constructor(clientId: string) {
         super()
+        this.clientId = clientId
         RunnerGraphView.finder.set(this.viewId, this)
     }
     protected initGraph(): Graph {
@@ -46,6 +49,7 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
             },
             autoResize: true,
         })
+
 
         graph.on('node:change:position', ({ node, current }) => {
             const n = this.state.getNodes().find(v => v.id === node.id)
@@ -186,7 +190,12 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
                             }
                         }))
                     }
-                })
+                }),
+                Menu.button({
+                    icon: 'del', key: 'runFlow', label: '执行', action: () => {
+                        this.runFlow(data.id)
+                    }
+                }),
             ]), event)
         }
     }
@@ -211,9 +220,9 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
             .selector<'flowId', string>('flowId', {
                 title: '流程节点',
                 value: this.nodes.find(v => isFlowNodeData(v))?.id ?? '',
-                options: this.nodes.filter(v => {
+                options: (this.nodes as FlowNodeData[]).filter(v => {
                     return isFlowNodeData(v)
-                }).map(node => ({
+                }).map((node:FlowNodeData) => ({
                     key: node.id,
                     title: node.meta.name + (node.meta.label ? `(${node.meta.label})` : '')
                 }))
@@ -262,6 +271,58 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
                 this.refresh()
             }
         }))
+    }
+
+    runFlow(flowId: string) {
+        const flowNode = this.nodes
+            .filter(v => isFlowNodeData(v))
+            .find(v => v.id === flowId)
+
+        if (!flowNode) return
+        const nodes: AllNodeData[] = []
+        let node: AllNodeData = flowNode
+        let step = 0
+
+        while (true) {
+            if (step > 50) return
+            const edge = this.edges.find(v => v.view.source === node.id)
+            if (!edge) { break }
+            const target = this.nodes.find(v => v.id === edge.view.target)
+            if (!target) { break }
+            nodes.push(target)
+            node = target
+        }
+
+        const config = nodes.reduce<RunnerTaskConfig>((config, node) => {
+            if (isSqlNodeData(node)) {
+                const step: SqliteRunnerStep = {
+                    worker: 'sqlite-runner',
+                    option: {
+                        fileUrl: node.meta.fileUrl,
+                        sql: node.meta.sql,
+                        type: node.meta.type
+                    }
+                }
+
+                config.steps = config.steps.concat([step])
+            } else if (isJsonNodeData(node)) {
+                const step: RunnerTaskStep<any> = {
+                    worker: 'json-data-runner',
+                    option: {
+                        receiveId: node.id,
+                    }
+                }
+                config.steps = config.steps.concat([step])
+            } else {
+                throw new Error('unknown step node!!!')
+            }
+
+            return config
+        }, { steps: [] })
+
+
+        window.runnerApi.runFlow(this.clientId, config)
+
     }
 
     setNodeSize(id: string, size: { height: number; width: any }): void {

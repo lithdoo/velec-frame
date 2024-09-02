@@ -1,4 +1,4 @@
-import { RunnerClientStatus } from "@common/runner"
+import { RunnerClientStatus, RunnerTaskConfig } from "@common/runner"
 import { ipcRenderer } from "electron"
 
 export const runnerApi = {
@@ -10,5 +10,9 @@ export const runnerApi = {
     },
     disposeClient: async (clientId: string) => {
         return ipcRenderer.invoke('@runner/client/dispose', clientId) as Promise<void>
+    },
+
+    runFlow: async (clientId: string, config: RunnerTaskConfig) => {
+        return ipcRenderer.invoke('@runner/client/run', clientId, config) as Promise<void>
     }
 }

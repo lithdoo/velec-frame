@@ -151,8 +151,8 @@ class ExplorerWrokspace {
         if (/.run$/.test(file.name)) {
             contextMenu.open(
                 PopMenuBuilder.create()
-                    .button('open', '打开', () => {
-                        appTab.addTab(PageRunner.create(file.url))
+                    .button('open', '打开', async () => {
+                        appTab.addTab(await PageRunner.create(file.url))
                     })
                     .build(),
                 ev
