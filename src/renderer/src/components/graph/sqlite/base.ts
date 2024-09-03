@@ -157,7 +157,6 @@ export class BaseState extends ErdStateExtend<{}, {
 
     save() {
         const { nodes, edges } = this
-        console.log({ nodes, edges })
         return { nodes, edges }
     }
 

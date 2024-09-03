@@ -1,6 +1,9 @@
 import { RunnerClientStatus, RunnerTaskConfig } from "@common/runner"
 import { ipcMain } from "electron"
 import { uuid } from "uuidv4"
+import { RunnerWorker } from "./common"
+import { SqliteRunnerWorker } from "./worker/sqlite"
+import { JsonDataRunnerWorker } from "./worker/jsonData"
 
 export class RunnerService {
     static install() {
@@ -17,24 +20,20 @@ export class RunnerService {
         })
 
         ipcMain.handle('@runner/client/run', async (_, clientId: string, config: RunnerTaskConfig) => {
-            console.log(JSON.stringify({ clientId, config }, null, 2))
+            return RunnerClient.run(clientId, config)
         })
     }
 }
 
 
-export abstract class RunnerWorker<Option> {
-    abstract readonly keyName: string
-    abstract run(option: Option, argus: any[]): {
-        process: Promise<{
-            result: any
-        }>
-    }
-}
-
 
 export class RunnerClient {
     static all: Map<string, RunnerClient> = new Map()
+
+    static workers: RunnerWorker<unknown>[] = [
+        new SqliteRunnerWorker(),
+        new JsonDataRunnerWorker()
+    ]
 
     static checkTimeout() {
         Array.from(this.all.values()).forEach(v => v.chechTimeout())
@@ -43,6 +42,14 @@ export class RunnerClient {
 
     static {
         RunnerClient.checkTimeout()
+    }
+
+    static run(clientId: string, config: RunnerTaskConfig) {
+        const client = this.all.get(clientId)
+        if (!client) return
+        const status = client.status()
+        if (status !== RunnerClientStatus.Free) return
+        client.run(config)
     }
 
     static status(clientId: string) {
@@ -73,6 +80,13 @@ export class RunnerClient {
         RunnerClient.all.set(this.id, this)
     }
 
+
+    run(config: RunnerTaskConfig) {
+        if (this.current) return
+        this.current = new RunnerTask(config, RunnerClient.workers, () => {
+            this.current = null
+        })
+    }
 
 
     dispose() {
@@ -112,14 +126,23 @@ export class RunnerClient {
 export class RunnerTask {
     readonly config: RunnerTaskConfig
     readonly workers: Map<string, RunnerWorker<unknown>> = new Map()
-    constructor(config: RunnerTaskConfig, workers: RunnerWorker<unknown>[]) {
+    constructor(
+        config: RunnerTaskConfig,
+        workers: RunnerWorker<unknown>[],
+        onfinish: () => void
+    ) {
         this.config = config
         this.workers = new Map(workers.map(w => [w.keyName, w]))
+        
+        this.next([]).finally(()=>{
+            onfinish()
+        })
     }
     private current: number = -1
     private working: boolean = true
 
     async next(argus: any[]) {
+        console.log('next', this.current, argus)
         if (!this.working) {
             return null
         }

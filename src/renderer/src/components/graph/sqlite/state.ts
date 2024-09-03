@@ -128,7 +128,6 @@ export class ErdGraphStateCenter<S extends { [key: string]: ErdStateExtend<any, 
 
     getEdges() {
         const edges = super.getEdges()
-        console.log('edges', edges)
         this.resetEdgeOffset(edges)
         return edges
     }

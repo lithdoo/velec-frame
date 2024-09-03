@@ -65,6 +65,7 @@ export class PageRunner implements TabPage {
 
     onDestroy(): void {
         this.isDestoryed = true
+        this.view.dispose()
     }
 
 }

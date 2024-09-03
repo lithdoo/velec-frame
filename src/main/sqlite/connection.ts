@@ -90,7 +90,13 @@ export class SqliteConection {
 
     async run(sql: string) {
         return this.requset(async () => {
-            await this.sql.run(sql)
+            return await this.sql.run(sql)
+        })
+    }
+
+    async query(sql: string) {
+        return this.requset(async () => {
+           return await this.sql.all(sql)
         })
     }
 

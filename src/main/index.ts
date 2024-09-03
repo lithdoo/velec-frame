@@ -6,6 +6,7 @@ import { ExplorerService } from './explorer'
 import { EditorService } from './editor'
 import { SqliteService } from './sqlite'
 import { RunnerService } from './runner'
+import { JsonDataService } from './jsonData'
 
 Menu.setApplicationMenu(null)
 
@@ -64,8 +65,6 @@ app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
-  console.log(app.getAppPath())
-
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -76,10 +75,11 @@ app.whenReady().then(async () => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
-  await ExplorerService.install()
   await EditorService.install()
   await SqliteService.install()
   await RunnerService.install()
+  await ExplorerService.install()
+  await JsonDataService.install()
 
   createWindow()
 

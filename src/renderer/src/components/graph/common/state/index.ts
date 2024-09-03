@@ -40,6 +40,8 @@ export abstract class StateExtend<
     abstract save(): File
 
     abstract load(cache: File | null, extra: ExtraData)
+
+    dispose() {}
 }
 
 
@@ -83,5 +85,9 @@ export class GraphStateCenter<
     getEdges() {
         const edges = this.list.reduce<EdgeData[]>((res, state) => state.getEdges(res), [])
         return edges
+    }
+
+    dispose(){
+        this.list.forEach(v => v.dispose())
     }
 }

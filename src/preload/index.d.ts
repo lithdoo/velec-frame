@@ -3,6 +3,7 @@ import { explorerApi } from './explorer'
 import { editorApi } from './editor'
 import { sqliteApi } from './sqlite'
 import { runnerApi } from './runner'
+import { jsonDataApi } from './jsonData'
 
 declare global {
   interface Window {
@@ -11,6 +12,7 @@ declare global {
     editorApi: typeof editorApi
     sqliteApi: typeof sqliteApi
     runnerApi: typeof runnerApi
+    jsonDataApi: typeof jsonDataApi
     api: unknown,
   }
 }

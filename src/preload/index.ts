@@ -4,6 +4,7 @@ import { explorerApi } from './explorer'
 import { editorApi } from './editor'
 import { sqliteApi } from './sqlite'
 import { runnerApi } from './runner'
+import { jsonDataApi } from './jsonData'
 
 // Custom APIs for renderer
 const api = {
@@ -21,6 +22,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('editorApi', editorApi)
     contextBridge.exposeInMainWorld('sqliteApi', sqliteApi)
     contextBridge.exposeInMainWorld('runnerApi', runnerApi)
+    contextBridge.exposeInMainWorld('jsonDataApi', jsonDataApi)
   } catch (error) {
     console.error(error)
   }

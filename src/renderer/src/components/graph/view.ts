@@ -82,4 +82,9 @@ export abstract class GraphStateView<
         )
     }
 
+    dispose(){
+        this.graph?.dispose()
+        this.state?.dispose()
+    }
+
 }

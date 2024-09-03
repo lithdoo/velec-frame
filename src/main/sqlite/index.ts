@@ -2,6 +2,9 @@ import { ipcMain } from "electron"
 import { SqliteConection } from './connection'
 import { getRawData } from "./erd"
 
+export * from './connection'
+export * from './erd'
+
 export class SqliteService {
     static install() {
  

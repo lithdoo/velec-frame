@@ -133,7 +133,6 @@ export class GhRunnerFlowComponent {
                 if (!view) throw new Error('view is not found!')
                 if (!view.graph) throw new Error('view.graph is not found!')
                 const zoom = 1 / view.graph.zoom()
-                console.log({ zoom })
                 const { height, width } = this.data.view
                 return {
                     height, width, zoom

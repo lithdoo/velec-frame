@@ -18,8 +18,13 @@ const state = (viewId: string) => {
         .init()
 }
 
+
+
 export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
     static finder: Map<string, RunnerGraphView> = new Map()
+    static {
+        RunnerGraphStateCenter.getView = (viewId: string) => this.finder.get(viewId)
+    }
     readonly viewId: string = nanoid()
     readonly state = state(this.viewId)
     readonly clientId: string
@@ -63,6 +68,7 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
         return graph
     }
     dispose() {
+        super.dispose()
         RunnerGraphView.finder.delete(this.viewId)
     }
 

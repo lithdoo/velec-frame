@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { GraphStateCenter, StateExtend } from "../common";
+import { type RunnerGraphView } from './view'
 
 export enum NodeShapeKey {
     GH_RUNNER_SQL_NODE = 'GH_RUNNER_SQL_NODE',
@@ -105,12 +106,20 @@ export abstract class RunnerStateExtend<
 > {
 
     abstract update(node: AllNodeData)
+
+    getView(): RunnerGraphView {
+        const gh = RunnerGraphStateCenter.getView(this.viewId)
+        if (!gh) { throw new Error('no graph view') }
+        return gh
+    }
 }
 
 
 export class RunnerGraphStateCenter<S extends { [key: string]: RunnerStateExtend<any, any> }> extends GraphStateCenter<RunnerStateKey,
     AllNodeData,
     AllEdgeData, RunnerStateExtend<any, any>, S> {
+
+    static getView: (viewId: string) => RunnerGraphView | void = (viewId: string) => { }
 
     extends<T extends {
         [key: string]: RunnerStateExtend<any, any>
@@ -136,9 +145,6 @@ export class RunnerGraphStateCenter<S extends { [key: string]: RunnerStateExtend
         this.list.forEach(v => v.setNodeSize?.(id, size))
     }
 }
-
-
-
 
 
 export class RunnerSqlState extends RunnerStateExtend<{}, { nodes: SqlNodeData[] }> {
@@ -192,7 +198,6 @@ export class RunnerSqlState extends RunnerStateExtend<{}, { nodes: SqlNodeData[]
     }
 
     update(node: AllNodeData) {
-        console.log({ node })
         if (isSqlNodeData(node)) {
             this.nodes = this.nodes.filter(n => n.id !== node.id).concat([{ ...node }])
         }
@@ -213,9 +218,13 @@ export class RunnerSqlState extends RunnerStateExtend<{}, { nodes: SqlNodeData[]
 export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData[] }> {
     readonly key = RunnerStateKey.JSON
     nodes: JsonNodeData[] = []
+    readonly onDataLoaded: string
 
     constructor(viewId: string) {
         super(viewId)
+        this.onDataLoaded = window.jsonDataApi.onDataLoaded((_, receiveId) => {
+            this.updateData(receiveId)
+        })
     }
 
     load(cache: { nodes: JsonNodeData[] } | null) {
@@ -274,6 +283,36 @@ export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData
 
     private nodeSize() {
         return { width: 360, height: 480 }
+    }
+
+    dispose(): void {
+        super.dispose()
+        console.log('dispose')
+        window.jsonDataApi.offDataLoaded(this.onDataLoaded)
+    }
+
+    private async updateData(receiveId: string) {
+        const nodes = this.nodes.filter(v => v.id === receiveId)
+        if (nodes.length > 0) {
+            const data = await window.jsonDataApi.getData(receiveId)
+            if (data !== undefined) {
+                nodes.forEach(v => {
+                    v.meta.data = data
+                    v.meta.isBlank = false
+                })
+            } else {
+                nodes.forEach(v => {
+                    v.meta.data = undefined
+                    v.meta.isBlank = true
+                })
+            }
+            const view = this.getView()
+            nodes.forEach(v => {
+                view.refreshNode(v)
+            })
+        }
+
+        console.log(this.getView(), nodes, this.nodes)
     }
 
 }
