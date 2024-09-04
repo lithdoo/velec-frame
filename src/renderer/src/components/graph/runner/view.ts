@@ -168,6 +168,13 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
                             }
                         }))
                     }
+                }),
+                
+                Menu.button({
+                    icon: 'del', key: 'clearData', label: '清除数据', action: () => {
+                        this.state.states.json.clearNode(data)
+                        this.refreshNode(data)
+                    }
                 })
             ]), event)
         }

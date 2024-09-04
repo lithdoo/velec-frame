@@ -315,6 +315,10 @@ export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData
         console.log(this.getView(), nodes, this.nodes)
     }
 
+    clearNode(node:JsonNodeData){
+        node.meta.isBlank = true
+        node.meta.data = undefined
+    }
 }
 
 export class RunnerFlowState extends RunnerStateExtend<{}, { nodes: FlowNodeData[], edges: FlowEdgeData[] }> {

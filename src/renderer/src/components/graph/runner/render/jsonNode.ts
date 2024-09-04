@@ -147,6 +147,15 @@ export class GhRunnerJsonComponent {
 
         const resize = this.element.querySelector('.gh-runner-json__resize')
 
+        const code = this.element.querySelector('.gh-runner-json__body')
+        if(code instanceof HTMLElement){
+            code.onwheel = (e)=>{
+                if(code.scrollHeight > code.clientHeight){
+                    e.stopPropagation()
+                }
+            }
+        }
+
         if (resize instanceof HTMLElement) {
 
             const size = () => {
