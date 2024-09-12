@@ -1,6 +1,5 @@
 import { Graph } from "@antv/x6"
-import { AllEdgeData, AllNodeData, FlowNodeData, isFlowNodeData, isJsonNodeData, isSqlNodeData, RunnerFlowState, RunnerGraphStateCenter, RunnerJsonState, RunnerSqlState } from "./state"
-import { GraphStateView } from "../view"
+import { GraphStateView } from "../base/view"
 import { nanoid } from "nanoid"
 import { contextMenu } from "@renderer/view/fixed/contextmenu"
 import { Menu, PopMenuListHandler } from "@renderer/components/base/PopMenu"
@@ -10,24 +9,20 @@ import { PageJsonEditor } from "@renderer/page/jsonEditor"
 import { CommonFormBuilder } from "@renderer/components/form"
 import { PageDataForm } from "@renderer/page/dataForm"
 import { RunnerTaskConfig, RunnerTaskStep, SqliteRunnerStep } from "@common/runner"
+import { AllEdgeData, AllNodeData, RunnerGraphStateCenter } from "./states"
+import { isSqlNodeData } from "./sql/cell"
+import { isJsonNodeData } from "./json/cell"
+import { FlowNodeData, isFlowNodeData } from "./flow/cell"
+import { toX6Node } from "../base/cell"
+import { isScopeNodeData } from "./scope/cell"
 
-const state = (viewId: string) => {
-    return new RunnerGraphStateCenter({}, [])
-        .extends({ sql: new RunnerSqlState(viewId) })
-        .extends({ json: new RunnerJsonState(viewId) })
-        .extends({ flow: new RunnerFlowState(viewId) })
-        .init()
-}
 
 
 
 export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
     static finder: Map<string, RunnerGraphView> = new Map()
-    static {
-        RunnerGraphStateCenter.getView = (viewId: string) => this.finder.get(viewId)
-    }
     readonly viewId: string = nanoid()
-    readonly state = state(this.viewId)
+    readonly state = RunnerGraphStateCenter.create(this.viewId)
     readonly clientId: string
     constructor(clientId: string) {
         super()
@@ -55,15 +50,13 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
             },
             autoResize: true,
         })
-
-
         graph.on('node:change:position', ({ node, current }) => {
             const n = this.state.getNodes().find(v => v.id === node.id)
             if (!current || !n) { return }
             n.view.x = current.x
             n.view.y = current.y
+            n._x6 = toX6Node(n.view, n._x6)
         })
-
         this.graph = graph
 
         return graph
@@ -81,16 +74,16 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
     }
 
     load(cache: any = null) {
+        console.log('cache', cache)
         this.state.list.forEach(state => {
             state.load(cache?.[state.key] ?? null, null)
         })
-        
-        console.log('nodes0',this.state.getNodes())
+        console.log('nodes', this.state.getNodes())
         this.refresh()
     }
 
     refreshNode(node: AllNodeData) {
-        this.state.update(node)
+        this.state.updateNode(node.id, node)
         this.refresh()
     }
 
@@ -100,7 +93,64 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
         event: MouseEvent,
         data: AllNodeData
     }) {
+        if (isScopeNodeData(data)) {
+            console.log('data1', data.meta.fields)
 
+            const remove = Menu.submenu({
+                icon: 'del', key: 'removeField', label: '删除字段', menu: PopMenuListHandler.create(
+                    data.meta.fields.map(field => Menu.button({
+                        icon: 'del',
+                        key: field,
+                        label: field,
+                        action: () => {
+                            this.state.states.scope.removeNodeField(data, field)
+                            this.refreshNode(data)
+                        }
+                    }))
+                )
+            })
+
+            const edit = Menu.submenu({
+                icon: 'del', key: 'removeField', label: '编辑字段', menu: PopMenuListHandler.create(
+                    data.meta.fields.map(field => Menu.button({
+                        icon: 'del',
+                        key: field,
+                        label: field,
+                        action: () => {
+                            const form = CommonFormBuilder.create()
+                                .input('field', {
+                                    title: '字段名', value: field
+                                })
+                                .build()
+
+                            console.log('data2', data.meta.fields)
+
+                            appTab.addTab(PageDataForm.create({
+                                form,
+                                title: `Runner<${data.meta.label}>`,
+                                onsubmit: (value) => {
+                                    const { field: newField } = value
+                                    this.state.states.scope.updateNodeField(data, field, newField)
+
+                                    console.log('data3', data.meta.fields)
+                                    this.refreshNode(data)
+                                }
+                            }))
+                            this.refreshNode(data)
+                        }
+                    }))
+                )
+            })
+
+            const add = Menu.button({
+                icon: 'del', key: 'addField', label: '添加字段', action: () => {
+                    this.state.states.scope.addNodeField(data)
+                    this.refreshNode(data)
+                }
+            })
+
+            contextMenu.open(PopMenuListHandler.create(data.meta.fields.length ? [add, edit, remove] : [add]), event)
+        }
         if (isSqlNodeData(data)) {
             contextMenu.open(PopMenuListHandler.create([
                 Menu.button({
@@ -177,8 +227,8 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
                         appTab.addTab(PageJsonEditor.create({
                             title: `Runner<${data.meta.label}>`,
                             value: data.meta.data,
-                            save: async (value:any) => {
-                                console.log('save',value)
+                            save: async (value: any) => {
+                                console.log('save', value)
                                 await window.jsonDataApi.setData(data.id, value)
                             }
                         }))
@@ -225,6 +275,8 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
                 }),
             ]), event)
         }
+
+
     }
 
     addSqlNode(fileUrl: string) {
@@ -233,7 +285,12 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
     }
 
     addJsonNode(label: string = '') {
-        this.state.states.json.addNode(label)
+        this.state.states.json.addJsonNode(label)
+        this.refresh()
+    }
+
+    addScopeNode(label: string = '') {
+        this.state.states.scope.addScopeNode(label)
         this.refresh()
     }
 
@@ -249,7 +306,7 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
                 value: this.nodes.find(v => isFlowNodeData(v))?.id ?? '',
                 options: (this.nodes as FlowNodeData[]).filter(v => {
                     return isFlowNodeData(v)
-                }).map((node:FlowNodeData) => ({
+                }).map((node: FlowNodeData) => ({
                     key: node.id,
                     title: node.meta.name + (node.meta.label ? `(${node.meta.label})` : '')
                 }))

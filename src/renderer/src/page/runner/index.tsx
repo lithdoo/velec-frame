@@ -3,7 +3,7 @@ import { VNode } from "vue";
 import { fixReactive } from "@renderer/fix";
 import { default as PageRunnerVue } from "./PageRunner.vue";
 import { nanoid } from "nanoid";
-import { RunnerGraphView } from "@renderer/components/graph/runner";
+import { RunnerGraphView } from "@renderer/components/graph2/runner";
 import { RunnerClientStatus } from "@common/runner";
 
 export class PageRunner implements TabPage {

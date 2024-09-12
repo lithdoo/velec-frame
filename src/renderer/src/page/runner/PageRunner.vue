@@ -25,6 +25,9 @@ const toolbar = ToolBarBuilder.create()
     .button('addJsonNode', '添加 Json 节点', async () => {
         props.page.view.addJsonNode('')
     }, { icon: 'del' })
+    .button('addScopeNode', '添加 Scope 节点', async () => {
+        props.page.view.addScopeNode('123')
+    }, { icon: 'del' })
     .button('addFlowNode', '添加 Flow 节点', async () => {
         props.page.view.addFlowNode('')
     }, { icon: 'del' })

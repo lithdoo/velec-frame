@@ -4,6 +4,9 @@ export const jsonDataApi = {
     getData: async (receiveId: string, clear: boolean = false) => {
         return ipcRenderer.invoke('@json-data/store/data', receiveId, clear) as Promise<any>
     },
+    setData: async (receiveId: string, value: any  = undefined) => {
+        return ipcRenderer.invoke('@json-data/store/save', receiveId, value) as Promise<any>
+    },
     onDataLoaded: (event: (e: Electron.IpcRendererEvent, receiveId: string) => void) => {
         const listenerKey: string = Math.random().toString(36).substring(7) + Math.random().toString(36).substring(7) + Math.random().toString(36).substring(7)
         evDataLoaded.set(listenerKey, event)

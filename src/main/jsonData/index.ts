@@ -6,6 +6,9 @@ export class JsonDataService {
         ipcMain.handle('@json-data/store/data', async (_, receiveId: string, clear: boolean = true) => {
             return JsonDataStore.main.get(receiveId, clear)
         })
+        ipcMain.handle('@json-data/store/save', async (_, receiveId: string, value: any = true) => {
+            return JsonDataStore.main.set(receiveId, value)
+        })
     }
 }
 
