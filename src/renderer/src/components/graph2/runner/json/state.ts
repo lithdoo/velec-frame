@@ -1,15 +1,26 @@
-import { NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "../common"
-import { initNodeViewData, NodeViewData, toX6Node } from "@renderer/components/graph2/base/cell"
-import { NodeData } from "@renderer/components/graph2/base/cell"
-import { isJsonNodeData, JsonNodeData, JsonNodeMeta} from "./cell"
+import { CheckNodeData, NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "../common"
+import { NodeViewData, toX6Node } from "@renderer/components/graph2/base/cell"
+import { isJsonNodeData, JsonNodeData, JsonNodeMeta } from "./cell"
 import { nanoid } from "nanoid"
-import type { AllNodeData } from "../states"
+import type { AllEdgeData, AllNodeData } from "../states"
+import { JsonDataRunnerStep, RunnerTaskStep } from "@common/runnerExt"
 
-
-export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData [] }> {
+export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData[] }> {
     readonly key = RunnerStateKey.JSON
     nodes: JsonNodeData[] = []
     readonly onDataLoaded: string
+
+
+    protected checkNodeData<JsonNodeData>(node: CheckNodeData): JsonNodeData {
+        node.view.outputs = [{
+            keyName: 'output'
+        }]
+        node.view.inputs = [{
+            keyName: 'input'
+        }]
+        return super.checkNodeData(node as any) as JsonNodeData
+    }
+
 
     constructor() {
         super()
@@ -20,13 +31,13 @@ export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData
 
     load(cache: { nodes: JsonNodeData[] } | null) {
         const nodes = cache?.nodes ?? []
-        this.nodes = nodes.filter(node => isJsonNodeData(node)) as JsonNodeData[]
-        // this.scopeNodes = nodes.filter(node => isScopeNodeData(node)) as ScopeNodeData[]
-            ;
-        ([] as NodeData<string>[]).concat(this.nodes).forEach(node => {
+        this.nodes = nodes
+        this.nodes.forEach(node => {
             node._viewId = this.viewId
-            node.view = initNodeViewData(node.view)
-            node._x6 = toX6Node(node.view, node._x6 ?? {})
+            if(!node.meta.isBlank) {
+                window.jsonDataApi.setData(node.id,node.meta.data)
+            }
+            this.checkNodeData(node)
         })
     }
 
@@ -43,17 +54,15 @@ export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData
             zIndex: 1,
             x: 0,
             y: 0,
-            ...this.defaultNodeSize(),
-            inputs: [],
-            outputs: []
+            ...this.defaultNodeSize()
         }
-        const node: JsonNodeData = {
+
+        const node: JsonNodeData = this.checkNodeData({
             id,
             meta,
             view,
             _viewId: this.viewId,
-            _x6: toX6Node(view, {}),
-        }
+        })
 
         this.nodes.push(node)
     }
@@ -74,7 +83,7 @@ export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData
         this.nodes = nodes
     }
 
-    updateEdge(): void {}
+    updateEdge(): void { }
 
     setNodeSize(id: string, size: { width: number; height: number; }) {
         const node = this.nodes.find(v => v.id == id)
@@ -120,5 +129,20 @@ export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData
     clearNode(node: JsonNodeData) {
         node.meta.isBlank = true
         node.meta.data = undefined
+    }
+
+    generateRunnerStep(node: AllNodeData, inputs: { edge: AllEdgeData; node: AllNodeData }[]): JsonDataRunnerStep | null {
+        if (isJsonNodeData(node)) {
+            return {
+                inputs: inputs.map(v => v.node.id),
+                output: node.id,
+                worker: 'json-data-runner',
+                option: {
+                    receiveId: node.id
+                }
+            }
+        } else {
+            return null
+        }
     }
 }

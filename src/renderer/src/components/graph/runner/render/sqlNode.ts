@@ -128,7 +128,6 @@ export class GhRunnerSqlComponent {
             )
         }
 
-
         const renderNode = (t: MTemplate<Props>) => {
             return t.div('gh-runner-sql')(
                 renderHeader(t),

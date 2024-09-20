@@ -1,10 +1,11 @@
 import { insertCss } from "insert-css";
 import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate, render, RenderScope } from "../../base/template";
-import { EdgeShapeKey,  NodeShapeKey } from "../common";
+import { EdgeShapeKey, NodeShapeKey } from "../common";
 import { Edge, Graph, Shape } from "@antv/x6";
 import { initArch } from "../../addon/resizeNode";
 import { FlowNodeData } from "./cell";
 import { RunnerGraphView } from "../view";
+import { GraphView } from "../../base/view";
 
 
 interface GhRunnerFlowNodeState {
@@ -195,7 +196,7 @@ export class GhRunnerFlowNode {
     }
 
     findView() {
-        const view = RunnerGraphView.finder.get(this.nodeData._viewId)
+        const view = GraphView.find<RunnerGraphView>(this.nodeData._viewId)
         if (!view) throw new Error('view is not found!')
         return view
     }
@@ -217,6 +218,8 @@ export class GhSqlErdEdge {
         }
 
         ErdEdge.config({
+            connector: { name: 'rounded' },
+            router: { name: 'metro' },
             attrs: {
                 wrap: {
                     connection: true,
@@ -235,8 +238,8 @@ export class GhSqlErdEdge {
                     },
                     targetMarker: {
                         name: 'block',
-                        width:10,
-                        height:10,
+                        width: 10,
+                        height: 10,
                     },
 
                 },

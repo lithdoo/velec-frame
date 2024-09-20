@@ -1,4 +1,4 @@
-import { RunnerClientStatus, RunnerTaskConfig } from "@common/runner"
+import { RunnerClientStatus, RunnerTaskConfig } from "@common/runnerExt"
 import { ipcRenderer } from "electron"
 
 export const runnerApi = {

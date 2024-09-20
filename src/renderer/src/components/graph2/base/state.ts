@@ -1,15 +1,16 @@
+import { EdgeData, NodeData } from "./cell"
 import { GraphView, GraphStateView } from "./view"
 
 export abstract class StateExtend<
     StateKey,
-    NodeData,
-    EdgeData,
+    StateNodeData extends NodeData,
+    StateEdgeData extends EdgeData,
     ExtraData,
     Upper extends {
         [key: string]: StateExtend<
             StateKey,
-            NodeData,
-            EdgeData,
+            StateNodeData,
+            StateEdgeData,
             ExtraData>
     } = any,
     File = any,
@@ -20,19 +21,19 @@ export abstract class StateExtend<
     readonly viewId: string = null as any
     readonly states: Upper = null as any
 
-    abstract updateNode(id: string, data?: NodeData): void
-    abstract updateEdge(id: string, data?: EdgeData): void
+    abstract updateNode(id: string, data?: StateNodeData): void
+    abstract updateEdge(id: string, data?: StateEdgeData): void
 
     stateInit(viewId: string, states: Upper) {
         (this.states as any) = states;
         (this.viewId as any) = viewId;
     }
 
-    getNodes(res: NodeData[]): NodeData[] {
+    getNodes(res: StateNodeData[]): StateNodeData[] {
         return res
     }
 
-    getEdges(res: EdgeData[]): EdgeData[] {
+    getEdges(res: StateEdgeData[]): StateEdgeData[] {
         return res
     }
 
@@ -42,7 +43,15 @@ export abstract class StateExtend<
         return view as View
     }
 
-    abstract setNodeSize?(id: string, size: { width: number, height: number })
+    setNodeSize(id: string, size: { width: number, height: number }){
+        console.log(id, size)
+        this.getNodes([]).forEach(node => {
+            if (node.id === id) {
+                node.view.height = size.height
+                node.view.width = size.width
+            }
+        })
+    }
 
     abstract save(): File
 
@@ -54,12 +63,12 @@ export abstract class StateExtend<
 
 export class GraphStateCenter<
     StateKey,
-    NodeData,
-    EdgeData,
+    GNodeData extends NodeData<string,any>,
+    GEdgeData extends EdgeData<string,any>,
     Extends extends StateExtend<
         StateKey,
-        NodeData,
-        EdgeData,
+        GNodeData,
+        GEdgeData,
         any, any>,
     S extends {
         [key: string]: Extends
@@ -75,7 +84,7 @@ export class GraphStateCenter<
     extends<T extends {
         [key: string]: Extends
     }>(states: T)
-        : GraphStateCenter<StateKey, NodeData, EdgeData, Extends, S & T> {
+        : GraphStateCenter<StateKey, GNodeData, GEdgeData, Extends, S & T> {
         return new GraphStateCenter(
             this.viewId,
             { ...this.states, ...states },
@@ -89,11 +98,11 @@ export class GraphStateCenter<
     }
 
     getNodes() {
-        return this.list.reduce<NodeData[]>((res, state) => state.getNodes(res), [])
+        return this.list.reduce<GNodeData[]>((res, state) => state.getNodes(res), [])
     }
 
     getEdges() {
-        const edges = this.list.reduce<EdgeData[]>((res, state) => state.getEdges(res), [])
+        const edges = this.list.reduce<GEdgeData[]>((res, state) => state.getEdges(res), [])
         return edges
     }
 

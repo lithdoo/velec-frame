@@ -14,7 +14,7 @@ const toolbar = ToolBarBuilder.create()
         props.page.save()
     }, { icon: 'del' })
     .button('update', '更新', () => {
-        // props.page.reload()
+        props.page.view.refresh()
     }, { icon: 'del' })
     .button('addSqlNode', '添加 SQL 节点', async () => {
         const fileUrl = await window.explorerApi.selectFile({ extensions: ['db'] })

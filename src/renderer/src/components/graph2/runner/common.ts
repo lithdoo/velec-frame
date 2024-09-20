@@ -1,3 +1,5 @@
+import { RunnerTaskStep } from "@common/runnerExt"
+import { initNodeViewData, NodeData, toX6Node } from "../base/cell"
 import { StateExtend } from "../base/state"
 import type { AllEdgeData, AllNodeData } from "./states"
 
@@ -17,6 +19,12 @@ export enum RunnerStateKey {
     SCOPE = "GH_RUNNER_STATE_SCOPE"
 }
 
+export type CheckNodeData<T extends NodeData<string, any> = NodeData<string, any>> = Partial<T> & {
+    view: T['view'],
+    id: T['id'],
+    _viewId: T['_viewId'],
+    meta: T['meta']
+}
 export abstract class RunnerStateExtend<
     Upper extends { [key: string]: RunnerStateExtend<any> },
     File = any
@@ -29,4 +37,13 @@ export abstract class RunnerStateExtend<
     File
 > {
 
+    protected checkNodeData<T extends NodeData<string, any>>(node: CheckNodeData<T>) {
+        Object.assign(node.view, initNodeViewData(node.view))
+        node._x6 = toX6Node(node.view, node._x6 ?? {})
+        return node as T
+    }
+
+    generateRunnerStep(node: AllNodeData, inputs: { edge: AllEdgeData, node: AllNodeData }[]): RunnerTaskStep<unknown> | null {
+        return null
+    }
 }

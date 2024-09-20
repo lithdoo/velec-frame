@@ -1,4 +1,3 @@
-
 export enum RunnerClientStatus {
     Free = 'Free',
     Procesing = 'Procesing',
@@ -7,15 +6,16 @@ export enum RunnerClientStatus {
 
 
 export interface RunnerTaskConfig {
-    steps: RunnerTaskStep<unknown>[];
+    outputs: string[];
+    steps: RunnerTaskStep<unknown>[]
 }
 
 export interface RunnerTaskStep<Option> {
+    inputs: (string | null)[],
+    output: string,
     worker: string;
     option: Option;
 }
-
-
 
 export interface SqliteRunnerStep extends RunnerTaskStep<{
     fileUrl: string,
@@ -40,11 +40,13 @@ export const isJsonDataRunnerStep = (step: RunnerTaskStep<unknown>): step is Jso
     return step.worker === 'json-data-runner'
 }
 
-export interface RunnerTaskContent {
-    outputs: string[];
-    steps: {
-        inputs: string[],
-        output: string,
-        runner: RunnerTaskStep<unknown>,
-    }[]
+
+export interface ScopeDataRunnerStep extends RunnerTaskStep<{
+    fields: string[]
+}> {
+    worker: 'scope-data-runner'
+}
+
+export const isScopeDataRunnerStep = (step: RunnerTaskStep<unknown>): step is ScopeDataRunnerStep => {
+    return step.worker === 'scope-data-runner'
 }

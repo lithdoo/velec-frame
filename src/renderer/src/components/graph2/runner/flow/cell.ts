@@ -16,4 +16,8 @@ export interface FlowEdgeMeta {
     flowId: string, color: string
 }
 
+export const isFlowEdgeData = (node: EdgeData<any, any>): node is FlowEdgeData => {
+    return (node as FlowEdgeData).view.shape === EdgeShapeKey.GH_RUNNER_FLOW_EDGE
+}
+
 export type FlowEdgeData = EdgeData<EdgeShapeKey.GH_RUNNER_FLOW_EDGE, FlowEdgeMeta>

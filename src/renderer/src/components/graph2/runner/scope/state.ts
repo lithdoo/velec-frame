@@ -1,12 +1,27 @@
-import { NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "../common"
-import { initNodeViewData, NodeViewData, toX6Node } from "@renderer/components/graph2/base/cell"
+import { CheckNodeData, NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "../common"
+import { NodeViewData, toX6Node } from "@renderer/components/graph2/base/cell"
 import { isScopeNodeData, ScopeNodeData, ScopeNodeMeta } from "./cell"
 import { nanoid } from "nanoid"
-import type { AllNodeData } from "../states"
+import type { AllEdgeData, AllNodeData } from "../states"
+import { Graph, KeyValue } from "@antv/x6"
+import { RunnerTaskStep, ScopeDataRunnerStep } from "@common/runnerExt"
 
+const SCOPE_INPUT_POSITION = 'SCOPE_INPUT_POSITION'
+
+Graph.registerPortLayout(SCOPE_INPUT_POSITION, (portsPositionArgs: KeyValue<any>[]) => {
+    return portsPositionArgs.map((_, idx) => {
+        return {
+            position: {
+                x: 0,
+                y: 12 + 26 + idx * 24,
+            },
+            angle: 0,
+        }
+    })
+})
 
 export class RunnerScopeState extends RunnerStateExtend<{}, { nodes: (ScopeNodeData)[] }> {
-    readonly key = RunnerStateKey.JSON
+    readonly key = RunnerStateKey.SCOPE
     nodes: ScopeNodeData[] = []
 
     load(cache: { nodes: (ScopeNodeData)[] } | null) {
@@ -14,11 +29,26 @@ export class RunnerScopeState extends RunnerStateExtend<{}, { nodes: (ScopeNodeD
         this.nodes = nodes
         this.nodes.forEach(node => {
             node._viewId = this.viewId
-            node.view = initNodeViewData(node.view)
-            node._x6 = toX6Node(node.view, node._x6 ?? {})
+            this.checkNodeData(node)
         })
     }
 
+    protected checkNodeData<ScopeNodeData>(node: CheckNodeData): ScopeNodeData {
+        node.view.outputs = [{
+            keyName: 'output'
+        }]
+
+        const meta = node.meta as ScopeNodeMeta
+
+        node.view.inputLayout = SCOPE_INPUT_POSITION
+
+        node.view.inputs = meta.fields.map(field => {
+            return {
+                keyName: field
+            }
+        })
+        return super.checkNodeData(node as any) as ScopeNodeData
+    }
 
     addScopeNode(label: string) {
         const id = nanoid()
@@ -32,9 +62,7 @@ export class RunnerScopeState extends RunnerStateExtend<{}, { nodes: (ScopeNodeD
             zIndex: 1,
             x: 0,
             y: 0,
-            ...this.defaultNodeSize(),
-            inputs: [],
-            outputs: []
+            ...this.defaultNodeSize()
         }
         const node: ScopeNodeData = {
             id,
@@ -79,13 +107,31 @@ export class RunnerScopeState extends RunnerStateExtend<{}, { nodes: (ScopeNodeD
 
     private updateNodeHeight(node: ScopeNodeData) {
         node.view.height = 28 + node.meta.fields.length * 24
-        node._x6 = toX6Node(node.view, node._x6)
+        this.checkNodeData(node)
     }
 
     dispose(): void {
         super.dispose()
     }
 
+    generateRunnerStep(node: AllNodeData, inputs: { edge: AllEdgeData; node: AllNodeData }[]): RunnerTaskStep<unknown> | null {
+        if (!isScopeNodeData(node)) {
+            return null
+        }
+        const inputTable: Map<string, string> = new Map()
+        inputs.forEach(({ edge }) => {
+            inputTable.set(edge.view.targetPortKey, edge.view.target)
+        })
+        const step: ScopeDataRunnerStep = {
+            inputs: node.meta.fields.map(name => inputTable.get(name) ?? null),
+            output: node.id,
+            worker: 'scope-data-runner',
+            option: {
+                fields: node.meta.fields
+            }
+        }
+        return step
+    }
 
     addNodeField(node: ScopeNodeData) {
         let name = 'field'

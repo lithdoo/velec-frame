@@ -1,3 +1,4 @@
+import { RunnerTaskConfig, RunnerTaskStep } from "@common/runnerExt"
 import { GraphStateCenter } from "../base/state"
 import { RunnerStateExtend, RunnerStateKey } from "./common"
 import { FlowEdgeData, FlowNodeData } from "./flow/cell"
@@ -51,6 +52,15 @@ export class RunnerGraphStateCenter<S extends { [key: string]: RunnerStateExtend
 
     setNodeSize(id: string, size: { height: number, width: number }) {
         this.list.forEach(v => v.setNodeSize?.(id, size))
+    }
+
+    generateRunnerStep(node: AllNodeData, inputs: { edge: AllEdgeData, node: AllNodeData }[]): RunnerTaskStep<unknown> | null {
+        let result: RunnerTaskStep<unknown> | null = null
+        for (const state of this.list) {
+            result = state.generateRunnerStep(node, inputs)
+            if (result) { break }
+        }
+        return result
     }
 }
 

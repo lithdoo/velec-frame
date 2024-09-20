@@ -1,9 +1,10 @@
-import { RunnerClientStatus, RunnerTaskConfig } from "@common/runner"
+import { RunnerClientStatus, RunnerTaskConfig } from "@common/runnerExt"
 import { ipcMain } from "electron"
 import { uuid } from "uuidv4"
 import { RunnerWorker } from "./common"
 import { SqliteRunnerWorker } from "./worker/sqlite"
 import { JsonDataRunnerWorker } from "./worker/jsonData"
+import { ScopeDataRunnerWorker } from "./worker/scopeData"
 
 export class RunnerService {
     static install() {
@@ -32,7 +33,8 @@ export class RunnerClient {
 
     static workers: RunnerWorker<unknown>[] = [
         new SqliteRunnerWorker(),
-        new JsonDataRunnerWorker()
+        new JsonDataRunnerWorker(),
+        new ScopeDataRunnerWorker(),
     ]
 
     static checkTimeout() {
@@ -126,6 +128,7 @@ export class RunnerClient {
 export class RunnerTask {
     readonly config: RunnerTaskConfig
     readonly workers: Map<string, RunnerWorker<unknown>> = new Map()
+    readonly outputs: Map<string, any> = new Map()
     constructor(
         config: RunnerTaskConfig,
         workers: RunnerWorker<unknown>[],
@@ -133,16 +136,15 @@ export class RunnerTask {
     ) {
         this.config = config
         this.workers = new Map(workers.map(w => [w.keyName, w]))
-        
-        this.next([]).finally(()=>{
+
+        this.next().finally(() => {
             onfinish()
         })
     }
     private current: number = -1
     private working: boolean = true
 
-    async next(argus: any[]) {
-        console.log('next', this.current, argus)
+    async next() {
         if (!this.working) {
             return null
         }
@@ -156,11 +158,18 @@ export class RunnerTask {
             return null
         }
 
+        const argus = step.inputs.map(v=>{
+            if(!v) return undefined
+            return this.outputs.get(v)
+        })
+
+        console.log(step.worker,argus)
         const { process } = worker.run(step.option, argus)
 
         try {
             const { result } = await process
-            return this.next([result])
+            this.outputs.set(step.output,result)
+            return this.next()
         } catch (e) {
             return null
         }

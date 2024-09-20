@@ -348,7 +348,7 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
         }, { steps: [] })
 
 
-        window.runnerApi.runFlow(this.clientId, config)
+        // window.runnerApi.runFlow(this.clientId, config)
 
     }
 

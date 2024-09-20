@@ -13,8 +13,10 @@ export class JsonDataRunnerWorker extends RunnerWorker<Option> {
         const [data] = argus
 
         const process = (async () => {
-            JsonDataStore.main.set(receiveId, data)
-            return this.result(null)
+            if(data !== undefined){
+                JsonDataStore.main.set(receiveId, data)
+            }
+            return this.result(JsonDataStore.main.get(receiveId,false))
         })()
         return { process }
     }

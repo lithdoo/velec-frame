@@ -6,6 +6,9 @@ import { type EdgeData, type NodeData } from "./cell"
 
 export abstract class GraphView {
     static finder: Map<string, GraphView> = new Map()
+    static find<T extends GraphView>(id: string) {
+        return this.finder.get(id) as T
+    }
     readonly id = nanoid()
 
     outer: HTMLElement = document.createElement('div')
@@ -39,17 +42,23 @@ export abstract class GraphView {
         container.style.flex = '1'
         element.appendChild(container)
         this.graph = this.initGraph()
+        GraphView.finder.set(this.id, this)
         this.refresh()
     }
 
     fitView() {
         this.graph?.zoomToFit()
     }
+
+    dispose() {
+        this.graph?.dispose()
+        GraphView.finder.delete(this.id)
+    }
 }
 
 export abstract class GraphStateView<
-    NodeType extends NodeData<any,any>,
-    EdgeType extends EdgeData<any,any>,
+    NodeType extends NodeData<any, any>,
+    EdgeType extends EdgeData<any, any>,
 > extends GraphView {
     nodes: NodeType[] = []
     edges: EdgeType[] = []
@@ -60,7 +69,7 @@ export abstract class GraphStateView<
         EdgeType, any, any
     >
 
-    constructor(){
+    constructor() {
         super()
         markRaw(this)
     }
@@ -71,19 +80,15 @@ export abstract class GraphStateView<
         this.nodes = this.state.getNodes()
         this.edges = this.state.getEdges()
 
-        console.log(
-            this
-        )
-
         this.graph?.addNodes(this.nodes
-            .map(node => Object.assign({}, node._x6, { data: node }))
+            .map(node => Object.assign({}, node._x6 as any, { data: node }))
         )
         this.graph?.addEdges(this.edges
             .map(edge => Object.assign({}, edge._x6, { data: edge }))
         )
     }
 
-    dispose(){
+    dispose() {
         this.graph?.dispose()
         this.state?.dispose()
     }

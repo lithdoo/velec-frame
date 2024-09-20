@@ -16,7 +16,15 @@ export class CommonFormHandler<Form extends FormBase> {
     constructor(list: Field<FormKey, unknown>[]) {
         this.list = list
     }
-    async emitValidate(keyName: string) {
+
+    onValueChange: (
+        value: Partial<Form>,
+        options: {
+            fields: Field<FormKey, unknown>[]
+        }
+    ) => void = () => { }
+
+    async emitValidate(keyName: string, updateMessage: boolean = true) {
         const field = this.list.find(v => v.keyName === keyName)
         if (!field) {
             return true
@@ -25,13 +33,34 @@ export class CommonFormHandler<Form extends FormBase> {
         if (
             (!field.required) || (value)
         ) {
-            this.validateMesssage.delete(field)
+            if (updateMessage) {
+                this.validateMesssage.delete(field)
+            }
             return true
         } else {
-            const msg = `${field.title} 为必填项`
-            this.validateMesssage.set(field, msg)
+            if (updateMessage) {
+                const msg = `${field.title} 为必填项`
+                this.validateMesssage.set(field, msg)
+            }
             return false
         }
+    }
+
+    emitValueChange() {
+        const value = this.value()
+
+        this.onValueChange(value, {
+            fields: this.list
+        })
+    }
+
+    value(): Partial<Form> {
+        const res = {} as any
+        for (const field of this.list) {
+            const value = field.transfer ? field.transfer(field.value) : field.value
+            res[field.keyName] = value ?? field.blank
+        }
+        return res as Form
     }
 
     async submit() {

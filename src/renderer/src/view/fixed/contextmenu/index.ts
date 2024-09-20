@@ -1,9 +1,15 @@
 import { PopMenuListHandler } from "@renderer/components/base/PopMenu";
 import { fixReactive } from "@renderer/fix";
-class ContextMenu {
-    ev: MouseEvent | null = null
 
-    open(list: PopMenuListHandler,ev?:MouseEvent) {
+export interface ContextMenuEvent {
+    clientY: number,
+    clientX: number,
+}
+
+class ContextMenu {
+    ev: ContextMenuEvent | null = null
+
+    open(list: PopMenuListHandler,ev?:ContextMenuEvent) {
         this.ev = ev ?? null
         this.$emitOpen?.(list)
     }

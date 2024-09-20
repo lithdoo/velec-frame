@@ -4,8 +4,8 @@ import { Database, verbose } from "sqlite3"
 const sqlite3 = verbose()
 
 interface SqlMethods {
-    all: <T = any>(sql: string) => Promise<T[]>;
-    run: (sql: string) => Promise<void>
+    all: <T = any>(sql: string, params:any) => Promise<T[]>;
+    run: (sql: string, params:any) => Promise<void>
 }
 
 export class SqliteConection {
@@ -28,15 +28,19 @@ export class SqliteConection {
     }
 
     private get sql(): SqlMethods {
-        const all = <T = any>(sql: string) => new Promise<T[]>((res, rej) => {
-            this.db.all<T>(sql, (error, rows) => {
+        const all = <T = any>(sql: string,params:any) => new Promise<T[]>((res, rej) => {
+            console.log({sql,params})
+            this.db.all<T>(sql,params, (error, rows) => {
+                console.log({error})
                 if (error) rej(error)
                 else res(rows)
             })
         })
 
-        const run = (sql: string) => new Promise<void>((res, rej) => {
-            this.db.run(sql, (error) => {
+        const run = (sql: string,params:any) => new Promise<void>((res, rej) => {
+            console.log({sql,params})
+            this.db.run(sql,params, (error) => {
+                console.log({error})
                 if (error) rej(error)
                 else res()
             })
@@ -81,28 +85,28 @@ export class SqliteConection {
     }
 
 
-    async runSelectAll(sql: string) {
+    async runSelectAll(sql: string, params: any = undefined) {
         return this.requset(async () => {
-            const res = await this.sql.all<any[]>(sql)
+            const res = await this.sql.all<any[]>(sql,params)
             return res
         })
     }
 
-    async run(sql: string) {
+    async run(sql: string, params: any = undefined) {
         return this.requset(async () => {
-            return await this.sql.run(sql)
+            return await this.sql.run(sql,params)
         })
     }
 
-    async query(sql: string) {
+    async query(sql: string , params: any = undefined) {
         return this.requset(async () => {
-           return await this.sql.all(sql)
+           return await this.sql.all(sql,params)
         })
     }
 
     async getAllTables() {
         return this.requset(async () => {
-            const rowNameArr = await this.sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' order by name;`)
+            const rowNameArr = await this.sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' order by name;`,undefined)
             const rows = await Promise.all(rowNameArr.map(async ({ name }) => {
                 const fields: {
                     cid: number
@@ -112,7 +116,7 @@ export class SqliteConection {
                     pk: number
                     type: string
                     label: string
-                }[] = await this.sql.all(`pragma table_info(${name})`)
+                }[] = await this.sql.all(`pragma table_info(${name})`,undefined)
                 return {
                     name, label: '', fieldList: fields.map(field => {
                         return {
@@ -131,7 +135,7 @@ export class SqliteConection {
     }
     async getTableInfo(name: string) {
         return this.requset(async () => {
-            const rowNameArr = await this.sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' and name = '${name}'`)
+            const rowNameArr = await this.sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' and name = '${name}'`,undefined)
             const rows = await Promise.all(rowNameArr.map(async ({ name }) => {
                 const fields: {
                     cid: number
@@ -141,7 +145,7 @@ export class SqliteConection {
                     pk: number
                     type: string
                     label: string
-                }[] = await this.sql.all(`pragma table_info(${name})`)
+                }[] = await this.sql.all(`pragma table_info(${name})`,undefined)
                 return {
                     name, label: '', fieldList: fields.map(field => {
                         return {
