@@ -12,7 +12,7 @@ const props = defineProps<{
 <template>
     <div class="page-tool-bar">
         <div class="page-tool-bar__item" v-for="(v, i) in props.handler.list" :key="v.type === 'button' ? v.key : i">
-            <div v-if="v.type == 'button'" class="page-tool-bar__button" @click="props.handler.emit(v.key)">
+            <div v-if="v.type == 'button'" class="page-tool-bar__button" @click="e => props.handler.emit(v.key, e)">
                 <VxIcon class="page-tool-bar__button-icon" v-if="v.icon" :name="v.icon"></VxIcon>
                 {{ v.label }}
             </div>
@@ -46,7 +46,7 @@ const props = defineProps<{
         background-color: #333;
     }
 
-    .page-tool-bar__button-icon{
+    .page-tool-bar__button-icon {
         margin-left: -4px;
     }
 }

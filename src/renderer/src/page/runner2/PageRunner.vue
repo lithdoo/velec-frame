@@ -2,8 +2,12 @@
 import { RunnerClientStatus } from '@common/runner';
 import type { PageRunner } from './index';
 import { ToolBarBuilder, ToolBar } from '@renderer/components/base/ToolBar';
-import { GraphContainer } from "@renderer/components/graph";
+import { GraphContainer } from "@renderer/mods/graph";
 import { computed, onMounted } from 'vue';
+import { NodeShapeKey } from './common';
+import { contextMenu } from '@renderer/view/fixed/contextmenu';
+import { Menu, PopMenuListHandler } from '@renderer/components/base/PopMenu';
+import { nanoid } from 'nanoid';
 
 const props = defineProps<{
     page: PageRunner
@@ -16,22 +20,24 @@ const toolbar = ToolBarBuilder.create()
     .button('update', '更新', () => {
         props.page.view.refresh()
     }, { icon: 'del' })
-    .button('addSqlNode', '添加 SQL 节点', async () => {
-        const fileUrl = await window.explorerApi.selectFile({ extensions: ['db'] })
-        if (fileUrl) {
-            props.page.view.addSqlNode(fileUrl)
-        }
+    .button('addScopeNode', '添加节点', async (event) => {
+        contextMenu.open(PopMenuListHandler.create(
+            ([
+                ['SQL', NodeShapeKey.GH_RUNNER_SQL_NODE],
+                ['JSON', NodeShapeKey.GH_RUNNER_JSON_NODE],
+                ['FLOW', NodeShapeKey.GH_RUNNER_FLOW_NODE],
+                // ['SCOPE', NodeShapeKey.GH_RUNNER_SCOPE_NODE]
+            ] as [string, NodeShapeKey][]).map(([label, type]) => {
+                return Menu.button({
+                    icon: 'del', key: nanoid(), label, action: () => {
+                        props.page.view.addBlankNode(type)
+                    }
+                })
+            })
+        ), event)
+
     }, { icon: 'del' })
-    .button('addJsonNode', '添加 Json 节点', async () => {
-        props.page.view.addJsonNode('')
-    }, { icon: 'del' })
-    .button('addScopeNode', '添加 Scope 节点', async () => {
-        props.page.view.addScopeNode('123')
-    }, { icon: 'del' })
-    .button('addFlowNode', '添加 Flow 节点', async () => {
-        props.page.view.addFlowNode('')
-    }, { icon: 'del' })
-    .button('addFlowEdge', '添加 Flow 流程', async () => {
+    .button('addFlowEdge', '添加流程', async () => {
         props.page.view.addFlowEdge()
     }, { icon: 'del' })
     .build()

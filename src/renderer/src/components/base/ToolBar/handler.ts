@@ -16,12 +16,12 @@ export class ToolBarHandler {
         this.list = list
     }
 
-    emit(key: string) {
+    emit(key: string,e:MouseEvent) {
         const button = this.list
             .filter(v => isToolButton(v))
             .find(v => (v as ToolButton).key === key)
         if (button && isToolButton(button)) {
-            button.action?.()
+            button.action?.(e)
         }
     }
 }
@@ -44,7 +44,7 @@ export class ToolBarBuilder {
         return new ToolBarBuilder(this.list.concat([item]))
     }
 
-    button(key: string, label: string | VNode, action?: () => void, option: {
+    button(key: string, label: string | VNode, action?: (e:MouseEvent) => void, option: {
         icon?: string,
         disabled?: boolean,
     } = {}) {

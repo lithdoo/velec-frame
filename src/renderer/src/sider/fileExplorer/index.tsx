@@ -11,7 +11,7 @@ import { PageSqlErd } from "@renderer/page/sqlErd"
 import { contextMenu } from "@renderer/view/fixed/contextmenu"
 import { PopMenuBuilder } from "@renderer/components/base/PopMenu"
 import { PageSqlEditor } from "@renderer/page/sqlEditor"
-import { PageRunner } from "@renderer/page/runner"
+import { PageRunner } from "@renderer/page/runner2"
 
 
 export class SiderFileExplorer implements AppSiderPanel {

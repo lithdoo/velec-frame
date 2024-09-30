@@ -25,6 +25,9 @@ export type CheckNodeData<T extends NodeData<string, any> = NodeData<string, any
     _viewId: T['_viewId'],
     meta: T['meta']
 }
+
+
+
 export abstract class RunnerStateExtend<
     Upper extends { [key: string]: RunnerStateExtend<any> },
     File = any
@@ -36,6 +39,12 @@ export abstract class RunnerStateExtend<
     Upper,
     File
 > {
+
+    static checkNodeData<T extends NodeData<string, any>>(node: CheckNodeData<T>) {
+        Object.assign(node.view, initNodeViewData(node.view))
+        node._x6 = toX6Node(node.view, node._x6 ?? {})
+        return node as T
+    }
 
     protected checkNodeData<T extends NodeData<string, any>>(node: CheckNodeData<T>) {
         Object.assign(node.view, initNodeViewData(node.view))

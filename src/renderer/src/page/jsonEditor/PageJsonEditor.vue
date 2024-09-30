@@ -22,7 +22,7 @@ const toolbar = ToolBarBuilder.create()
             <ToolBar :handler="toolbar"></ToolBar>
         </div>
         <div class="page-sql-editor__editor">
-             <TextEditor :handler="props.page.editorHandler"></TextEditor>
+            <TextEditor :handler="props.page.editorHandler"></TextEditor>
         </div>
     </div>
 </template>

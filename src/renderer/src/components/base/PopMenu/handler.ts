@@ -9,7 +9,7 @@ export interface MenuButton {
     icon?: string,
     extra?: string | VNode
     disabled: boolean
-    action?: () => void
+    action?: (e:MouseEvent) => void
     $el?: HTMLElement
 }
 
@@ -112,7 +112,7 @@ export class Menu {
         label: string | VNode,
         icon?: string,
         disabled?: boolean,
-        action?: () => void
+        action?: (e:MouseEvent) => void
     }): MenuButton {
         return {
             disabled: false,
