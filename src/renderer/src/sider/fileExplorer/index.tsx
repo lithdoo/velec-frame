@@ -6,12 +6,12 @@ import { fixReactive } from "@renderer/fix"
 import { FileType } from "@common/file"
 import { appTab } from "@renderer/state/tab"
 import { PageFileEditor } from "@renderer/page/fileEditor"
-import { PageGraphEditor } from "@renderer/page/graphEditor"
-import { PageSqlErd } from "@renderer/page/sqlErd"
+// import { PageGraphEditor } from "@renderer/page/graphEditor"
+// import { PageSqlErd } from "@renderer/page/sqlErd"
 import { contextMenu } from "@renderer/view/fixed/contextmenu"
 import { PopMenuBuilder } from "@renderer/components/base/PopMenu"
 import { PageSqlEditor } from "@renderer/page/sqlEditor"
-import { PageRunner } from "@renderer/page/runner2"
+// import { PageRunner } from "@renderer/page/runner2"
 
 
 export class SiderFileExplorer implements AppSiderPanel {
@@ -65,9 +65,9 @@ export class SiderFileExplorer implements AppSiderPanel {
             appTab.addTab(PageGraphEditor.create())
         }
 
-        if (file.name.indexOf('.db') > 0) {
-            appTab.addTab(PageSqlErd.sqlite(file.url))
-        }
+        // if (file.name.indexOf('.db') > 0) {
+        //     appTab.addTab(PageSqlErd.sqlite(file.url))
+        // }
     }
 
 
@@ -135,7 +135,7 @@ class ExplorerWrokspace {
             contextMenu.open(
                 PopMenuBuilder.create()
                     .button('openErd', '打开 ER 图', () => {
-                        appTab.addTab(PageSqlErd.sqlite(file.url))
+                        // appTab.addTab(PageSqlErd.sqlite(file.url))
                     })
                     .button('openEditor', '打开 SQL 编辑器', () => {
                         appTab.addTab(PageSqlEditor.create({
@@ -152,7 +152,7 @@ class ExplorerWrokspace {
             contextMenu.open(
                 PopMenuBuilder.create()
                     .button('open', '打开', async () => {
-                        appTab.addTab(await PageRunner.create(file.url))
+                        // appTab.addTab(await PageRunner.create(file.url))
                     })
                     .build(),
                 ev
