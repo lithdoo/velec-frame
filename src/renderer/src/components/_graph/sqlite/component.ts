@@ -96,7 +96,7 @@ export class GhSqlErdNodeComponent {
             return t.div('gh-sql-erd__field')(
                 t.div('gh-sql-erd__field-name')(t.text(s => {
                     const name = s.get('field').name
-                    const label = s.get('data').meta.label ?? ''
+                    const label = s.get('field').label ?? ''
                     return name + (label ? ` ( ${label} )` : '')
                 })),
                 t.div('gh-sql-erd__field-type')(t.text(s => `${s.get('field').type}${s.get('field').unique ? ' UNIQUE' : ''}${s.get('field').notNull ? ' NOT NULL' : ''}`))

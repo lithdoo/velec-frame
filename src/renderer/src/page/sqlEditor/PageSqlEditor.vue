@@ -15,6 +15,12 @@ const toolbar = ToolBarBuilder.create()
     .button('save', '保存', () => { props.page.save() },{
         icon:'del'
     })
+    .button('saveAndClose', '保存并关闭', () => { 
+        props.page.save() 
+        props.page.close() 
+    },{
+        icon:'del'
+    })
     .build()
 
 </script>

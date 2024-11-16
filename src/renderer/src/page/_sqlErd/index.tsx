@@ -2,7 +2,7 @@ import { appTab, TabPage } from "@renderer/state/tab";
 import { VNode } from "vue";
 import { fixReactive } from "@renderer/fix";
 import { default as PageSqlErdVue } from "./PageSqlErd.vue";
-import { NodeData, SqlErdGraphView } from "@renderer/components/graph/sqlite/index";
+import { NodeData, SqlErdGraphView } from "@renderer/components/_graph/sqlite/index";
 import { nanoid } from "nanoid";
 import { contextMenu } from "@renderer/view/fixed/contextmenu";
 import { Menu, PopMenuListHandler } from "@renderer/components/base/PopMenu";

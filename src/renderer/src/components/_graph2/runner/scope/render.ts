@@ -223,13 +223,13 @@ export class GhRunnerScopeNode {
         this.component = new GhRunnerScopeComponent(this.nodeData)
         this.component.oncontextmenu = (event) => {
             const view = this.findView()
-            view.onNodeContextMenu?.({ event, data: this.nodeData })
+            ;(view as any).onNodeContextMenu?.({ event, data: this.nodeData })
         }
         // this.component.refresh = () => {
         //     const view = this.findView()
         //     view.refreshNode(this.nodeData)
         // }
-        this.component.getView = () => this.findView()
+        ;(this.component as any).getView = () => this.findView()
     }
 
     findView() {

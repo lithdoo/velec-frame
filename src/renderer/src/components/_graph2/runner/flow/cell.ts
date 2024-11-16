@@ -1,4 +1,4 @@
-import { EdgeData, NodeData } from "@renderer/components/graph2/base/cell";
+import { EdgeData, NodeData } from "@renderer/components/_graph2/base/cell";
 import { EdgeShapeKey, NodeShapeKey } from "../common";
 
 export interface FlowNodeMeta {

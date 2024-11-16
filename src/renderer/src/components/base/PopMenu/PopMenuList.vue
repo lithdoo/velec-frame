@@ -17,10 +17,10 @@ const layer = computed(() => {
     return props.layer
 })
 
-const onButtonClick = (item: MenuButton) => {
+const onButtonClick = (item: MenuButton,e: MouseEvent) => {
     if (item.disabled) return
     else{
-        item.action?.()
+        item.action?.(e)
         layer.value.clear()
     }
 }
@@ -68,7 +68,7 @@ const stopHide = () => {
                 <hr class="menu-list__divide" />
             </template>
             <template v-if="item.type === 'button'">
-                <div @click="() => onButtonClick(item)" @mouseenter="() => hideSubmenu()"
+                <div @click="(e) => onButtonClick(item,e)" @mouseenter="() => hideSubmenu()"
                     @mouseleave="() => hideSubmenu()" :ref="(el) => item.$el = el as HTMLElement"
                     :class="['menu-list__button', item.disabled ? 'menu-list__button--disabled' : '']">
                     <div class="menu-list__button-icon">

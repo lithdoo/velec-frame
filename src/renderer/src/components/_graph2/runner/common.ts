@@ -52,7 +52,7 @@ export abstract class RunnerStateExtend<
         return node as T
     }
 
-    generateRunnerStep(node: AllNodeData, inputs: { edge: AllEdgeData, node: AllNodeData }[]): RunnerTaskStep<unknown> | null {
+    generateRunnerStep(_node: AllNodeData, _inputs: { edge: AllEdgeData, node: AllNodeData }[]): RunnerTaskStep<unknown> | null {
         return null
     }
 }

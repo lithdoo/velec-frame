@@ -1,11 +1,11 @@
 export class EventBus<Event> {
     listener: Map<any, EventListener<Event, unknown>> = new Map()
 
-    remove(key: any) {
+    remove(_key: any) {
 
     }
 
-    add(listener: EventListener<Event, unknown>) {
+    add(_listener: EventListener<Event, unknown>) {
 
     }
 }

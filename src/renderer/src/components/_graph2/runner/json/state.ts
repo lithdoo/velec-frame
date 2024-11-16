@@ -1,9 +1,9 @@
 import { CheckNodeData, NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "../common"
-import { NodeViewData, toX6Node } from "@renderer/components/graph2/base/cell"
+import { NodeViewData } from "@renderer/components/_graph2/base/cell"
 import { isJsonNodeData, JsonNodeData, JsonNodeMeta } from "./cell"
 import { nanoid } from "nanoid"
 import type { AllEdgeData, AllNodeData } from "../states"
-import { JsonDataRunnerStep, RunnerTaskStep } from "@common/runnerExt"
+import { JsonDataRunnerStep } from "@common/runnerExt"
 
 export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData[] }> {
     readonly key = RunnerStateKey.JSON
@@ -34,8 +34,8 @@ export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData
         this.nodes = nodes
         this.nodes.forEach(node => {
             node._viewId = this.viewId
-            if(!node.meta.isBlank) {
-                window.jsonDataApi.setData(node.id,node.meta.data)
+            if (!node.meta.isBlank) {
+                window.jsonDataApi.setData(node.id, node.meta.data)
             }
             this.checkNodeData(node)
         })
@@ -131,14 +131,14 @@ export class RunnerJsonState extends RunnerStateExtend<{}, { nodes: JsonNodeData
         node.meta.data = undefined
     }
 
-    generateRunnerStep(node: AllNodeData, inputs: { edge: AllEdgeData; node: AllNodeData }[]): JsonDataRunnerStep | null {
+    generateRunnerStep(node: AllNodeData, _inputs: { edge: AllEdgeData; node: AllNodeData }[]): JsonDataRunnerStep | null {
         if (isJsonNodeData(node)) {
             return {
-                inputs: inputs.map(v => v.node.id),
                 output: node.id,
                 worker: 'json-data-runner',
                 option: {
-                    receiveId: node.id
+                    receiveId: node.id,
+                    default: null
                 }
             }
         } else {

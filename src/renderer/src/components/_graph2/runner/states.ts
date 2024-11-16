@@ -1,4 +1,4 @@
-import { RunnerTaskConfig, RunnerTaskStep } from "@common/runnerExt"
+import { RunnerTaskStep } from "@common/runnerExt"
 import { GraphStateCenter } from "../base/state"
 import { RunnerStateExtend, RunnerStateKey } from "./common"
 import { FlowEdgeData, FlowNodeData } from "./flow/cell"

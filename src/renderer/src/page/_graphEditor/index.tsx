@@ -1,7 +1,7 @@
 import { TabPage } from "@renderer/state/tab";
 import { VNode } from "vue";
 import { fixReactive } from "@renderer/fix";
-import { GraphContainer, GraphView } from "@renderer/components/graph";
+import { GraphContainer, GraphView } from "@renderer/components/_graph";
 
 export class PageGraphEditor implements TabPage {
 

@@ -158,10 +158,11 @@ export class RunnerTask {
             return null
         }
 
-        const argus = step.inputs.map(v=>{
-            if(!v) return undefined
-            return this.outputs.get(v)
-        })
+        const argus = [] 
+        // step.inputs.map(v=>{
+        //     if(!v) return undefined
+        //     return this.outputs.get(v)
+        // })
 
         console.log(step.worker,argus)
         const { process } = worker.run(step.option, argus)

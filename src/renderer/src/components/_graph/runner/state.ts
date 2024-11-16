@@ -119,7 +119,7 @@ export class RunnerGraphStateCenter<S extends { [key: string]: RunnerStateExtend
     AllNodeData,
     AllEdgeData, RunnerStateExtend<any, any>, S> {
 
-    static getView: (viewId: string) => RunnerGraphView | void = (viewId: string) => { }
+    static getView: (viewId: string) => RunnerGraphView | void = (_viewId: string) => { }
 
     extends<T extends {
         [key: string]: RunnerStateExtend<any, any>

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PageSqlErd } from './index';
 import { ToolBarBuilder, ToolBar } from '@renderer/components/base/ToolBar';
-import { GraphContainer } from "@renderer/components/graph";
+import { GraphContainer } from "@renderer/components/_graph";
 
 const props = defineProps<{
     page: PageSqlErd

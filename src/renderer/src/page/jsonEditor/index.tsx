@@ -4,6 +4,7 @@ import { fixReactive } from "@renderer/fix";
 import { TextEditorHandler } from "@renderer/components/editor/handler";
 import PageJsonEditorVue from "./PageJsonEditor.vue"
 import { PageDataView } from "../dataView";
+import { nanoid } from "nanoid";
 
 
 
@@ -14,17 +15,19 @@ interface PageJsonEditorOption {
 }
 
 
-// export const PageJsonEditor = {
-    
-// } as any
-
 export class PageJsonEditor implements TabPage {
 
     static create(option: PageJsonEditorOption) {
         const page = fixReactive(new PageJsonEditor(option))
         return page
     }
-    tabId: string = Math.random().toString()
+
+    static open(option: PageJsonEditorOption) {
+        const page = PageJsonEditor.create(option)
+        appTab.addTab(page)
+    }
+
+    tabId: string = nanoid()
     element: VNode
     icon = 'del'
     title = ''
@@ -37,14 +40,13 @@ export class PageJsonEditor implements TabPage {
         this.title = option.title
         this.save = async () => {
             const content = this.editorHandler.editor?.getValue() ?? ''
-
             try {
                 const value = JSON.parse(content)
                 await option.save?.(value)
             } catch (e: any) {
                 alert(e?.message ?? 'JSON 格式错误')
+                throw e
             }
-
         }
         this.defalutValue = option.value
         let content = ''
@@ -62,5 +64,8 @@ export class PageJsonEditor implements TabPage {
         this.editorHandler.destory()
     }
 
+    close(){
+        appTab.removeTab(this.tabId)
+    }
 
 }

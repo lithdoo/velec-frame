@@ -6,6 +6,7 @@ import { ExplorerService } from './explorer'
 import { EditorService } from './editor'
 import { SqliteService } from './sqlite'
 import { RunnerService } from './runner'
+import { RunnerExtService } from './runnerExt'
 import { JsonDataService } from './jsonData'
 
 Menu.setApplicationMenu(null)
@@ -80,6 +81,7 @@ app.whenReady().then(async () => {
   await RunnerService.install()
   await ExplorerService.install()
   await JsonDataService.install()
+  await RunnerExtService.install()
 
   createWindow()
 

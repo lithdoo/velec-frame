@@ -17,15 +17,10 @@ const addWorkspace = () => handler.value.addExplorerWrokspace()
 <template>
     <div class="explorer-sider-panel">
         <div class="explorer-sider-panel__title">
-            资源管理器
+            资源管理器  <button @click="addWorkspace">添加工作空间</button>
         </div>
 
-        <template v-if="!handler.list.length">
-            <div>
-                <button @click="addWorkspace">添加工作空间</button>
-            </div>
-        </template>
-        <template v-else>
+        <template v-if="handler.list.length">
             <div class="explorer-sider-panel__tree" v-for="(ws, idx) in handler.list" :key="idx">
                 <FlatTree :handler="ws.tree">
                     <template #item="{ item }">

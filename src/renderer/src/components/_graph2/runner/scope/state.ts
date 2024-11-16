@@ -1,5 +1,5 @@
 import { CheckNodeData, NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "../common"
-import { NodeViewData, toX6Node } from "@renderer/components/graph2/base/cell"
+import { NodeViewData, toX6Node } from "@renderer/components/_graph2/base/cell"
 import { isScopeNodeData, ScopeNodeData, ScopeNodeMeta } from "./cell"
 import { nanoid } from "nanoid"
 import type { AllEdgeData, AllNodeData } from "../states"
@@ -123,7 +123,6 @@ export class RunnerScopeState extends RunnerStateExtend<{}, { nodes: (ScopeNodeD
             inputTable.set(edge.view.targetPortKey, edge.view.target)
         })
         const step: ScopeDataRunnerStep = {
-            inputs: node.meta.fields.map(name => inputTable.get(name) ?? null),
             output: node.id,
             worker: 'scope-data-runner',
             option: {

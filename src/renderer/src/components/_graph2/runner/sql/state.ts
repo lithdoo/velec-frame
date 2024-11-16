@@ -1,6 +1,6 @@
 import { CheckNodeData, NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "../common"
-import { initNodeViewData, NodeViewData, toX6Node } from "@renderer/components/graph2/base/cell"
-import { EdgeData } from "@renderer/components/graph2/base/cell"
+import { NodeViewData } from "@renderer/components/_graph2/base/cell"
+import { EdgeData } from "@renderer/components/_graph2/base/cell"
 import { isSqlNodeData, SqlNodeData, SqlNodeMeta } from "./cell"
 import { nanoid } from "nanoid"
 import { AllEdgeData, AllNodeData } from "../states"
@@ -79,16 +79,16 @@ export class RunnerSqlState extends RunnerStateExtend<{}, { nodes: SqlNodeData[]
 
     }
 
-    generateRunnerStep(node: AllNodeData, inputs: { edge: AllEdgeData; node: AllNodeData }[]): RunnerTaskStep<unknown> | null {
+    generateRunnerStep(node: AllNodeData, _inputs: { edge: AllEdgeData; node: AllNodeData }[]): RunnerTaskStep<unknown> | null {
         if(!isSqlNodeData(node)){
             return null
         }
 
         const step :SqliteRunnerStep= {
-            inputs : [inputs[0]?.node.id].filter(v=>!!v) as string[],
             output: node.id,
             worker: 'sqlite-runner',
             option: {
+                useParams: false,
                 type: node.meta.type,
                 sql: node.meta.sql,
                 fileUrl: node.meta.fileUrl

@@ -7,10 +7,11 @@ import { FileType } from "@common/file"
 import { appTab } from "@renderer/state/tab"
 import { PageFileEditor } from "@renderer/page/fileEditor"
 // import { PageGraphEditor } from "@renderer/page/graphEditor"
-// import { PageSqlErd } from "@renderer/page/sqlErd"
+import { PageSqlErd } from "@renderer/page/_sqlErd"
 import { contextMenu } from "@renderer/view/fixed/contextmenu"
 import { PopMenuBuilder } from "@renderer/components/base/PopMenu"
 import { PageSqlEditor } from "@renderer/page/sqlEditor"
+import { PageTaskRunner } from "@renderer/page/taskRunner"
 // import { PageRunner } from "@renderer/page/runner2"
 
 
@@ -37,10 +38,12 @@ export class SiderFileExplorer implements AppSiderPanel {
         if (!root) return
 
         const workspace = await ExplorerWrokspace.create(root)
-        if (this.list.find(v => v.rootUrl === workspace.rootUrl)) {
-            return
-        }
-        this.list = this.list.concat([workspace])
+        // if (this.list.find(v => v.rootUrl === workspace.rootUrl)) {
+        //     return
+        // }
+        // this.list = this.list.concat([workspace])
+
+        this.list = [workspace]
     }
 
     init() {
@@ -55,15 +58,22 @@ export class SiderFileExplorer implements AppSiderPanel {
                 url: file.url
             }))
         }
+
+        if (file.name.indexOf('.trunner') > 0) {
+            PageTaskRunner.add(file.url)
+        }
+
         if (file.name.indexOf('.json') > 0) {
             appTab.addTab(PageFileEditor.create({
                 name: file.name,
                 url: file.url
             }, 'json'))
         }
-        if (file.name.indexOf('.md') > 0) {
-            appTab.addTab(PageGraphEditor.create())
-        }
+
+
+        // if (file.name.indexOf('.md') > 0) {
+        //     appTab.addTab(PageGraphEditor.create())
+        // }
 
         // if (file.name.indexOf('.db') > 0) {
         //     appTab.addTab(PageSqlErd.sqlite(file.url))
@@ -135,7 +145,7 @@ class ExplorerWrokspace {
             contextMenu.open(
                 PopMenuBuilder.create()
                     .button('openErd', '打开 ER 图', () => {
-                        // appTab.addTab(PageSqlErd.sqlite(file.url))
+                        appTab.addTab(PageSqlErd.sqlite(file.url))
                     })
                     .button('openEditor', '打开 SQL 编辑器', () => {
                         appTab.addTab(PageSqlEditor.create({

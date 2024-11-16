@@ -18,6 +18,15 @@ export class ExplorerService {
             }
         })
 
+        ipcMain.handle('@explorer/dir/select', async () => {
+            const data = await dialog.showOpenDialog({ properties: ['openDirectory'] })
+            if (!data.canceled && data.filePaths[0]) {
+                return pathToFileURL(data.filePaths[0]).toString()
+            } else {
+                return ''
+            }
+        })
+
         ipcMain.handle('@explorer/file/select', async (_, options: { extensions?: string[] }) => {
             const data = await dialog.showOpenDialog({
                 properties: ['openFile'],
@@ -28,7 +37,7 @@ export class ExplorerService {
             if (!data.canceled && data.filePaths[0]) {
                 return pathToFileURL(data.filePaths[0]).toString()
             } else {
-                return ''
+                return null
             }
         })
 
@@ -62,6 +71,9 @@ export class ExplorerService {
         })
 
         ipcMain.handle('@explorer/json/write', async (_, fileUrl: string, content: any) => {
+            console.log({
+                fileUrl, content
+            })
             try {
                 const text = JSON.stringify(content)
                 fs.writeFileSync(new URL(fileUrl), text)

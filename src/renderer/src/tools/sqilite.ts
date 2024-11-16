@@ -55,6 +55,8 @@ export class SqliteConnect {
         );
         `+ this.lableSql(table)
 
+        console.log('sql')
+
         return window.sqliteApi.sqlRun(this.url, sql)
     }
 

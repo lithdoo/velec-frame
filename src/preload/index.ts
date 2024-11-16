@@ -3,7 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 import { explorerApi } from './explorer'
 import { editorApi } from './editor'
 import { sqliteApi } from './sqlite'
-import { runnerApi } from './runner'
+import { runnerApi,runerExtApi } from './runner'
 import { jsonDataApi } from './jsonData'
 
 // Custom APIs for renderer
@@ -22,6 +22,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('editorApi', editorApi)
     contextBridge.exposeInMainWorld('sqliteApi', sqliteApi)
     contextBridge.exposeInMainWorld('runnerApi', runnerApi)
+    contextBridge.exposeInMainWorld('runerExtApi', runerExtApi)
     contextBridge.exposeInMainWorld('jsonDataApi', jsonDataApi)
   } catch (error) {
     console.error(error)

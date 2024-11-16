@@ -99,7 +99,7 @@ export class RunnerGraphView extends GraphStateView {
             return res
         }, {})
     }
-    load(cache: any = null) {
+    load(_cache: any = null) {
         // console.log('cache', cache)
         // this.state.list.forEach(state => {
         //     state.load(cache?.[state.key] ?? null, null)

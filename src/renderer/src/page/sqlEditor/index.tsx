@@ -24,6 +24,11 @@ export class PageSqlEditor implements TabPage {
         return page
     }
 
+    static open(option: PageSqlEditorOption) {
+        const page = this.create(option)
+        appTab.addTab(page)
+    }
+
     connection?: SqlConnectOption
 
     tabId: string = Math.random().toString()
@@ -63,4 +68,7 @@ export class PageSqlEditor implements TabPage {
         appTab.active(this.dataView.tabId)
     }
 
+    close(){
+        appTab.removeTab(this.tabId)
+    }
 }

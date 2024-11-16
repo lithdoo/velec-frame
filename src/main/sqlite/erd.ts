@@ -43,7 +43,7 @@ export type RawData = {
 
 export const getRawData = async (connect: SqliteConection) => {
     const allTables = await connect.requset(async (sql) => {
-        const rowNameArr = await sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' order by name;`)
+        const rowNameArr = await sql.all<{ name: string }>(`select name from sqlite_master where type = 'table' order by name;`,[])
         const rows = await Promise.all(rowNameArr.map(async ({ name }) => {
             const fields: {
                 cid: number
@@ -53,7 +53,7 @@ export const getRawData = async (connect: SqliteConection) => {
                 pk: number
                 type: string
                 label: string
-            }[] = await sql.all(`pragma table_info(${name})`)
+            }[] = await sql.all(`pragma table_info(${name})`,[])
             const foreignKeys: {
                 from: string
                 to: string
@@ -63,7 +63,7 @@ export const getRawData = async (connect: SqliteConection) => {
                 // on_delete: "NO ACTION"
                 // on_update: "NO ACTION"
                 seq: 0
-            }[] = await sql.all(`pragma foreign_key_list(${name})`)
+            }[] = await sql.all(`pragma foreign_key_list(${name})`,[])
             return { name, fields, foreignKeys }
         }))
         return rows

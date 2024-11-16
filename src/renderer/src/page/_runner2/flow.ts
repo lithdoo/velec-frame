@@ -1,10 +1,9 @@
-import { CheckNodeData, EdgeData, GhComponent, GraphView, initEdgeViewData, NodeData, NodeViewData, toX6Edge } from "@renderer/mods/graph"
+import { CheckNodeData, EdgeData, GhComponent, initEdgeViewData, NodeData, toX6Edge } from "@renderer/mods/graph"
 import { EdgeShapeKey, NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "./common"
 import { nanoid } from "nanoid"
 import { insertCss } from "insert-css"
 import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate } from "@renderer/mods/template"
 import { initArch } from "@renderer/mods/graph/addon/resizeNode"
-import { Shape } from "@antv/x6"
 
 export interface FlowNodeMeta {
     keyName: string
@@ -103,9 +102,9 @@ export class RunnerFlowState extends RunnerStateExtend<
         return { nodes: this.nodes, edges: this.edges }
     }
 
-    private defaultNodeSize() {
-        return { width: 240, height: 48 }
-    }
+    // private defaultNodeSize() {
+    //     return { width: 240, height: 48 }
+    // }
 
 }
 

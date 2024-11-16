@@ -16,3 +16,9 @@ export const runnerApi = {
         return ipcRenderer.invoke('@runner/client/run', clientId, config) as Promise<void>
     }
 }
+
+export const runerExtApi = {
+    runFlow: async (config: RunnerTaskConfig, flowId: string) => {
+        return ipcRenderer.invoke('@runnerExt/config/run', config, flowId) as Promise<void>
+    }
+}

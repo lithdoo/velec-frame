@@ -1,4 +1,4 @@
-import { GsCode, GsExtend, GsScript } from "@renderer/mods/gscript";
+import { GsExtend, GsScript } from "@renderer/mods/gscript";
 
 // 存储所有的注释信息
 class GsLabel implements GsExtend {

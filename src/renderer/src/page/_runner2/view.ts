@@ -95,7 +95,7 @@ export class RunnerGraphView extends GraphStateView {
             return res
         }, {})
     }
-    load(cache: any = null) {
+    load(_cache: any = null) {
         // console.log('cache', cache)
         // this.state.list.forEach(state => {
         //     state.load(cache?.[state.key] ?? null, null)
@@ -284,7 +284,7 @@ export class RunnerGraphView extends GraphStateView {
             form,
             title: `Runner Flow`,
             onsubmit: (value) => {
-                const { flowId, source, target, sourcePort, targetPort } = value
+                const { flowId, source, target} = value
 
                 if (!flowId) return
                 if (source === target) return

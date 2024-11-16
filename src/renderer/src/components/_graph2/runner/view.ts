@@ -14,7 +14,6 @@ import { isJsonNodeData } from "./json/cell"
 import { FlowNodeData, isFlowEdgeData, isFlowNodeData } from "./flow/cell"
 import { toX6Node } from "../base/cell"
 import { isScopeNodeData } from "./scope/cell"
-import { nanoid } from "nanoid"
 
 
 
@@ -493,7 +492,7 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
         }).filter(v => !!v) as RunnerTaskStep<unknown>[]
 
         const config: RunnerTaskConfig = {
-            outputs, steps
+            outputs, steps, flows: []
         }
 
         console.log({ config })

@@ -1,4 +1,4 @@
-import { EdgeData, GhComponent, GraphView, NodeData } from "@renderer/mods/graph";
+import { EdgeData, GhComponent, NodeData } from "@renderer/mods/graph";
 import { NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "./common";
 import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate } from "@renderer/mods/template";
 import { insertCss } from "insert-css";

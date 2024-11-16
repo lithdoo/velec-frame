@@ -1,4 +1,4 @@
-import { NodeData } from "@renderer/components/graph2/base/cell";
+import { NodeData } from "@renderer/components/_graph2/base/cell";
 import { NodeShapeKey } from "../common";
 
 export interface SqlNodeMeta {

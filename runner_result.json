@@ -1,0 +1,49 @@
+{
+  "result": [
+    {
+      "$name": ".sqllsrc.json",
+      "$url": "file:///C:/Users/mini/Desktop/ennv/jav/.sqllsrc.json",
+      "$size": 137
+    },
+    {
+      "$name": "jav - 副本.db",
+      "$url": "file:///C:/Users/mini/Desktop/ennv/jav/jav%20-%20%E5%89%AF%E6%9C%AC.db",
+      "$size": 61440
+    },
+    {
+      "$name": "jav - 副本.db.erd",
+      "$url": "file:///C:/Users/mini/Desktop/ennv/jav/jav%20-%20%E5%89%AF%E6%9C%AC.db.erd",
+      "$size": 6374
+    },
+    {
+      "$name": "jav.db",
+      "$url": "file:///C:/Users/mini/Desktop/ennv/jav/jav.db",
+      "$size": 49152
+    },
+    {
+      "$name": "test - 副本.run",
+      "$url": "file:///C:/Users/mini/Desktop/ennv/jav/test%20-%20%E5%89%AF%E6%9C%AC.run",
+      "$size": 7333
+    },
+    {
+      "$name": "test.db",
+      "$url": "file:///C:/Users/mini/Desktop/ennv/jav/test.db",
+      "$size": 49152
+    },
+    {
+      "$name": "test.db.erd",
+      "$url": "file:///C:/Users/mini/Desktop/ennv/jav/test.db.erd",
+      "$size": 5217
+    },
+    {
+      "$name": "test.run",
+      "$url": "file:///C:/Users/mini/Desktop/ennv/jav/test.run",
+      "$size": 4340
+    },
+    {
+      "$name": "test.trunner",
+      "$url": "file:///C:/Users/mini/Desktop/ennv/jav/test.trunner",
+      "$size": 209
+    }
+  ]
+}

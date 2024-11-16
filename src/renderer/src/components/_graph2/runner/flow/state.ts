@@ -1,6 +1,6 @@
 import { CheckNodeData, EdgeShapeKey, NodeShapeKey, RunnerStateExtend, RunnerStateKey } from "../common"
-import { initEdgeViewData, NodeData, NodeViewData, toX6Edge, toX6Node } from "@renderer/components/graph2/base/cell"
-import { EdgeData } from "@renderer/components/graph2/base/cell"
+import { initEdgeViewData, NodeData, NodeViewData, toX6Edge } from "@renderer/components/_graph2/base/cell"
+import { EdgeData } from "@renderer/components/_graph2/base/cell"
 import { FlowEdgeData, FlowEdgeMeta, FlowNodeData, FlowNodeMeta, isFlowNodeData } from "./cell"
 import { nanoid } from "nanoid"
 import type { AllNodeData, AllEdgeData } from "../states"

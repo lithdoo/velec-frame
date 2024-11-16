@@ -84,8 +84,8 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
         this.state.list.forEach(state => {
             state.load(cache?.[state.key] ?? null, null)
         })
-        
-        console.log('nodes0',this.state.getNodes())
+
+        console.log('nodes0', this.state.getNodes())
         this.refresh()
     }
 
@@ -177,8 +177,8 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
                         appTab.addTab(PageJsonEditor.create({
                             title: `Runner<${data.meta.label}>`,
                             value: data.meta.data,
-                            save: async (value:any) => {
-                                console.log('save',value)
+                            save: async (value: any) => {
+                                console.log('save', value)
                                 await window.jsonDataApi.setData(data.id, value)
                             }
                         }))
@@ -249,7 +249,7 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
                 value: this.nodes.find(v => isFlowNodeData(v))?.id ?? '',
                 options: (this.nodes as FlowNodeData[]).filter(v => {
                     return isFlowNodeData(v)
-                }).map((node:FlowNodeData) => ({
+                }).map((node: FlowNodeData) => ({
                     key: node.id,
                     title: node.meta.name + (node.meta.label ? `(${node.meta.label})` : '')
                 }))
@@ -320,7 +320,7 @@ export class RunnerGraphView extends GraphStateView<AllNodeData, AllEdgeData> {
             node = target
         }
 
-        const config = nodes.reduce<RunnerTaskConfig>((config, node) => {
+        nodes.reduce<RunnerTaskConfig>((config, node) => {
             if (isSqlNodeData(node)) {
                 const step: SqliteRunnerStep = {
                     worker: 'sqlite-runner',
