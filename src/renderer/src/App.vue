@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import AppFrame from './view/frame/Index.vue'
-import GlobalContextMenu from './view/fixed/contextmenu/GlobalContextMenu.vue';
-import { ConfigProvider,theme } from 'ant-design-vue'
+import AppFrame from './Frame.vue'
+// import GlobalContextMenu from './view/fixed/contextmenu/GlobalContextMenu.vue';
+import { ConfigProvider, theme } from 'ant-design-vue'
 
 // const ipcHandle = () => window.electron.ipcRenderer.send('ping')
 </script>
@@ -10,11 +10,12 @@ import { ConfigProvider,theme } from 'ant-design-vue'
   <ConfigProvider :theme="{
     token: {
       borderRadius: 0,
+      fontSize: 13,
     },
-    algorithm:[theme.darkAlgorithm,theme.compactAlgorithm]
+    algorithm: [theme.darkAlgorithm]
   }">
     <AppFrame />
-    <GlobalContextMenu />
+    <!-- <GlobalContextMenu /> -->
   </ConfigProvider>
   <!-- <img alt="logo" class="logo" src="./assets/electron.svg" />
   <div class="creator">Powered by electron-vite</div>

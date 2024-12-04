@@ -19,9 +19,9 @@ export class SqliteService {
             return await connection.runSelectAll(sql)
         })
 
-        ipcMain.handle('@sqlite/sql/run', async (_, url: string,sql:string) => {
+        ipcMain.handle('@sqlite/sql/run', async (_, url: string,sql:string,params?: any[]) => {
             const connection = SqliteService.connection(url)
-            return await connection.run(sql)
+            return await connection.run(sql,params)
         })
 
         ipcMain.handle('@sqlite/table/all', async (_, url: string) => {

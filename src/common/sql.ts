@@ -1,8 +1,8 @@
 export interface FieldInfo<DataType extends string> {
     name: string;
     label: string;
-    type: DataType;                // 类型
-
+    type: DataType;            // 类型
+    // foreignKey: boolean        // 是否外键
     primaryKey: boolean        // 是否主键
     unique: boolean;
     notNull: boolean;

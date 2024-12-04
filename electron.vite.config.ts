@@ -33,6 +33,13 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler' // or "modern"
+        }
+      }
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
@@ -42,8 +49,9 @@ export default defineConfig({
     plugins: [vue(), vueJsx(), vsix()],
     optimizeDeps: {
       esbuildOptions: {
-        plugins: [importMetaUrlPlugin]
+        plugins: [importMetaUrlPlugin as any]
       }
     }
-  }
+  },
+
 })

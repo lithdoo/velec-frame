@@ -81,8 +81,6 @@ export function isMBasePropsTempalteNode<Scope extends Record<string, unknown>, 
 }
 
 
-
-
 export class RenderScope<T extends Record<string, unknown>> implements MBaseTScope<T> {
 
     static create<T extends Record<string, unknown>>(t: T) {
@@ -108,8 +106,6 @@ export class RenderScope<T extends Record<string, unknown>> implements MBaseTSco
         }
     }
 }
-
-
 
 export function render<Scope extends Record<string, unknown>>(template: MBaseTempalteNode<Scope>, scope: MBaseTScope<Scope>): MBaseRenderFragment {
 

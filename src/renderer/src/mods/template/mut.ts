@@ -1,8 +1,6 @@
 import { MutDomRender, MutValueHandler } from "./dom"
 
 export class MBaseValue<T> {
-
-
   private val: T
   onchangeCall: Map<Symbol, (t: T) => void> = new Map()
   constructor(def: T) {
