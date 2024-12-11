@@ -9,8 +9,6 @@ export class SqliteRunner extends StepRunner<SqliteRunnerStep> {
         const input = useParams ? this.inputs : []
         const connection = SqliteService.connection(fileUrl)
 
-        // console.log('sqlite step', fileUrl, sql, type, input)
-
         if (type === 'run') {
             await connection.run(sql, input)
         } else if (type === 'query') {

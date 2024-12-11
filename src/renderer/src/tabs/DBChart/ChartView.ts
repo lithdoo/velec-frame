@@ -1,7 +1,7 @@
 import { Graph, Node } from "@antv/x6"
 import type { ChartViewState, EntityData } from "./ChartState"
 
-export abstract class GraphView {
+abstract class GraphView {
     outer: HTMLElement = document.createElement('div')
     inner: HTMLElement = document.createElement('div')
     graph?: Graph
@@ -26,7 +26,6 @@ export abstract class GraphView {
     }
 
     loadContainer(outer: HTMLElement) {
-        console.log('loadContainer', outer)
         this.outer = outer
         const element = this.outer
         const container = this.inner
@@ -46,12 +45,12 @@ export abstract class GraphView {
 
 export class ChartGraphView extends GraphView {
     static finder: WeakMap<ChartViewState, ChartGraphView> = new WeakMap()
-    static entity2View(entity:EntityData) {
+    static entity2View(entity: EntityData) {
         const x = entity.render.pos_left
         const y = entity.render.pos_top
         const width = entity.render.size_width
         const height = entity.render.size_height
-        return { x, y, width, height ,shape:'GH_SQLERD_ENTITY_NODE'}
+        return { x, y, width, height, shape: 'GH_SQLERD_ENTITY_NODE' }
     }
     constructor(
         public readonly state: ChartViewState
@@ -65,6 +64,15 @@ export class ChartGraphView extends GraphView {
             // connecting: {
             //     router: 'sql-er-router'
             // },
+            grid: {
+                visible: true,
+                type: 'dot',
+                size: 20,
+                args: {
+                  color: '#aaaaaa', // 网点颜色
+                  thickness: 1, // 网点大小
+                },
+            },
             panning: {
                 enabled: true,
                 eventTypes: ['leftMouseDown'],
@@ -108,9 +116,7 @@ export class ChartGraphView extends GraphView {
     // }
 
     refresh() {
-        console.log('refresh')
         this.graph?.removeCells(this.graph.getCells())
-
         this.graph?.addNodes(this.state.getAllEntities()
             .map(node => Object.assign({}, ChartGraphView.entity2View(node), { data: node }))
         )

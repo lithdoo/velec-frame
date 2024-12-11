@@ -30,7 +30,6 @@ export class SqliteConection {
     private get sql(): SqlMethods {
         const all = <T = any>(sql: string, params: any[]) => new Promise<T[]>((res, rej) => {
             this.db.all<T>(sql, ...params, (error, rows) => {
-                console.log({ error })
                 if (error) rej(error)
                 else res(rows)
             })
@@ -38,7 +37,6 @@ export class SqliteConection {
 
         const run = (sql: string, params: any[]) => new Promise<void>((res, rej) => {
             this.db.run(sql, ...params, (error) => {
-                console.log({ error })
                 if (error) rej(error)
                 else res()
             })
@@ -94,6 +92,15 @@ export class SqliteConection {
         return this.requset(async () => {
             return await this.sql.run(sql, params)
         })
+    }
+
+    async runList(sqls: string[], params: any[][] = []) {
+        while (sqls.length) {
+            const sql = sqls.shift()
+            const param = params.shift()
+            if (!sql) return
+            await this.run(sql, param)
+        }
     }
 
     async query(sql: string, params: any[] = []) {

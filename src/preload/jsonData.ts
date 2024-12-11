@@ -20,7 +20,6 @@ export const jsonDataApi = {
 const evDataLoaded = new Map<string, (e: Electron.IpcRendererEvent, receiveId: string) => void>()
 
 ipcRenderer.on('@json-data/data/done', (e, receiveId: string) => {
-    console.log(evDataLoaded, evDataLoaded.size)
     evDataLoaded.forEach((ev) => { ev(e, receiveId) })
 })
 

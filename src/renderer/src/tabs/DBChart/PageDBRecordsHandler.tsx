@@ -50,9 +50,7 @@ export class PageSqlViewData implements TabPage {
         const table = this.tableInfo
         const service = this.service
 
-        console.log({ table, data })
         await service.insertToTable(table, data)
-
         this.viewMode()
     }
 

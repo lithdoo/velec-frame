@@ -1,7 +1,7 @@
 <template>
     <div class="page-db-chart">
         <div class="page-db-chart__tool-bar">
-            <DBChartToolBar></DBChartToolBar>
+            <DBChartToolBar :model="model"></DBChartToolBar>
         </div>
         <div class="page-db-chart__content">
             <SinglePanelSplit :handler="panelSplit">
@@ -12,7 +12,7 @@
                         showSideBar ? '' : 'page-db-chart__side-bar--hidden'
                     ]" :style="{ width: siderSplitWidth + 'px' }">
 
-                        <DBChartSider />
+                        <DBChartSider :model="model"/>
                     </div>
                 </template>
                 <template #extra>
@@ -20,6 +20,8 @@
                 </template>
             </SinglePanelSplit>
         </div>
+
+        <ConfirmModal :handler="modal"></ConfirmModal>
     </div>
 </template>
 
@@ -31,18 +33,18 @@ import type { DBChartModel } from './DBChartModel';
 import GraphContainer from './GraphContainer.vue';
 import { computed, ref } from 'vue';
 import { fixReactive } from '@renderer/fix';
+import { ConfirmModal } from '@renderer/widgets/ConfirmModal';
+import { modalControl } from './common'
 
 const panelSplit = fixReactive(new SinglePanelSplitHandler())
 const siderSplitWidth = computed(() => showSideBar.value ? panelSplit.distance : 0)
 const showSideBar = ref(true)
 
+const props = defineProps<{ model: DBChartModel }>()
+const modal = computed(() => modalControl.get(props.model))
 
 
 
-
-const props = defineProps<{
-    model: DBChartModel
-}>()
 
 </script>
 
@@ -51,6 +53,7 @@ const props = defineProps<{
     height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative;
 
     .page-db-chart__tool-bar {
         flex: none;

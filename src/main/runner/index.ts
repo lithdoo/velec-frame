@@ -164,7 +164,6 @@ export class RunnerTask {
         //     return this.outputs.get(v)
         // })
 
-        console.log(step.worker,argus)
         const { process } = worker.run(step.option, argus)
 
         try {

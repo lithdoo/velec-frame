@@ -212,8 +212,6 @@ export class DataGridHandler<T = any, Request extends GridRequset<T> = GridRequs
             }, option)
         }
 
-        console.log(this.grid.list)
-
         if (this.afterUpdateData) {
             this.afterUpdateData()
         }

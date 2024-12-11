@@ -156,7 +156,6 @@ class ExplorerWrokspace {
 
     fileConextmenu(file: FileTreeItem, ev: MouseEvent) {
         const operations = fileHandler.getOperations(file.url)
-        console.log('fileConextmenu',operations)
         contextMenu.open(PopMenuListHandler.create(operations), ev)
 
         // if (/.db$/.test(file.name)) {

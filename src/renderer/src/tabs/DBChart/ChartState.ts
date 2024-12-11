@@ -3,12 +3,16 @@ import { CommentStoreRecord, HiddenTable, RenderStoreRecord, RelationStoreRecord
 import { nanoid } from 'nanoid'
 import { ChartEntityNode } from "./ChartRender";
 
-export class ChartState {
+class ChartState {
     tables: SqliteTableInfo[] = [];
-    service?: DBChartService
     [HiddenTable.Comment]: CommentStoreRecord[] = [];
     [HiddenTable.Render]: RenderStoreRecord[] = [];
     [HiddenTable.Relation]: RelationStoreRecord[] = [];
+
+
+    constructor(public service: DBChartService) {
+        this.service = service;
+    }
 
     async reload(service: DBChartService) {
         await service.init();
@@ -20,22 +24,24 @@ export class ChartState {
         const initRender = async (time: number) => {
 
             if (time > 10) {
-                console.log(this)
                 throw new Error('init render error');
             }
             this[HiddenTable.Render] = await service.getRenderStore();
+
             const renderTableName = new Set(this[HiddenTable.Render].map(r => r.table_name));
             const unInitTables = this.tables.filter(t => !renderTableName.has(t.name));
 
             if (unInitTables.length) {
+                const maxListIdx = this[HiddenTable.Render].reduce((res, cur) => res > cur.list_idx ? res : cur.list_idx, 0)
 
-                const unInitRender: RenderStoreRecord[] = unInitTables.map(({ name, fieldList }) => ({
+                const unInitRender: RenderStoreRecord[] = unInitTables.map(({ name, fieldList }, idx) => ({
                     table_name: name,
                     pos_left: 0,
                     pos_top: 0,
                     size_width: 300,
                     size_height: Math.min(ChartEntityNode.maxHeight(fieldList.length), 600),
-                    color: `#66ccff`
+                    color: `#66ccff`,
+                    list_idx: maxListIdx + idx + 1,
                 }))
 
                 await service.updateRenderRecords(unInitRender)
@@ -68,8 +74,8 @@ export class ChartViewState extends ChartState {
     nodes: Map<string, EntityData> = new Map()
 
 
-    constructor() {
-        super()
+    constructor(service: DBChartService) {
+        super(service)
         ChartViewState.all.set(this.viewId, this)
     }
 
@@ -91,8 +97,6 @@ export class ChartViewState extends ChartState {
             }
             return res
         }, new Map<string, EntityData>())
-
-        console.log('reload', this)
     }
 
     updateNodePos(id: string, x: number, y: number) {
@@ -104,6 +108,12 @@ export class ChartViewState extends ChartState {
                 this.service?.updateEntityPos(id, x, y)
             })
         }
+    }
+
+    async clearAll() {
+        if (!this.service) return
+        await this.service.clearData()
+        await this.reload(this.service)
     }
 
 

@@ -5,18 +5,20 @@ export class DBService {
     }
 
     protected async run(sql: string) {
-        await window.sqliteApi.sqlRun(this.dbUrl, sql)
+        return await window.sqliteApi.sqlRun(this.dbUrl, sql)
     }
     protected async select(sql: string) {
         return await window.sqliteApi.sqlSelectAll(this.dbUrl, sql)
     }
+    protected async runList(sqls: string[]) {
+        return await window.sqliteApi.sqlRunList(this.dbUrl, sqls)
+    }
 
- 
 }
 
 
 export class DBChartService extends DBService {
-   
+
     async init() {
         const sqlCreateLabelStore = `
         CREATE TABLE IF NOT EXISTS ${HiddenTable.Comment}(
@@ -38,7 +40,8 @@ export class DBChartService extends DBService {
             pos_top INTEGER NOT NULL,
             size_width INTEGER NOT NULL,
             size_height INTEGER NOT NULL,
-            color TEXT NOT NULL
+            color TEXT NOT NULL,
+            list_idx INTEGER NOT NULL
         );`
 
         await this.run(sqlCreateLabelStore)
@@ -49,7 +52,8 @@ export class DBChartService extends DBService {
     }
 
     async getAllTableInfo() {
-        return (await window.sqliteApi.getAllTables(this.dbUrl)).filter(v => !HiddenTableSet.has(v.name as any))
+        return (await window.sqliteApi.getAllTables(this.dbUrl))
+            // .filter(v => !HiddenTableSet.has(v.name as any))
     }
 
     async getCommentStore() {
@@ -63,25 +67,33 @@ export class DBChartService extends DBService {
     }
 
     async updateRenderRecords(records: RenderStoreRecord[]) {
-        const sql = `INSERT OR REPLACE INTO ${HiddenTable.Render} (table_name, pos_left, pos_top, size_width, size_height, color) VALUES ${records.map(record => `
-                ('${record.table_name}', ${record.pos_left}, ${record.pos_top}, ${record.size_width}, ${record.size_height}, '${record.color}')`).join(',')
+        const sql = `INSERT OR REPLACE INTO ${HiddenTable.Render} (table_name, pos_left, pos_top, size_width, size_height, color, list_idx ) VALUES ${records.map(record => `
+                ('${record.table_name}', ${record.pos_left}, ${record.pos_top}, ${record.size_width}, ${record.size_height}, '${record.color}', ${record.list_idx})`).join(',')
             }`
         await this.run(sql)
     }
 
     async getRenderStore() {
-        const sql = `SELECT * FROM ${HiddenTable.Render}`
+        const sql = `SELECT * FROM ${HiddenTable.Render} ORDER BY list_idx ASC`
         return await window.sqliteApi.sqlSelectAll(this.dbUrl, sql) as RenderStoreRecord[]
     }
 
-
     async updateEntityPos(entityName: string, pos_left: number, pos_top: number) {
         const sql = `UPDATE ${HiddenTable.Render} SET pos_left = ${pos_left}, pos_top = ${pos_top} WHERE table_name = '${entityName}'`
-        console.log(sql)
         await this.run(sql)
     }
+    async clearData() {
+        const sqls = Array.from(Object.values(HiddenTable))
+            .flatMap(table => [`DROP TABLE ${table};`])
+        await Promise.all(sqls.map(sql => this.run(sql)))
+    }
 
-    
+    async sortTable(list: { table: string, idx: number }[]) {
+        const sqls = list.map(({table,idx})=> `UPDATE ${HiddenTable.Render} SET list_idx = ${idx} WHERE table_name = '${table}'`)
+        await this.runList(sqls)
+    }
+
+
 }
 
 export class DBRecordsService extends DBService {
@@ -162,6 +174,7 @@ export type RenderStoreRecord = {
     size_width: number,
     size_height: number,
     color: string,
+    list_idx: number
 }
 
 export type RelationStoreRecord = {

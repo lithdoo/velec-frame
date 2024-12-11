@@ -35,7 +35,6 @@ export class SinglePanelSplitHandler {
                         : calc
 
                 this.distance = newDistance
-                console.log(newDistance)
 
                 return
             }
@@ -85,19 +84,16 @@ export class SinglePanelSplitHandler {
             start.distance = this.distance
             globalThis.addEventListener('mousemove', moveDragging)
             globalThis.addEventListener('mouseup', stopDragging)
-            console.log('start dragging')
         }
 
         const moveDragging = (e: MouseEvent) => {
             const { screenX, screenY } = e
             update({ x: screenX, y: screenY })
-            console.log('moveDragging')
         }
 
         const stopDragging = (_e: MouseEvent) => {
             globalThis.removeEventListener('mousemove', moveDragging)
             globalThis.removeEventListener('mouseup', moveDragging)
-            console.log('stopDragging')
         }
 
         controller.addEventListener('mousedown', startDragging)

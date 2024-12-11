@@ -23,6 +23,10 @@ export class SqliteService {
             const connection = SqliteService.connection(url)
             return await connection.run(sql,params)
         })
+        ipcMain.handle('@sqlite/sql/runList', async (_, url: string,sqls:string[],params?: any[][]) => {
+            const connection = SqliteService.connection(url)
+            return await connection.runList(sqls,params)
+        })
 
         ipcMain.handle('@sqlite/table/all', async (_, url: string) => {
             const connection = SqliteService.connection(url)

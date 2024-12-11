@@ -15,6 +15,10 @@ export const sqliteApi = {
     sqlRun: async (url: string, sql: string, params?: any[]) => {
         return ipcRenderer.invoke('@sqlite/sql/run', url, sql, params) as Promise<any[]>
     },
+
+    sqlRunList: async (url: string, sqls: string[], params?: any[][]) => {
+        return ipcRenderer.invoke('@sqlite/sql/runList', url, sqls, params) as Promise<any[]>
+    },
     getAllTables: async (url: string) => {
         return ipcRenderer.invoke('@sqlite/table/all', url) as Promise<TableInfo<SqliteDataType>[]>
     },

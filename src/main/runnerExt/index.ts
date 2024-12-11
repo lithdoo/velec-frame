@@ -131,7 +131,6 @@ export class RunnerExtTask {
         const value = this.store.get(current.input)
 
         if (isFlowStopNode(node)) {
-            console.log('stop')
             this.store.set(node.id, value)
             if (!this.store.get(node.id)) {
                 closeCurrentFlow()
@@ -140,7 +139,6 @@ export class RunnerExtTask {
             }
 
         } else if (isFlowLinkNode(node)) {
-            console.log('link')
             this.store.set(node.id, value)
             const { flowLinkId } = node
             const nextFlow = this.flowMap.get(flowLinkId)
@@ -155,7 +153,6 @@ export class RunnerExtTask {
                 }] : []
             }].concat(this.stack)
         } else if (isFlowLinearNode(node)) {
-            console.log('linear')
             this.store.set(node.id, value)
             flow.todoList = node.children.map((child) => {
                 return {
@@ -164,7 +161,6 @@ export class RunnerExtTask {
                 }
             }).concat(flow.todoList)
         } else if (isFlowStepNode(node)) {
-            console.log('step')
             const currentVal = await this.runStep(node, value)
             this.store.set(node.id, currentVal)
             nextChild(node)

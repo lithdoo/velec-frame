@@ -29,8 +29,6 @@ const parent = computed(() => {
 
 
 const bind = (newParent:HTMLElement |null) =>{
-
-    console.log('bind',newParent)
     if (!newParent) {
         return
     }
