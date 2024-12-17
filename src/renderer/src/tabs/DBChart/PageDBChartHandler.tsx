@@ -49,7 +49,6 @@ export class PageDBChart implements TabPage {
                         text: "退出",
                         type: "link",
                         action: ({close}) => {
-                            // do nothing
                             tabControl.removeTab(this.tabId)
                             close()
                         }

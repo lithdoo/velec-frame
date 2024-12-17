@@ -20,9 +20,24 @@
                             @dragend="e => entitySorter.end(e, entity.table.name)">
                             <VxIcon name="drag-vertical"></VxIcon>
                         </div>
-                        <div class="db-chart-sider__entity-name" :title="entity.table.name">
-                            {{ entity.table.name }}
-                        </div>
+                        <template v-if="currentEditName && currentEditName.oldName === entity.table.name">
+                            <BtnInput class="db-chart-sider__entity-name-editor" @click.native.stop v-model="currentEditName.newName" :placeholder="'请输入新表名'">
+                                <template #btns>
+                                    <VxButton only-icon icon="clear" :click="() => cancelEditEntryName()"></VxButton>
+                                    <VxButton only-icon icon="done" :click="() => submitEditEntryName()"></VxButton>
+                                </template>
+                            </BtnInput>
+                        </template>
+                        <template v-else>
+                            <div class="db-chart-sider__entity-name" :title="entity.table.name">
+                                {{ entity.table.name }}
+                            </div>
+                            <div class="db-chart-sider__entity-btns" @click.stop :title="entity.table.name">
+                                <VxButton only-icon icon="edit" :click="() => beginEditEntryName(entity)"></VxButton>
+                                <VxButton only-icon icon="focus" :click="() => focusEntiry(entity)"></VxButton>
+                            </div>
+                        </template>
+
                     </div>
 
                     <AutoDrawer :open="openEntityName === entity.table.name">
@@ -56,23 +71,22 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { EntityData } from '../ChartState';
-import { VxIcon, AutoDrawer } from '@renderer/components';
+import { VxIcon, AutoDrawer, VxButton, BtnInput } from '@renderer/components';
 import { fixReactive } from '@renderer/fix';
 import { DBChartModel } from '../DBChartModel';
 
 const props = defineProps<{
-    // state: ChartViewState,
     model: DBChartModel
 }>()
 
 const state = computed(() => props.model.state)
 
 const entities = computed(() => {
+    console.log('entities', state.value.nodes)
     const list = state.value.nodeIds.map(id => state.value.nodes.get(id)).filter(v => !!v) as EntityData[]
     const sort = list.sort((a, b) => a.render.list_idx - b.render.list_idx)
     return sort
 })
-
 
 const openEntityName = ref<string | null>(null)
 const toggleEntity = (name: string) => {
@@ -82,7 +96,6 @@ const toggleEntity = (name: string) => {
         openEntityName.value = name
     }
 }
-
 
 const entitySorter = fixReactive(new class {
     readonly key: string = Math.random().toString(36).substring(7);
@@ -122,7 +135,7 @@ const entitySorter = fixReactive(new class {
             return [transName]
         }).filter(v => !!v).map((table, idx) => ({ table, idx }))
 
-        props.model.sortTable(res)
+        props.model.control.emit('db:sortTables', res)
     }
 
     insertPos() {
@@ -141,6 +154,32 @@ const entitySorter = fixReactive(new class {
         return insetPos
     }
 })
+
+const focusEntiry = (entity: EntityData) => {
+    props.model.control.emit('table:focus', entity.table.name)
+}
+
+const currentEditName = ref<{ oldName: string, newName: string } | null>(null)
+
+const beginEditEntryName = (entity: EntityData) => {
+    currentEditName.value = { oldName: entity.table.name, newName: entity.table.name }
+}
+
+const cancelEditEntryName = () => {
+    currentEditName.value = null
+}
+
+const submitEditEntryName = async () => {
+    if(currentEditName.value === null) return
+    const { oldName, newName } = currentEditName.value
+    if (oldName === newName) {
+        currentEditName.value = null
+        return
+    }
+    await props.model.control.emit('table:rename', oldName, newName )
+    currentEditName.value = null
+}
+
 
 </script>
 
@@ -272,6 +311,42 @@ const entitySorter = fixReactive(new class {
         &:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
+
+        .db-chart-sider__entity-color {
+            width: 6px;
+            height: 100%;
+            border-radius: 1px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .db-chart-sider__entity-name {
+            padding: 0 16px;
+            padding-left: 4px;
+            flex: 1 1 0;
+            width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .db-chart-sider__entity-name-editor{
+            flex: 1 1 0;
+        }
+
+        .db-chart-sider__entity-btns {
+            flex: 0 0 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            padding: 0 4px;
+        }
+
+        &:hover .db-chart-sider__entity-btns {
+            flex: 0 0 auto;
+        }
     }
 
 
@@ -306,34 +381,17 @@ const entitySorter = fixReactive(new class {
         margin: 0 4px;
         cursor: pointer;
 
-        .db-chart-sider__field-item-name{
+        .db-chart-sider__field-item-name {
             flex: 1 1 0;
             width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .db-chart-sider__field-item-type{
+
+        .db-chart-sider__field-item-type {
             flex: 0 0 auto;
         }
     }
 
-}
-
-.db-chart-sider__entity-color {
-    width: 6px;
-    height: 100%;
-    border-radius: 1px;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.db-chart-sider__entity-name {
-    padding: 0 16px;
-    padding-left: 4px;
-    flex: 1 1 0;
-    width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 </style>

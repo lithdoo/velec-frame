@@ -21,7 +21,7 @@ type Props = {
 export class ChartEntityNode {
 
     static maxHeight(fieldLength: number) {
-        const outerBorder  = 6
+        const outerBorder = 6
         const fieldHeight = 30
         const colorBanner = 6
         const titleHeight = 32
@@ -196,52 +196,32 @@ export class ChartEntityNode {
         return url ? new DBRecordsService(url) : null
     }
 
+    private getControl() {
+        const state = ChartViewState.get(this.data.viewId)
+        return state.control
+    }
+
     oncontextmenu(ev: MouseEvent) {
         const service = this.getRecordService()
         if (!service) return
-
         contextMenu.open(PopMenuListHandler.create([
             Menu.button({
-                icon: 'del', key: 'viewData', label: '浏览数据', action: () => {
-                    const dataView = PageSqlViewData.create(service, this.data.table)
-                    tabControl.addTab(dataView)
-                    tabControl.active(dataView.tabId)
+                icon: 'del', key: 'viewData', label: '浏览数据', action: async () => {
+                    await this.getControl().emit('table:showDataGrid', this.data.table.name, 'view')
                 }
             }),
             Menu.button({
-                icon: 'del', key: 'insertTable', label: '添加数据', action: () => {
-                    const dataView = PageSqlViewData.create(service, this.data.table)
-                    tabControl.addTab(dataView)
-                    tabControl.active(dataView.tabId)
-                    dataView.insertMode()
+                icon: 'del', key: 'insertTable', label: '添加数据', action: async () => {
+                    await this.getControl().emit('table:showDataGrid', this.data.table.name, 'insert')
                 }
             }),
-            // Menu.button({
-            //     icon: 'del', key: 'editLabel', label: '修改注释', action: () => {
-            //         const connection = this.connection
-
-            //         const tab = PageSqlEditLabel.create(
-            //             connection,
-            //             node2table(data),
-            //             this.view.getNodeLabels(node2table(data)),
-            //             (labels) => {
-            //                 this.view.updateLabels(labels)
-            //                 this.view.refresh()
-            //             }
-            //         )
-            //         appTab.addTab(tab)
-            //         appTab.active(tab.tabId)
-            //     }
-            // }),
-            // Menu.button({
-            //     icon: 'del', key: 'deleteTable', label: '删除表', action: async () => {
-            //         await service.deleteTable(data.meta.name)
-            //         await this.reload()
-            //     }
-            // })
+            Menu.button({
+                icon: 'del', key: 'deleteTable', label: '删除', action: async () => {
+                    const control = this.getControl()
+                    await control.emit('table:delete', this.data.table.name)
+                }
+            })
         ]), ev)
-
-
     }
 }
 

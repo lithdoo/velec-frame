@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url"
+import { promiseHooks } from "node:v8";
 import { Database, verbose } from "sqlite3"
 
 const sqlite3 = verbose()
@@ -37,6 +38,7 @@ export class SqliteConection {
 
         const run = (sql: string, params: any[]) => new Promise<void>((res, rej) => {
             this.db.run(sql, ...params, (error) => {
+                console.log('run', sql)
                 if (error) rej(error)
                 else res()
             })
@@ -93,6 +95,33 @@ export class SqliteConection {
             return await this.sql.run(sql, params)
         })
     }
+
+    // async runList(sqls: string[], params: any[][] = []) {
+    //     return this.requset(async () => {
+
+    //         return new Promise((res,rej) => {
+    //             this.db.serialize(() => {
+    //                 this.db.run("BEGIN TRANSACTION;");
+
+    //                 Promise.all([
+    //                     this.sql.run("BEGIN TRANSACTION;", []),
+    //                     ...sqls.map((sql, index) => {
+    //                         return this.sql.run(sql, params[index] ?? [])
+    //                     }),
+    //                     this.sql.run("COMMIT TRANSACTION;", [])
+    //                 ]).then(()=>{
+    //                     res(true)
+    //                 }).catch((err)=>{
+    //                     rej(err)
+    //                 })
+    //             });
+    //         })
+
+    //     })
+
+
+
+    // }
 
     async runList(sqls: string[], params: any[][] = []) {
         while (sqls.length) {

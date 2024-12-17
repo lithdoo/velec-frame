@@ -7,7 +7,7 @@ const model = defineModel<string>()
 
 <template>
     <div>
-        <Input v-model:value="model">
+        <Input v-model:value="model" :style="{ width: '100%' }">
             <template #suffix>
                 <slot name="btns"></slot>
             </template>

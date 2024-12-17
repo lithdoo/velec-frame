@@ -2,6 +2,7 @@ import { debounce } from "@renderer/utils";
 import { CommentStoreRecord, HiddenTable, RenderStoreRecord, RelationStoreRecord, SqliteTableInfo, DBChartService } from "./DBService";
 import { nanoid } from 'nanoid'
 import { ChartEntityNode } from "./ChartRender";
+import { ChartControl } from "./ChartControl";
 
 class ChartState {
     tables: SqliteTableInfo[] = [];
@@ -74,7 +75,7 @@ export class ChartViewState extends ChartState {
     nodes: Map<string, EntityData> = new Map()
 
 
-    constructor(service: DBChartService) {
+    constructor(service: DBChartService, public control: ChartControl) {
         super(service)
         ChartViewState.all.set(this.viewId, this)
     }

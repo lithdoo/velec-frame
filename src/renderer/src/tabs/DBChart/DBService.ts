@@ -53,7 +53,7 @@ export class DBChartService extends DBService {
 
     async getAllTableInfo() {
         return (await window.sqliteApi.getAllTables(this.dbUrl))
-            // .filter(v => !HiddenTableSet.has(v.name as any))
+        // .filter(v => !HiddenTableSet.has(v.name as any))
     }
 
     async getCommentStore() {
@@ -89,7 +89,26 @@ export class DBChartService extends DBService {
     }
 
     async sortTable(list: { table: string, idx: number }[]) {
-        const sqls = list.map(({table,idx})=> `UPDATE ${HiddenTable.Render} SET list_idx = ${idx} WHERE table_name = '${table}'`)
+        const sqls = list.map(({ table, idx }) => `UPDATE ${HiddenTable.Render} SET list_idx = ${idx} WHERE table_name = '${table}'`)
+        await this.runList(sqls)
+    }
+
+    async createBlankTable(name: string) {
+        const sql = `CREATE TABLE IF NOT EXISTS ${name}(id TEXT);`
+        console.log(sql)
+        await this.run(sql)
+    }
+
+    async deleteTable(name: string) {
+        const sqls = [`DROP TABLE ${name};`, `DELETE FROM ${HiddenTable.Render} WHERE table_name = '${name}'`]
+        await this.runList(sqls)
+    }
+
+    async renameTable(oldName: string, newName: string) {
+        const sqls = [
+            `ALTER TABLE ${oldName} RENAME TO ${newName};`,
+            `UPDATE ${HiddenTable.Render} SET table_name = '${newName}' WHERE table_name = '${oldName}';`
+        ]
         await this.runList(sqls)
     }
 
