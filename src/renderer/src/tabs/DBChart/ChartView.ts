@@ -1,7 +1,7 @@
 import { Graph, Node } from "@antv/x6"
 import type { ChartViewState, EntityData } from "./ChartState"
 
-abstract class GraphView {
+export abstract class GraphView {
     outer: HTMLElement = document.createElement('div')
     inner: HTMLElement = document.createElement('div')
     graph?: Graph

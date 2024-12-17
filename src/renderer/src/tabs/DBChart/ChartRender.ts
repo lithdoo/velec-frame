@@ -4,8 +4,6 @@ import { insertCss } from "insert-css";
 import { Edge, Graph, Shape } from "@antv/x6";
 import { Menu, PopMenuListHandler } from "@renderer/widgets/PopMenu";
 import { contextMenu } from "@renderer/parts/GlobalContextMenu";
-import { PageSqlViewData } from "./PageDBRecordsHandler";
-import { tabControl } from "@renderer/parts/PageTab";
 import { DBRecordsService } from "./DBService";
 
 interface GhJsonStructNodeState {

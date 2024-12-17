@@ -2,7 +2,7 @@
 import { TextEditorHandler, TextEditor } from '@renderer/widgets/TextEditor';
 import { ToolBar, ToolBarHandler } from '@renderer/widgets/ToolBar';
 
-const props = defineProps<{
+defineProps<{
     toolbar: ToolBarHandler,
     editor: TextEditorHandler,
 }>()

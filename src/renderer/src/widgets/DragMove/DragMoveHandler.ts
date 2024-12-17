@@ -17,7 +17,7 @@ export class DragMoveHandler<T> {
         }
     }
 
-    bindReceiver(item: HTMLElement) {
+    bindReceiver(_item: HTMLElement) {
         
     }
 }

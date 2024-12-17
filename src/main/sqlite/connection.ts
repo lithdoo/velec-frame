@@ -1,5 +1,4 @@
 import { fileURLToPath } from "node:url"
-import { promiseHooks } from "node:v8";
 import { Database, verbose } from "sqlite3"
 
 const sqlite3 = verbose()

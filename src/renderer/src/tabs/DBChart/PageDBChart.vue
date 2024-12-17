@@ -37,6 +37,8 @@ import { ConfirmModal } from '@renderer/widgets/ConfirmModal';
 import { modalControl } from './common'
 
 const panelSplit = fixReactive(new SinglePanelSplitHandler())
+panelSplit.distance = 360
+panelSplit.maxDistance = 600
 const siderSplitWidth = computed(() => showSideBar.value ? panelSplit.distance : 0)
 const showSideBar = ref(true)
 

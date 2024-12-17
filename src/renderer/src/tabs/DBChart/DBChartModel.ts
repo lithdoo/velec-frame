@@ -141,7 +141,34 @@ export class DBChartModel {
 
         this.control.on('table:rename', async (oldName, newName) => {
             await this.service.renameTable(oldName, newName)
-            await this.reload()            
+            await this.reload()
+        })
+
+        this.control.on('field:rename', async (table, oldName, newName) => {
+            await this.service.renameField(table, oldName, newName)
+            await this.reload()
+        })
+
+        this.control.on('field:add', async (table, name, type) => {
+            await this.service.addField(table, name, type)
+            await this.reload()
+        })
+
+        this.control.on('field:delete', async (table, field) => {
+            this.confirm.open({
+                title: `确定要删除字段 ${table.name}.${field} 吗？`,
+                message: "删除字段将会删除该字段下的所有数据且不可恢复，请谨慎操作",
+                buttons: [ConfirmModalHandler.btnClose(), {
+                    text: "确认删除",
+                    type: "danger",
+                    action: async ({ close }) => {  // 清除缓存
+                        await this.service.deleteField(table, field)
+                        await this.reload()
+                        close()
+                    }
+                }]
+            })
+
         })
     }
 

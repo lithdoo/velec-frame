@@ -112,6 +112,48 @@ export class DBChartService extends DBService {
         await this.runList(sqls)
     }
 
+    async renameField(table: SqliteTableInfo, oldName: string, newName: string) {
+        // const moveOldtoTemp = `ALTER TABLE ${table.name} RENAME TO ${table.name}_temp;`
+
+        const createNewTempTable = `CREATE TABLE IF NOT EXISTS ${table.name}_temp (${table.fieldList.map((col, idx) => {
+            return `${idx !== 0 ? ',\n' : '\n'}   ${col.name === oldName ? newName : col.name
+                } ${col.type
+                } ${col.primaryKey ? 'PRIMARY KEY' : ''
+                } ${col.notNull ? 'NOT NULL' : ''
+                }`
+        }).join('')}\n);`
+        const moveData = `INSERT INTO ${table.name}_temp(${table.fieldList.map(v => v.name === oldName ? newName : v.name).join(', ')}) SELECT ${table.fieldList.map(v => v.name).join(', ')} FROM ${table.name};`
+        const dropOldTable = `DROP TABLE ${table.name};`
+        const renameNewTable = `ALTER TABLE ${table.name}_temp RENAME TO ${table.name};`
+        await this.runList([
+            createNewTempTable, moveData, dropOldTable, renameNewTable
+        ])
+    }
+
+    async addField(table: SqliteTableInfo, oldName: string, type: SqliteDataType) {
+        const alterTable = `ALTER TABLE ${table.name} ADD COLUMN ${oldName} ${type};`
+        await this.run(alterTable)
+    }
+    async deleteField(table: SqliteTableInfo, field: string,) {
+        // const alterTable = `ALTER TABLE ${table.name} ADD COLUMN ${oldName} ${type};`
+        // await this.run(alterTable)
+
+        const fields = table.fieldList.filter(v => v.name !== field)
+
+        const createNewTempTable = `CREATE TABLE IF NOT EXISTS ${table.name}_temp (${fields.map((col, idx) => {
+            return `${idx !== 0 ? ',\n' : '\n'}   ${col.name
+                } ${col.type
+                } ${col.primaryKey ? 'PRIMARY KEY' : ''
+                } ${col.notNull ? 'NOT NULL' : ''
+                }`
+        }).join('')}\n);`
+        const moveData = `INSERT INTO ${table.name}_temp(${fields.map(v => v.name).join(', ')}) SELECT ${fields.map(v => v.name).join(', ')} FROM ${table.name};`
+        const dropOldTable = `DROP TABLE ${table.name};`
+        const renameNewTable = `ALTER TABLE ${table.name}_temp RENAME TO ${table.name};`
+        await this.runList([
+            createNewTempTable, moveData, dropOldTable, renameNewTable
+        ])
+    }
 
 }
 

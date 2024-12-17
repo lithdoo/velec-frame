@@ -20,11 +20,14 @@
                             @dragend="e => entitySorter.end(e, entity.table.name)">
                             <VxIcon name="drag-vertical"></VxIcon>
                         </div>
-                        <template v-if="currentEditName && currentEditName.oldName === entity.table.name">
-                            <BtnInput class="db-chart-sider__entity-name-editor" @click.native.stop v-model="currentEditName.newName" :placeholder="'请输入新表名'">
+                        <template
+                            v-if="entityNameEditor.current && entityNameEditor.current.oldName === entity.table.name">
+                            <BtnInput class="db-chart-sider__entity-name-editor" @click.native.stop
+                                v-model="entityNameEditor.current.newName" :placeholder="'请输入新表名'">
                                 <template #btns>
-                                    <VxButton only-icon icon="clear" :click="() => cancelEditEntryName()"></VxButton>
-                                    <VxButton only-icon icon="done" :click="() => submitEditEntryName()"></VxButton>
+                                    <VxButton only-icon icon="clear" :click="() => entityNameEditor.cancel()">
+                                    </VxButton>
+                                    <VxButton only-icon icon="done" :click="() => entityNameEditor.submit()"></VxButton>
                                 </template>
                             </BtnInput>
                         </template>
@@ -33,7 +36,8 @@
                                 {{ entity.table.name }}
                             </div>
                             <div class="db-chart-sider__entity-btns" @click.stop :title="entity.table.name">
-                                <VxButton only-icon icon="edit" :click="() => beginEditEntryName(entity)"></VxButton>
+                                <VxButton only-icon icon="edit" :click="() => entityNameEditor.start(entity)">
+                                </VxButton>
                                 <VxButton only-icon icon="focus" :click="() => focusEntiry(entity)"></VxButton>
                             </div>
                         </template>
@@ -43,16 +47,80 @@
                     <AutoDrawer :open="openEntityName === entity.table.name">
                         <div class="db-chart-sider__entity-item-body">
                             <div class="db-chart-sider__entity-fields">
-                                <div class="db-chart-sider__field-title">
-                                    <div class="db-chart-sider__field-title-icon">
-                                        <VxIcon name="fields"></VxIcon>
-                                    </div> Fields
+                                <div class="db-chart-sider__field-title-with-creator">
+
+                                    <div class="db-chart-sider__field-title">
+                                        <div class="db-chart-sider__field-title-icon">
+                                            <VxIcon name="fields"></VxIcon>
+                                        </div>
+                                        <div class="db-chart-sider__field-title-text">
+                                            Fields
+                                        </div>
+                                        <div class="db-chart-sider__field-title-btns" @click.stop
+                                            :data-show="fieldCreator.current && fieldCreator.current.entity === entity"
+                                            :title="entity.table.name">
+
+                                            <template
+                                                v-if="fieldCreator.current && fieldCreator.current.entity === entity">
+                                                <VxButton only-icon icon="clear" :click="() => fieldCreator.cancel()">
+                                                </VxButton>
+                                                <VxButton only-icon icon="done" :click="() => fieldCreator.submit()">
+                                                </VxButton>
+                                            </template>
+                                            <template v-else>
+
+                                                <VxButton only-icon icon="plus"
+                                                    :click="() => fieldCreator.start(entity)">
+                                                </VxButton>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="db-chart-sider__field-creator"
+                                        v-if="fieldCreator.current && fieldCreator.current.entity === entity">
+                                        <div class="db-chart-sider__field-creator-name">
+                                            <BtnInput class="db-chart-sider__field-name-editor" @click.native.stop
+                                                v-model="fieldCreator.current.name" :placeholder="'请输入新字段名'">
+                                            </BtnInput>
+                                        </div>
+                                        <div class="db-chart-sider__field-creator-type">
+                                            <BtnSelector :options="fieldCreator.options"
+                                                v-model="fieldCreator.current.type"></BtnSelector>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="db-chart-sider__field-item" v-for="field in entity.table.fieldList"
                                     :key="field.name">
-                                    <div class="db-chart-sider__field-item-name" :title="field.name">{{ field.name }}
-                                    </div>
-                                    <div class="db-chart-sider__field-item-type">[{{ field.type }}]</div>
+                                    <template
+                                        v-if="fieldNameEditor.current && fieldNameEditor.current.oldName === field.name && fieldNameEditor.current.entity === entity">
+                                        <BtnInput class="db-chart-sider__field-name-editor" @click.native.stop
+                                            v-model="fieldNameEditor.current.newName" :placeholder="'请输入新字段名'">
+                                            <template #btns>
+                                                <VxButton only-icon icon="clear"
+                                                    :click="() => fieldNameEditor.cancel()">
+                                                </VxButton>
+                                                <VxButton only-icon icon="done" :click="() => fieldNameEditor.submit()">
+                                                </VxButton>
+                                            </template>
+                                        </BtnInput>
+                                    </template>
+                                    <template v-else>
+                                        <div class="db-chart-sider__field-item-name" :title="field.name">{{ field.name
+                                            }}
+                                        </div>
+                                        <div class="db-chart-sider__field-item-type">[{{ field.type }}]</div>
+
+                                        <div class="db-chart-sider__field-item-btns" @click.stop
+                                            :title="entity.table.name">
+                                            <VxButton only-icon icon="focus" :click="() => focusEntiry(entity)">
+                                            </VxButton>
+                                            <VxButton only-icon icon="edit"
+                                                :click="() => fieldNameEditor.start(entity, field.name)">
+                                            </VxButton>
+                                            <VxButton only-icon icon="del" v-if="entity.table.fieldList.length > 1"
+                                                :click="() => removeField(entity, field.name)">
+                                            </VxButton>
+                                        </div>
+                                    </template>
                                 </div>
 
                             </div>
@@ -71,9 +139,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { EntityData } from '../ChartState';
-import { VxIcon, AutoDrawer, VxButton, BtnInput } from '@renderer/components';
+import { VxIcon, AutoDrawer, VxButton, BtnInput, BtnSelector } from '@renderer/components';
 import { fixReactive } from '@renderer/fix';
 import { DBChartModel } from '../DBChartModel';
+import { SqliteDataType } from '@common/sql';
 
 const props = defineProps<{
     model: DBChartModel
@@ -159,26 +228,92 @@ const focusEntiry = (entity: EntityData) => {
     props.model.control.emit('table:focus', entity.table.name)
 }
 
-const currentEditName = ref<{ oldName: string, newName: string } | null>(null)
 
-const beginEditEntryName = (entity: EntityData) => {
-    currentEditName.value = { oldName: entity.table.name, newName: entity.table.name }
-}
+const entityNameEditor = fixReactive(new class {
+    current: { oldName: string, newName: string } | null = null
 
-const cancelEditEntryName = () => {
-    currentEditName.value = null
-}
-
-const submitEditEntryName = async () => {
-    if(currentEditName.value === null) return
-    const { oldName, newName } = currentEditName.value
-    if (oldName === newName) {
-        currentEditName.value = null
-        return
+    start(entity: EntityData) {
+        this.current = { oldName: entity.table.name, newName: entity.table.name }
     }
-    await props.model.control.emit('table:rename', oldName, newName )
-    currentEditName.value = null
+
+    cancel() {
+        this.current = null
+    }
+
+    async submit() {
+        if (this.current === null) return
+        const { oldName, newName } = this.current
+        if (oldName === newName) return this.cancel()
+        await props.model.control.emit('table:rename', oldName, newName)
+        return this.cancel()
+    }
+})
+
+
+const fieldNameEditor = fixReactive(new class {
+    current: {
+        oldName: string,
+        newName: string,
+        entity: EntityData
+    } | null = null
+
+    start(entity: EntityData, field: string) {
+        this.current = { oldName: field, newName: field, entity }
+    }
+
+    cancel() {
+        this.current = null
+    }
+
+    async submit() {
+        if (this.current === null) return
+        const { oldName, newName, entity } = this.current
+        if (oldName === newName) return this.cancel()
+        await props.model.control.emit('field:rename', entity.table, oldName, newName)
+        return this.cancel()
+    }
+})
+
+const fieldCreator = fixReactive(new class {
+    current: {
+        name: string,
+        type: {
+            key: SqliteDataType,
+            label: SqliteDataType
+        }
+        entity: EntityData
+    } | null = null
+
+    options = Array.from(Object.values(SqliteDataType)).map(val => ({ label: val, key: val }))
+
+    start(entity: EntityData) {
+        this.current = {
+            name: '', type: {
+                label: SqliteDataType.TEXT,
+                key: SqliteDataType.TEXT
+            }, entity
+        }
+    }
+
+    cancel() {
+        this.current = null
+    }
+
+    async submit() {
+        if (this.current === null) return
+        if (!this.current.name.trim()) return
+        if (!this.current.type) return
+
+        const { name, type, entity } = this.current
+        await props.model.control.emit('field:add', entity.table, name, type.key)
+        return this.cancel()
+    }
+})
+
+const removeField = async(entity:EntityData, field: string) => {
+    await props.model.control.emit('field:delete', entity.table, field)
 }
+
 
 
 </script>
@@ -330,7 +465,7 @@ const submitEditEntryName = async () => {
             text-overflow: ellipsis;
         }
 
-        .db-chart-sider__entity-name-editor{
+        .db-chart-sider__entity-name-editor {
             flex: 1 1 0;
         }
 
@@ -349,6 +484,12 @@ const submitEditEntryName = async () => {
         }
     }
 
+    .db-chart-sider__field-title-with-creator {
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            text-decoration: underline;
+        }
+    }
 
     .db-chart-sider__field-title {
         height: 24px;
@@ -364,9 +505,57 @@ const submitEditEntryName = async () => {
             align-items: center;
         }
 
-        &:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            text-decoration: underline;
+
+
+        .db-chart-sider__field-title-text {
+            flex: 1 1 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .db-chart-sider__field-title-btns {
+            flex: 0 0 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0;
+            margin-left: 8px;
+
+            &[data-show="true"] {
+                flex: 0 0 auto;
+            }
+        }
+
+        &:hover .db-chart-sider__field-title-btns {
+            flex: 0 0 auto;
+        }
+    }
+
+    .db-chart-sider__field-creator {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 0 8px;
+        padding-bottom: 4px;
+
+        .db-chart-sider__field-creator-type {
+            flex: 0 0 80px;
+
+            >* {
+                width: 100%;
+            }
+        }
+
+
+        .db-chart-sider__field-creator-name {
+            flex: 1 1 0;
+            width: 0;
+
+            >* {
+                width: 100%;
+            }
         }
     }
 
@@ -381,6 +570,16 @@ const submitEditEntryName = async () => {
         margin: 0 4px;
         cursor: pointer;
 
+
+        .db-chart-sider__field-name-editor {
+            flex: 1 1 0;
+            margin-left: -12px;
+
+            >* {
+                height: 30px;
+            }
+        }
+
         .db-chart-sider__field-item-name {
             flex: 1 1 0;
             width: 0;
@@ -390,6 +589,25 @@ const submitEditEntryName = async () => {
 
         .db-chart-sider__field-item-type {
             flex: 0 0 auto;
+        }
+
+        .db-chart-sider__field-item-btns {
+            flex: 0 0 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0;
+            margin-left: 8px;
+        }
+
+        &:hover .db-chart-sider__field-item-btns {
+            flex: 0 0 auto;
+        }
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            text-decoration: underline;
         }
     }
 
