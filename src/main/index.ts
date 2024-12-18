@@ -11,7 +11,7 @@ import { JsonDataService } from './jsonData'
 
 Menu.setApplicationMenu(null)
 
-function createWindow(): void {
+async function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -26,13 +26,13 @@ function createWindow(): void {
       symbolColor: '#fff',
       height: 36
     },
-  
+
     show: true,
     autoHideMenuBar: true,
     backgroundColor: '#292929',
     fullscreenable: false,
-    resizable:true,
-    
+    resizable: true,
+
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -40,7 +40,16 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.on('ready-to-show', () => {
+  await EditorService.install()
+  await SqliteService.install(mainWindow)
+  await RunnerService.install()
+  await ExplorerService.install()
+  await JsonDataService.install()
+  await RunnerExtService.install()
+
+
+  mainWindow.on('ready-to-show', async () => {
+
     mainWindow.show()
     mainWindow.webContents.openDevTools()
   })
@@ -76,14 +85,8 @@ app.whenReady().then(async () => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
-  await EditorService.install()
-  await SqliteService.install()
-  await RunnerService.install()
-  await ExplorerService.install()
-  await JsonDataService.install()
-  await RunnerExtService.install()
 
-  createWindow()
+  await createWindow()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

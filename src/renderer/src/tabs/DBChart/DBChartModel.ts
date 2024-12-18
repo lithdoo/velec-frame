@@ -109,6 +109,22 @@ export class DBChartModel {
 
                         }
                     })
+                    .button('query', '查询并保存到文件', async () => {
+                        const sql = editPage.handler.editor?.getValue().toString()
+                        if (sql) {
+                            try {
+                                await window.sqliteApi.sqlSelectAlltoFile(
+                                    this.service.dbUrl,
+                                    sql
+                                )
+
+                                alert('执行成功')
+                            } catch (e: any) {
+                                alert(e.message)
+                            }
+
+                        }
+                    })
                     .build()
             )
             tabControl.addTab(editPage)
