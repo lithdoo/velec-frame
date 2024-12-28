@@ -58,7 +58,6 @@ const toggle = (id, e: Event) => {
 
 <template>
   <div class="flat-tree">
-
     <div class="flat-tree__inner">
       <div v-if="handler.loadingId" class="flat-tree__loadding-mask"></div>
       <div :class="{ 'flat-tree__item': true, 'flat-tree__item--selected': selectKeysSet.has(v.id) }"

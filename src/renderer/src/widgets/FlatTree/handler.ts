@@ -71,7 +71,6 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
     onItemHover: (item: T) => boolean | void = () => { }
     onItemContextMenu: (item: T,ev:MouseEvent) => boolean | void = () => { }
 
-
     async open(id) {
         if (this.loadingId) return
         const node = this.data.find(v => v.id == id)
@@ -103,6 +102,13 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
         } else {
             this.open(id)
         }
+    }
+
+    select(id){
+        const item = this.data.find(v => v.id == id)
+        if(!item) return
+        this.selectedKeys = [id]
+        this.onItemSelect(item)
     }
 
     onload?: (id: T) => Promise<boolean>

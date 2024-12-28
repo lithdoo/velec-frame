@@ -3,6 +3,8 @@ import logo from '@renderer/assets/icon.png'
 import { Menu, PopMenuLayer, PopMenuLayerHandler, PopMenuListHandler } from '@renderer/widgets/PopMenu'
 import { fixReactive } from '@renderer/fix';
 import { onUnmounted } from 'vue';
+import { tabControl } from '../PageTab';
+import { PageJthTemplate } from '@renderer/tabs/JsonToHtml';
 const menus = ['文件', '编辑', '选择', '查看', '运行', '帮助']
 const drag = { 'app-region': 'drag' }
 
@@ -83,12 +85,16 @@ onUnmounted(() => {
 })
 
 
+const dblclick = (e: MouseEvent) => {
+    tabControl.addTab(PageJthTemplate.create('测试'))
+}
+
 
 </script>
 
 <template>
 
-    <div class="frame-title-bar">
+    <div class="frame-title-bar" @dblclick="dblclick">
         <div class="frame-title-bar__logo" :style="{ backgroundImage: `url(${logo})`, ...drag }"></div>
         <div class="frame-title-bar__menu" @click.stop>
             <div class="frame-title-bar__menu-item" v-for="item in menus" :key="item" @click="(e) => click(e, item)"
