@@ -140,9 +140,17 @@ export class TemplateDetailHander<T extends JthTemplate> {
             throw new Error('template not found')
         }
 
+
+
         const handler = TemplateDetailHander.all.get(template)
-            ?? fixReactive(new TemplateDetailHander(template, model))
-        return handler
+
+        if(handler){
+            return handler
+        }else if(template.type === JthTemplateType.Element){
+            return fixReactive(new TemplateDetailElementHander(template, model))
+        }else{
+            return fixReactive(new TemplateDetailHander(template, model))
+        }
     }
 
     constructor(
@@ -166,3 +174,10 @@ export class TemplateDetailHander<T extends JthTemplate> {
 }
 
 
+export class TemplateDetailElementHander extends TemplateDetailHander<JthTemplateElement> {
+
+    tagName(){
+        return this.target.tagName
+    }
+
+}

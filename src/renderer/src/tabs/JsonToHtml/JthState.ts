@@ -75,7 +75,14 @@ export type JthTemplateProp = JthTemplateGroup<JthTemplateType.Prop> & {
     data: { [key: string]: ValueGenerator<any> }
 }
 
-export type JthTemplate = JthTemplateProp | JthTemplateLoop | JthTemplateApply | JthTemplateCond | JthTemplateText | JthTemplateElement | JthTemplateRoot
+export type JthTemplate = JthTemplateProp
+    | JthTemplateLoop
+    | JthTemplateApply
+    | JthTemplateCond
+    | JthTemplateText
+    | JthTemplateElement
+    | JthTemplateRoot
+
 export type JthComponent = { keyName: string, rootId: string }
 
 export type JthFile = {
@@ -124,8 +131,76 @@ export class JthStateModel {
 
 
 export class JthComponentHandler {
+    static staticValue<T>(value: T): ValueGenerator<T> {
+        return { type: 'static', value }
+    }
+
     static isGroup(template: JthTemplateBase<any> | JthTemplateGroup<any>): template is JthTemplateGroup<any> {
         return !!(template as JthTemplateGroup<any>).isGroup
+    }
+
+    static createBlankNode(type: JthTemplateType) {
+        let node: JthTemplate | null = null
+        if (type === JthTemplateType.Root) {
+            node = {
+                id: nanoid(),
+                type,
+                isGroup: true,
+                pid: undefined
+            }
+        } else if (type === JthTemplateType.Text) {
+            node = {
+                id: nanoid(),
+                type,
+                isGroup: false,
+                text: JthComponentHandler.staticValue('')
+            }
+        } else if (type === JthTemplateType.Element) {
+            node = {
+                id: nanoid(),
+                type,
+                isGroup: true,
+                tagName: 'div',
+                attrs: {}
+            }
+        } else if (type === JthTemplateType.Apply) {
+            node = {
+                id: nanoid(),
+                type,
+                isGroup: false,
+                data: {},
+                template: ''
+            }
+        } else if (type === JthTemplateType.Loop) {
+            node = {
+                id: nanoid(),
+                type,
+                isGroup: true,
+                loopValue: statcVal([])
+            }
+
+        } else if (type === JthTemplateType.Prop) {
+            node = {
+                id: nanoid(),
+                type,
+                isGroup: true,
+                data: {}
+            }
+
+        } else if (type === JthTemplateType.Cond) {
+            node = {
+                id: nanoid(),
+                type,
+                isGroup: true,
+                test: statcVal(true)
+            }
+        }
+
+        if (!node) {
+            throw new Error('Unknown template type')
+        }
+
+        else return node
     }
 
     constructor(public state: JthState) { }
@@ -208,6 +283,21 @@ export class JthComponentHandler {
                 if (children.findIndex(v => v === templateId) < 0) return
                 this.state.file.template.children[id] = children.filter(v => v !== templateId)
             })
+    }
+
+    replaceTemplateNode(oldId: string, newone: JthTemplate) {
+        const oldData = this.templateData(oldId)
+        if (!oldData.isGroup || !newone.isGroup) {
+            this.insertTemplateNode(newone, { after: oldId })
+            this.removeTemplateNode(oldId)
+        } else {
+            this.insertTemplateNode(newone, { after: oldId })
+            const children = this.templateChildren(oldId)
+            this.templateChildren(newone.id, children)
+            this.templateChildren(oldId, [])
+            this.removeTemplateNode(oldId)
+        }
+
     }
 
 
