@@ -361,7 +361,10 @@ export class JthComponentHandler {
             if (!templateData) continue
 
             tree.push({ id, pid, templateData })
-            todo.push(...this.templateChildren(id).map(cid => ({ id: cid, pid: id })))
+            const children = this.templateChildren(id)
+                ?.map(cid => ({ id: cid, pid: id }))
+                ?? []
+            if (children.length) todo.push(...children)
         }
         return tree
     }
