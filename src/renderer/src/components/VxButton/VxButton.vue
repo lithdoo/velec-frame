@@ -33,7 +33,7 @@ defineProps<{
     }
 
     &:hover {
-        background-color: #333;
+        background-color: rgba($color: #fff, $alpha: 0.2);
     }
 
     .page-tool-bar__button-icon {

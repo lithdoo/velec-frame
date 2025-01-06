@@ -3,7 +3,7 @@ import { contextMenu } from "@renderer/parts/GlobalContextMenu"
 import { FlatTreeHandler, FlatTreeItem } from "@renderer/widgets/FlatTree"
 import { PopMenuBuilder } from "@renderer/widgets/PopMenu"
 import { nanoid } from "nanoid"
-import { JthComponent, JthTemplate, JthStateModel, JthTemplateElement, JthTemplateType } from "../JthState"
+import { JthComponent, JthTemplate, JthStateModel, JthTemplateElement, JthTemplateType, ValueGenerator, JthComponentHandler, ValueField } from "../JthState"
 
 export class TemplateTreeHandler {
     static all = new WeakMap<JthComponent, TemplateTreeHandler>()
@@ -40,7 +40,7 @@ export class TemplateTreeHandler {
                 id: nanoid(),
                 type: JthTemplateType.Element,
                 tagName: 'div',
-                attrs: {},
+                attrs: [],
                 isGroup: true,
             }
 
@@ -117,7 +117,7 @@ export class TemplateTreeHandler {
             id: nanoid(),
             type: JthTemplateType.Element,
             tagName: 'div',
-            attrs: {},
+            attrs: [],
             isGroup: true,
         }, {
             parent: this.component.rootId,
@@ -144,11 +144,11 @@ export class TemplateDetailHander<T extends JthTemplate> {
 
         const handler = TemplateDetailHander.all.get(template)
 
-        if(handler){
+        if (handler) {
             return handler
-        }else if(template.type === JthTemplateType.Element){
+        } else if (template.type === JthTemplateType.Element) {
             return fixReactive(new TemplateDetailElementHander(template, model))
-        }else{
+        } else {
             return fixReactive(new TemplateDetailHander(template, model))
         }
     }
@@ -176,8 +176,87 @@ export class TemplateDetailHander<T extends JthTemplate> {
 
 export class TemplateDetailElementHander extends TemplateDetailHander<JthTemplateElement> {
 
-    tagName(){
+    tagName() {
         return this.target.tagName
     }
+    attrs(){
+        return this.target.attrs
+    }
 
+    addField() {
+        const target = this.target
+        const attrs = target.attrs
+        const newAttrs: ValueField[] = [{
+            name: 'field',
+            value: JthComponentHandler.staticValue('null')
+        }].concat(attrs)
+
+        this.model.component.templateData(this.target.id, {
+            ...this.target,
+            attrs: newAttrs
+        })
+
+        this.reload()
+    }
+
+
+    reload(){
+        const newone = this.model.component.templateData(this.target.id)
+        console.log('newone',newone)
+        if(newone.type !== JthTemplateType.Element) throw new Error('not element')
+        this.target = newone
+    }
+
+}
+
+
+
+
+export class FieldEditorHandler {
+    options: { key: ValueGenerator['type'], label: string, target: ValueGenerator }[] = []
+    currentValue: { key: ValueGenerator['type'], label: string, target: ValueGenerator } | null = null
+    currentName: string = ''
+    target: ValueField | null = null
+
+    beginEdit(filed: ValueField) {
+        this.target = filed
+        const old: ValueGenerator = JSON.parse(JSON.stringify(filed.value))
+
+        this.options = [
+            {
+                key: 'static', label: 'Static',
+                target: old.type === 'static'
+                    ? JSON.parse(JSON.stringify(old))
+                    : { type: 'static', json: '' }
+            },
+            {
+                key: 'dynamic:getter', label: 'Getter',
+                target: old.type === 'dynamic:getter'
+                    ? JSON.parse(JSON.stringify(old))
+                    : { type: 'dynamic:getter', getter: [] }
+            },
+            {
+                key: 'dynamic:script', label: 'Script',
+                target: old.type === 'dynamic:script'
+                    ? JSON.parse(JSON.stringify(old))
+                    : { type: 'dynamic:script', script: '' }
+            },
+        ]
+
+        this.currentValue = this.options.find(o => o.key === old.type) ?? null
+        this.currentName = filed.name
+    }
+
+    submitEdit(){
+        if(!this.target) return 
+        if(!this.currentName) return 
+        if(!this.currentValue) return
+        this.target.name = this.currentName
+        this.target.value = this.currentValue.target
+        this.cancelEdit()
+    }
+
+    cancelEdit() {
+        this.target = null
+    }
 }

@@ -1,10 +1,5 @@
 import { nanoid } from "nanoid"
 
-
-
-
-
-
 export enum JthTemplateType {
     Apply = "Apply",
     Element = "Element",
@@ -28,22 +23,22 @@ export type JthTemplateGroup<T extends JthTemplateType> = JthTemplateBase<T> & {
     isGroup: true,
 }
 
+export type ValueField = {
+    name: string, value: ValueGenerator
+}
 
-export type ValueGenerator<T = any> = {
-    type: 'static', value: T
+
+export type ValueGenerator = {
+    type: 'static', json: string
 } | {
-    type: 'dynamic:scrpit', value: string
+    type: 'dynamic:script', script: string
 } | {
-    type: 'dynamic:getter', value: string[]
+    type: 'dynamic:getter', getter: string[]
 }
 
 export type JthTemplateElement = JthTemplateGroup<JthTemplateType.Element> & {
     tagName: string,
-    attrs: { [key: string]: ValueGenerator<any> }
-}
-
-export const statcVal = <T>(value: T) => {
-    return { type: 'static' as 'static', value }
+    attrs: ValueField[]
 }
 
 
@@ -64,15 +59,17 @@ export type JthTemplateCond = JthTemplateGroup<JthTemplateType.Cond> & {
 export type JthTemplateApply = JthTemplateBase<JthTemplateType.Apply> & {
     template: string,
     isGroup: false,
-    data: { [key: string]: ValueGenerator<any> }
+    data: ValueField[]
 }
 
 export type JthTemplateLoop = JthTemplateGroup<JthTemplateType.Loop> & {
-    loopValue: ValueGenerator
+    loopValue: ValueGenerator,
+    valueField: string,
+    indexField: string,
 }
 
 export type JthTemplateProp = JthTemplateGroup<JthTemplateType.Prop> & {
-    data: { [key: string]: ValueGenerator<any> }
+    data: ValueField[]
 }
 
 export type JthTemplate = JthTemplateProp
@@ -92,7 +89,7 @@ export type JthFile = {
         children: { [key: string]: string[] }
     }
     components: JthComponent[]
-    render: { template: string, data: { [key: string]: ValueGenerator<any> } }[]
+    render: { template: string, data: { [key: string]: ValueGenerator } }[]
 }
 
 export class JthState {
@@ -131,8 +128,8 @@ export class JthStateModel {
 
 
 export class JthComponentHandler {
-    static staticValue<T>(value: T): ValueGenerator<T> {
-        return { type: 'static', value }
+    static staticValue(json: string): ValueGenerator {
+        return { type: 'static', json }
     }
 
     static isGroup(template: JthTemplateBase<any> | JthTemplateGroup<any>): template is JthTemplateGroup<any> {
@@ -161,14 +158,14 @@ export class JthComponentHandler {
                 type,
                 isGroup: true,
                 tagName: 'div',
-                attrs: {}
+                attrs: []
             }
         } else if (type === JthTemplateType.Apply) {
             node = {
                 id: nanoid(),
                 type,
                 isGroup: false,
-                data: {},
+                data: [],
                 template: ''
             }
         } else if (type === JthTemplateType.Loop) {
@@ -176,7 +173,9 @@ export class JthComponentHandler {
                 id: nanoid(),
                 type,
                 isGroup: true,
-                loopValue: statcVal([])
+                loopValue: JthComponentHandler.staticValue("[]"),
+                valueField: 'value',
+                indexField: 'index'
             }
 
         } else if (type === JthTemplateType.Prop) {
@@ -184,7 +183,7 @@ export class JthComponentHandler {
                 id: nanoid(),
                 type,
                 isGroup: true,
-                data: {}
+                data: []
             }
 
         } else if (type === JthTemplateType.Cond) {
@@ -192,7 +191,7 @@ export class JthComponentHandler {
                 id: nanoid(),
                 type,
                 isGroup: true,
-                test: statcVal(true)
+                test: JthComponentHandler.staticValue("true")
             }
         }
 

@@ -15,8 +15,6 @@ import { TemplateDetailHander, TemplateTreeHandler } from './handler';
 import { JthComponentHandler, JthStateModel, JthTemplateType } from '../JthState';
 import TemplateDetailElement from './TemplateDetailElement.vue'
 import TemplateDetailCommon from './TemplateDetailCommon.vue'
-import { fixReactive } from '@renderer/fix';
-
 
 const props = defineProps<{ templateId: string, model: JthStateModel ,tree: TemplateTreeHandler}>()
 
