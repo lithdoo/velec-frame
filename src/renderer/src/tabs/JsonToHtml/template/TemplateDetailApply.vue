@@ -5,6 +5,7 @@
             <TemplateEditValue :value="detail.target.component" :editor="compoentEditor"></TemplateEditValue>
         </div>
         <div class="template-element-apply__sub-title">Props
+            <VxButton only-icon icon="plus" :click="addField" />
         </div>
         <div class="template-element-apply__attr" v-for="field in detail.data()">
             <TemplateEditField :field="field" :editor="fieldEditor"></TemplateEditField>
