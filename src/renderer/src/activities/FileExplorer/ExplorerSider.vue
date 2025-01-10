@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { FlatTree } from '@renderer/widgets/FlatTree';
-import { VxButton } from '@renderer/components'
+import { VxButton, VxIcon } from '@renderer/components'
 import { computed } from 'vue';
-import { ActivFileExplorer } from '.';
+import { ActivFileExplorer, ExplorerWrokspace } from '.';
+import { ViewModal } from '@renderer/widgets/ViewModal';
 
 const props = defineProps<{
     handler: ActivFileExplorer
@@ -10,14 +11,14 @@ const props = defineProps<{
 
 const handler = computed(() => props.handler)
 
-
 const addWorkspace = () => handler.value.addExplorerWrokspace()
 const reload = () => handler.value.reloadCurrentWorkspace()
-
+const wsContextMenu = (ev: MouseEvent, ws: ExplorerWrokspace) => ws.dirContextMenu(ev, ws.rootUrl)
 </script>
 
 <template>
     <div class="explorer-sider-panel">
+        <ViewModal :handler="handler.modal"></ViewModal>
         <div class="explorer-sider-panel__title">
             <div class="explorer-sider-panel__title-text">资源管理器 </div>
             <div class="explorer-sider-panel__title-actions">
@@ -27,14 +28,21 @@ const reload = () => handler.value.reloadCurrentWorkspace()
         </div>
 
         <template v-if="handler.list.length">
-            <div class="explorer-sider-panel__tree" v-for="(ws, idx) in handler.list" :key="idx">
-                <FlatTree :handler="ws.tree">
-                    <template #item="{ item }">
-                        <div @dblclick="() => handler.fileOpen(item)">
-                            {{ item.name }}
-                        </div>
-                    </template>
-                </FlatTree>
+            <div class="explorer-sider-panel__workspace" v-for="(ws, idx) in handler.list" :key="idx">
+                <div class="explorer-sider-panel__workspace-title" :title="ws.rootUrl"
+                    @contextmenu="ev => wsContextMenu(ev, ws)">
+                    <VxIcon class="explorer-sider-panel__workspace-icon" name="home"/> 
+                    {{ ws.rootUrl.split('/').pop() }}
+                </div>
+                <div class="explorer-sider-panel__workspace-tree">
+                    <FlatTree :handler="ws.tree">
+                        <template #item="{ item }">
+                            <div @dblclick="() => handler.fileOpen(item)">
+                                {{ item.name }}
+                            </div>
+                        </template>
+                    </FlatTree>
+                </div>
             </div>
         </template>
     </div>
@@ -54,6 +62,7 @@ const reload = () => handler.value.reloadCurrentWorkspace()
     height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative;
 
     .explorer-sider-panel__title {
         height: var(--explorer-sider-title-height);
@@ -83,14 +92,25 @@ const reload = () => handler.value.reloadCurrentWorkspace()
         }
     }
 
-    .explorer-sider-panel__tree {
+    .explorer-sider-panel__workspace {
         flex: 1 1 0;
         height: 0;
     }
 
-    .explorer-sider-panel__tree {
-        flex: 1 1 0;
-        height: 0;
+    .explorer-sider-panel__workspace-title {
+        font-size: 16px;
+        padding: 4px 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: bolder;
+        background: rgba($color: #fff, $alpha: 0.05);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .explorer-sider-panel__workspace-icon{
+        font-size: 18px;
     }
 }
 </style>

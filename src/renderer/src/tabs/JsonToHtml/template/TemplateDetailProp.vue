@@ -1,12 +1,9 @@
 <template>
-    <div class="template-element-detail">
-        <div class="template-element-detail__sub-title">Tag
-            <{{ detail.tagName() }} />
-        </div>
-        <div class="template-element-detail__sub-title">Attr
+    <div class="template-element-prop">
+        <div class="template-element-prop__sub-title">Data
             <VxButton only-icon icon="plus" :click="addField" />
         </div>
-        <div class="template-element-detail__attr" v-for="field in detail.attrs()">
+        <div class="template-element-prop__attr" v-for="field in detail.data()">
             <TemplateEditField :field="field" :editor="fieldEditor"></TemplateEditField>
         </div>
     </div>
@@ -15,26 +12,26 @@
 
 <script setup lang="ts">
 import { fixReactive } from '@renderer/fix';
-import { FieldEditorHandler, type TemplateDetailElementHandler } from './handler';
+import { FieldEditorHandler, TemplateDetailPropHandler } from './handler';
 import TemplateEditField from './TemplateEditField.vue';
 import { VxButton } from '@renderer/components'
 
 const props = defineProps<{
-    detail: TemplateDetailElementHandler
+    detail: TemplateDetailPropHandler
 }>()
 
 const fieldEditor = fixReactive(new FieldEditorHandler())
 
 const addField = () => {
     props.detail.addField()
-    fieldEditor.beginEdit(props.detail.attrs()[0])
+    fieldEditor.beginEdit(props.detail.data()[0])
 }
 
 </script>
 
 <style lang="scss" scoped>
-.template-element-detail {
-    .template-element-detail__sub-title {
+.template-element-prop {
+    .template-element-prop__sub-title {
         margin-top: 8px;
         padding: 0 8px;
         font-size: 16px;

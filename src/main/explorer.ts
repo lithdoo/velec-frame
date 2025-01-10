@@ -4,7 +4,8 @@ import { promises as fsp } from 'fs'
 import { existsSync } from 'fs'
 import * as fs from 'fs'
 import path from 'path';
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL, URL } from 'node:url'
+import { findAppSettingDir } from "./utils"
 
 
 export class ExplorerService {
@@ -80,6 +81,44 @@ export class ExplorerService {
             } catch (_e) {
             }
         })
+
+
+        ipcMain.handle('@explorer/file/template/list', async (_,) => {
+            const settingDir = await findAppSettingDir()
+            if (!settingDir) { return [] }
+            const templateDir = path.join(settingDir, 'templates')
+            if (!existsSync(templateDir)) { return [] }
+            const files = (await fs.promises.readdir(templateDir)).map(file => {
+                return {
+                    name: file,
+                    path: path.join(templateDir, file),
+                    stat: fs.statSync(path.join(templateDir, file))
+                }
+            }).filter(file => file.stat.isFile())
+
+            const templates = files.map(file => {
+                const [name, ...exts] = file.name.split('.')
+                let ext = exts.join('.')
+                if (ext) { ext = '.' + ext }
+                return {
+                    name, ext, url: pathToFileURL(file.path).href
+                }
+            })
+
+            return templates
+
+        })
+
+        ipcMain.handle('@explorer/file/createFromTemplate', async (_, option: {
+            fileName:string,
+            templateUrl:string,
+            dirUrl:string
+        }) => {
+            const templatePath = fileURLToPath(option.templateUrl)
+            const dirPath = fileURLToPath(option.dirUrl)
+            await fs.promises.copyFile(templatePath, path.join(dirPath, option.fileName))
+        })
+
     }
 
 }

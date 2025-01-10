@@ -57,7 +57,7 @@ export type JthTemplateCond = JthTemplateGroup<JthTemplateType.Cond> & {
 }
 
 export type JthTemplateApply = JthTemplateBase<JthTemplateType.Apply> & {
-    template: string,
+    component: ValueGenerator,
     isGroup: false,
     data: ValueField[]
 }
@@ -150,7 +150,7 @@ export class JthComponentHandler {
                 id: nanoid(),
                 type,
                 isGroup: false,
-                text: JthComponentHandler.staticValue('')
+                text: JthComponentHandler.staticValue('""')
             }
         } else if (type === JthTemplateType.Element) {
             node = {
@@ -166,7 +166,7 @@ export class JthComponentHandler {
                 type,
                 isGroup: false,
                 data: [],
-                template: ''
+                component: JthComponentHandler.staticValue("null"),
             }
         } else if (type === JthTemplateType.Loop) {
             node = {

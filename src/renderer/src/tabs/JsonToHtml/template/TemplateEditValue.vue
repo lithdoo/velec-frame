@@ -1,48 +1,42 @@
 <template>
 
     <div class="template-field-editor">
-
-        <div class="template-field-editor__name">
-            <template v-if="isEdit">
-                <div class="template-field-editor__name-edit">
-                    <BtnInput v-model="editor.currentName"></BtnInput>
-                </div>
-                <div class="template-field-editor__btns">
-                    <VxButton only-icon icon="done" :click="submitEdit"></VxButton>
-                    <VxButton only-icon icon="clear" :click="cancelEdit"></VxButton>
-                </div>
-            </template>
-            <template v-else>
-                <div class="template-field-editor__name-text">
-                    [ {{ field.name }} ] :
-                </div>
-                <div class="template-field-editor__btns  template-field-editor__btns--view">
-                    <VxButton only-icon icon="edit" :click="beginEdit"></VxButton>
-                </div>
-            </template>
-        </div>
         <div class="template-field-editor__value">
             <template v-if="isEdit">
                 <div class="template-field-editor__selector">
-                    <BtnSelector :options="options" v-model="editor.currentValue"></BtnSelector>
+                    <VxSelector :options="options" v-model="editor.currentValue"></VxSelector>
                 </div>
 
                 <div class="template-field-editor__input">
                     <template v-if="editor.currentValue?.target.type === 'dynamic:script'">
-                        <BtnInput v-model="editor.currentValue.target.script"></BtnInput>
+                        <VxInput v-model="editor.currentValue.target.script">
+                            <template #suffix>
+                                <VxButton only-icon icon="done" :click="submitEdit"></VxButton>
+                                <VxButton only-icon icon="clear" :click="cancelEdit"></VxButton>
+                            </template>
+                        </VxInput>
                     </template>
 
 
                     <template v-if="editor.currentValue?.target.type === 'static'">
-                        <BtnInput v-model="editor.currentValue.target.json"></BtnInput>
+                        <VxInput v-model="editor.currentValue.target.json">
+                            <template #suffix>
+                                <VxButton only-icon icon="done" :click="submitEdit"></VxButton>
+                                <VxButton only-icon icon="clear" :click="cancelEdit"></VxButton>
+                            </template>
+                        </VxInput>
                     </template>
 
                 </div>
             </template>
 
             <template v-else>
-                <span class="template-field-editor__text-type">{{ type(props.field.value.type) }} : </span>
+                <span class="template-field-editor__text-type">{{ type(props.value.type) }} : </span>
                 <span class="template-field-editor__text-value">{{ value }}</span>
+
+                <div class="template-field-editor__btns  template-field-editor__btns--view">
+                    <VxButton only-icon icon="edit" :click="beginEdit"></VxButton>
+                </div>
             </template>
 
         </div>
@@ -52,19 +46,19 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ValueField, ValueGenerator } from '../JthState';
-import { BtnSelector, BtnInput, VxButton } from '@renderer/components';
-import { FieldEditorHandler } from './handler';
+import { ValueGenerator } from '../JthState';
+import { VxSelector, VxInput, VxButton } from '@renderer/components';
+import { ValueEditorHandler } from './handler';
 
 
 const props = defineProps<{
-    field: ValueField,
-    editor: FieldEditorHandler
+    value: ValueGenerator,
+    editor: ValueEditorHandler
 }>()
 
 
 const beginEdit = () => {
-    props.editor.beginEdit(props.field)
+    props.editor.beginEdit(props.value)
 }
 
 const cancelEdit = () => {
@@ -88,18 +82,18 @@ const type = (type: ValueGenerator['type']) => {
 }
 
 const value = computed(() => {
-    if (props.field.value.type === 'static') {
-        return props.field.value.json
-    } else if (props.field.value.type === 'dynamic:getter') {
-        return props.field.value.getter.join(',')
-    } else if (props.field.value.type === 'dynamic:script') {
-        return props.field.value.script
+    if (props.value.type === 'static') {
+        return props.value.json
+    } else if (props.value.type === 'dynamic:getter') {
+        return props.value.getter.join(',')
+    } else if (props.value.type === 'dynamic:script') {
+        return props.value.script
     }
     throw new Error('unknown type')
 })
 
 const isEdit = computed(() => {
-    return props.editor.target === props.field
+    return props.editor.target === props.value
 })
 
 const options = computed(() => {
@@ -118,7 +112,7 @@ const current = computed(() => {
     &:hover {
         background-color: rgba(255, 255, 255, 0.1);
 
-        .template-field-editor__btns--view{
+        .template-field-editor__btns--view {
             width: auto;
         }
     }

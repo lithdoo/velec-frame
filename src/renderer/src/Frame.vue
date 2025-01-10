@@ -9,6 +9,10 @@ import { computed, ref } from "vue";
 // import { appSider } from "@renderer/state/sider";
 
 const splitCenter = ref(new SinglePanelSplitHandler())
+splitCenter.value.minDistance = 240
+splitCenter.value.maxDistance = 480
+splitCenter.value.distance = 360
+
 const isSiderBarShown = computed(() => !!siderControl.currentPanel())
 const siderSplitWidth = computed(() => isSiderBarShown.value ? splitCenter.value.distance : 0)
 

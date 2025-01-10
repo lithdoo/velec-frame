@@ -22,14 +22,14 @@
                         </div>
                         <template
                             v-if="entityNameEditor.current && entityNameEditor.current.oldName === entity.table.name">
-                            <BtnInput class="db-chart-sider__entity-name-editor" @click.native.stop
+                            <VxInput class="db-chart-sider__entity-name-editor" @click.native.stop
                                 v-model="entityNameEditor.current.newName" :placeholder="'请输入新表名'">
-                                <template #btns>
+                                <template #suffix>
                                     <VxButton only-icon icon="clear" :click="() => entityNameEditor.cancel()">
                                     </VxButton>
                                     <VxButton only-icon icon="done" :click="() => entityNameEditor.submit()"></VxButton>
                                 </template>
-                            </BtnInput>
+                            </VxInput>
                         </template>
                         <template v-else>
                             <div class="db-chart-sider__entity-name" :title="entity.table.name">
@@ -78,13 +78,13 @@
                                     <div class="db-chart-sider__field-creator"
                                         v-if="fieldCreator.current && fieldCreator.current.entity === entity">
                                         <div class="db-chart-sider__field-creator-name">
-                                            <BtnInput class="db-chart-sider__field-name-editor" @click.native.stop
+                                            <VxInput class="db-chart-sider__field-name-editor" @click.native.stop
                                                 v-model="fieldCreator.current.name" :placeholder="'请输入新字段名'">
-                                            </BtnInput>
+                                            </VxInput>
                                         </div>
                                         <div class="db-chart-sider__field-creator-type">
-                                            <BtnSelector :options="fieldCreator.options"
-                                                v-model="fieldCreator.current.type"></BtnSelector>
+                                            <VxSelector :options="fieldCreator.options"
+                                                v-model="fieldCreator.current.type"></VxSelector>
                                         </div>
                                     </div>
                                 </div>
@@ -92,16 +92,16 @@
                                     :key="field.name">
                                     <template
                                         v-if="fieldNameEditor.current && fieldNameEditor.current.oldName === field.name && fieldNameEditor.current.entity === entity">
-                                        <BtnInput class="db-chart-sider__field-name-editor" @click.native.stop
+                                        <VxInput class="db-chart-sider__field-name-editor" @click.native.stop
                                             v-model="fieldNameEditor.current.newName" :placeholder="'请输入新字段名'">
-                                            <template #btns>
+                                            <template #suffix>
                                                 <VxButton only-icon icon="clear"
                                                     :click="() => fieldNameEditor.cancel()">
                                                 </VxButton>
                                                 <VxButton only-icon icon="done" :click="() => fieldNameEditor.submit()">
                                                 </VxButton>
                                             </template>
-                                        </BtnInput>
+                                        </VxInput>
                                     </template>
                                     <template v-else>
                                         <div class="db-chart-sider__field-item-name" :title="field.name">{{ field.name
@@ -139,7 +139,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { EntityData } from '../ChartState';
-import { VxIcon, AutoDrawer, VxButton, BtnInput, BtnSelector } from '@renderer/components';
+import { VxIcon, AutoDrawer, VxButton, VxInput, VxSelector } from '@renderer/components';
 import { fixReactive } from '@renderer/fix';
 import { DBChartModel } from '../DBChartModel';
 import { SqliteDataType } from '@common/sql';

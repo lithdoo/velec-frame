@@ -1,12 +1,17 @@
 import { AppSiderPanel, siderControl } from "@renderer/parts/SideBar"
 import ExplorerSider from "./ExplorerSider.vue"
 import { FlatTreeHandler, FlatTreeItem } from "@renderer/widgets/FlatTree"
-import { VNode } from "vue"
+import { computed, ref, VNode } from "vue"
 import { fixReactive } from "@renderer/fix"
 import { FileType } from "@common/file"
 import { fileHandler } from "./FileOperation"
 import { contextMenu } from "@renderer/parts/GlobalContextMenu"
-import { PopMenuListHandler } from "@renderer/widgets/PopMenu"
+import { PopMenuBuilder, PopMenuListHandler } from "@renderer/widgets/PopMenu"
+import { ModalContent, ViewModalHandler } from "@renderer/widgets/ViewModal/ViewModalHandler"
+import { nanoid } from "nanoid"
+import VxInput from "@renderer/components/VxInput/VxInput.vue"
+import VxSelector from "@renderer/components/VxInput/VxSelector.vue"
+import VxButton from "@renderer/components/VxButton/VxButton.vue"
 
 // import { tabControl } from "@renderer/parts/PageTab"
 // import { PageSqlErd } from "@renderer/page/_sqlErd"
@@ -32,6 +37,9 @@ export class ActivFileExplorer implements AppSiderPanel {
     label = '资源管理器'
     element: VNode = <div></div>
     list: ExplorerWrokspace[] = []
+
+    modal: ViewModalHandler = new ViewModalHandler()
+
     constructor() {
         this.element = <ExplorerSider handler={this}></ExplorerSider>
 
@@ -41,7 +49,7 @@ export class ActivFileExplorer implements AppSiderPanel {
         const root = await window.explorerApi.addWorkspace()
         if (!root) return
 
-        const workspace = await ExplorerWrokspace.create(root)
+        const workspace = await ExplorerWrokspace.create(root, this)
         // if (this.list.find(v => v.rootUrl === workspace.rootUrl)) {
         //     return
         // }
@@ -55,7 +63,7 @@ export class ActivFileExplorer implements AppSiderPanel {
         if (!workspace) return
         const root = workspace.rootUrl
         if (!root) return
-        const newWorkspace = await ExplorerWrokspace.create(root)
+        const newWorkspace = await ExplorerWrokspace.create(root, this)
         this.list = [newWorkspace, ...extra]
     }
 
@@ -105,15 +113,17 @@ export interface FileTreeItem extends FlatTreeItem {
     type: FileType
 }
 
-class ExplorerWrokspace {
-    static async create(root: string) {
-        const ws = fixReactive(new ExplorerWrokspace(root))
+export class ExplorerWrokspace {
+    static async create(root: string, sider: ActivFileExplorer) {
+        const ws = fixReactive(new ExplorerWrokspace(root, sider))
         ws.fetchRoots()
         return ws
     }
-    rootUrl: string
     tree: FlatTreeHandler<FileTreeItem>
-    constructor(rootUrl: string) {
+    constructor(
+        public rootUrl: string,
+        public sider: ActivFileExplorer
+    ) {
         this.rootUrl = rootUrl
         this.tree = fixReactive(new FlatTreeHandler<FileTreeItem>())
         this.tree.onload = async (node) => {
@@ -155,8 +165,13 @@ class ExplorerWrokspace {
     }
 
     fileConextmenu(file: FileTreeItem, ev: MouseEvent) {
-        const operations = fileHandler.getOperations(file.url)
-        contextMenu.open(PopMenuListHandler.create(operations), ev)
+        if (file.type === FileType.Directory) {
+            this.dirContextMenu(ev, file.url)
+        } else {
+            const operations = fileHandler.getOperations(file.url)
+            contextMenu.open(PopMenuListHandler.create(operations), ev)
+        }
+
 
         // if (/.db$/.test(file.name)) {
         //     contextMenu.open(
@@ -185,6 +200,119 @@ class ExplorerWrokspace {
         //         ev
         //     )
         // }
+    }
+
+
+
+    dirContextMenu(ev: MouseEvent, dirUrl: string) {
+        contextMenu.open(
+            PopMenuBuilder.create()
+                .button('createFile', '新建文件', async () => {
+                    this.newFile(dirUrl)
+                })
+                .build(),
+            ev
+        )
+    }
+
+    async newFile(dirUrl: string) {
+
+        // const list =fixReactive( [{
+        //     key: nanoid(),
+        //     label: 'BlankFile',
+        //     ext: '',
+        //     templateFileUrl: 'https://raw.githubusercontent.com/zhengxiaowai/blank-file/main/blank.txt',
+        // }, {
+        //     key: nanoid(),
+        //     label: 'SqliteDB',
+        //     ext: '.db',
+        //     templateFileUrl: 'https://raw.githubusercontent.com/zhengxiaowai/blank-file/main/blank.txt',
+        // }])
+
+        const list = (await window.explorerApi.getFileTemplates()).map(template=>({
+            key:nanoid(),
+            label:template.name,
+            ...template
+        }))
+
+        console.log({list})
+
+        const input = ref<{
+            template: {
+                key: string;
+                label: string;
+                ext: string;
+                url: string;
+            } | null
+            name: string;
+        }>({
+            template: null,
+            name: '',
+        })
+
+        const ext = computed(() => {
+            return input.value?.template?.ext || ''
+        })
+
+
+        const submit = async ()=>{
+
+            if(!input.value.template){return}
+            if(!input.value.name){return}
+
+            const fileName = `${input.value.name}${ext.value}`
+            const templateUrl = input.value.template.url
+
+            await window.explorerApi.createFileFromTemplate(fileName, templateUrl,dirUrl)
+            removeFile()
+        }
+
+
+        const content: ModalContent = {
+            key: nanoid(),
+            title: '新建文件',
+            content: <div style="min-width: 240px;">
+                {/* {dirUrl.split('/').pop()}
+                <button onClick={() => this.newFile(dirUrl)}>新建文件</button> */}
+                <VxSelector
+                    options={list}
+                    v-bind:modelValue={input.value.template}
+                    placeholder="选择模板"
+                    onUpdate:model-value={(v) => {
+                        console.log(v)
+                        input.value.template = v
+                    }}
+                    mounted={el=>{ 
+                        input.value.template = list[0]
+                        el.focus() 
+                    }}
+                    ref={el=>{console.log({el})}}
+                ></VxSelector>
+                <div style="height:16px"></div>
+                <VxInput
+                    v-bind:modelValue={input.value.name}
+                    placeholder="文件名"
+                    onUpdate:model-value={(v) => {
+                        input.value.name = v
+                    }}
+
+                    v-slots={{
+                        suffix: () => [
+                            <span style="padding-right:4px">{ext.value}</span>,
+                            <VxButton only-icon icon='clear' click={() => removeFile()}></VxButton>,
+                            <VxButton only-icon icon='done' click={() => submit()}></VxButton>,
+                        ]
+                    }}
+                >
+                </VxInput>
+            </div>
+        }
+
+        const removeFile = () => {
+            alert('关闭窗口')
+            this.sider.modal.remove(content.key)
+        }
+        this.sider.modal.push(content)
     }
 }
 

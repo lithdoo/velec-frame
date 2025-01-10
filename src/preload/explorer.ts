@@ -23,5 +23,20 @@ export const explorerApi = {
     },
     saveJson: async (filename: string, json: any) => {
         return await ipcRenderer.invoke('@explorer/json/write', filename, json) as Promise<void>
+    },
+    getFileTemplates: async () => {
+        return await ipcRenderer.invoke('@explorer/file/template/list') as Promise<{
+            name: string,
+            url: string,
+            ext: string
+        }[]>
+    },
+    createFileFromTemplate: async (fileName: string, templateUrl: string, dirUrl: string) => {
+        return await ipcRenderer.invoke('@explorer/file/createFromTemplate',{
+            fileName,
+            templateUrl,
+            dirUrl
+        }) as Promise<void>
     }
+
 }

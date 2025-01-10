@@ -1,4 +1,4 @@
-export * from './BtnInput'
+export * from './VxInput'
 export * from './ElementInject'
 export * from './VxButton'
 export * from './VxIcon'

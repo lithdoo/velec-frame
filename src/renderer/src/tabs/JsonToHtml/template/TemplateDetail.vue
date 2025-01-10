@@ -5,21 +5,41 @@
         <template v-if="detail.type() === JthTemplateType.Element">
             <TemplateDetailElement :detail="asType<any>(detail)"></TemplateDetailElement>
         </template>
+        <template v-if="detail.type() === JthTemplateType.Prop">
+            <TemplateDetailProp :detail="asType<any>(detail)"></TemplateDetailProp>
+        </template>
+        <template v-if="detail.type() === JthTemplateType.Apply">
+            <TemplateDetailApply :detail="asType<any>(detail)"></TemplateDetailApply>
+        </template>
+        <template v-if="detail.type() === JthTemplateType.Text">
+            <TemplateDetailText :detail="asType<any>(detail)"></TemplateDetailText>
+        </template>
+        <template v-if="detail.type() === JthTemplateType.Cond">
+            <TemplateDetailCond :detail="asType<any>(detail)"></TemplateDetailCond>
+        </template>
+        <template v-if="detail.type() === JthTemplateType.Loop">
+            <TemplateDetailLoop :detail="asType<any>(detail)"></TemplateDetailLoop>
+        </template>
     </div>
 
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { TemplateDetailHander, TemplateTreeHandler } from './handler';
-import { JthComponentHandler, JthStateModel, JthTemplateType } from '../JthState';
+import { TemplateDetailHandler, TemplateTreeHandler } from './handler';
+import { JthStateModel, JthTemplateType } from '../JthState';
 import TemplateDetailElement from './TemplateDetailElement.vue'
+import TemplateDetailProp from './TemplateDetailProp.vue'
+import TemplateDetailApply from './TemplateDetailApply.vue'
+import TemplateDetailText from './TemplateDetailText.vue'
+import TemplateDetailCond from './TemplateDetailCond.vue'
+import TemplateDetailLoop from './TemplateDetailLoop.vue'
 import TemplateDetailCommon from './TemplateDetailCommon.vue'
 
-const props = defineProps<{ templateId: string, model: JthStateModel ,tree: TemplateTreeHandler}>()
+const props = defineProps<{ templateId: string, model: JthStateModel, tree: TemplateTreeHandler }>()
 
 const detail = computed(() => {
-    return TemplateDetailHander.create(props.model, props.templateId)
+    return TemplateDetailHandler.create(props.model, props.templateId)
 })
 
 const asType = <T>(input: any) => {

@@ -9,12 +9,12 @@
             </template>
             <template v-else>
                 <div class="template-detail-common__type-selector">
-                    <BtnSelector :options="changeType.options" v-model="changeType.currentType">
-                        <template #btns>
+                    <VxSelector :options="changeType.options" v-model="changeType.currentType">
+                        <template #suffix>
                             <VxButton only-icon icon="done" :click="() => changeType.submit()"></VxButton>
                             <VxButton only-icon icon="clear" :click="() => changeType.cancel()"></VxButton>
                         </template>
-                    </BtnSelector>
+                    </VxSelector>
                 </div>
             </template>
         </div>
@@ -24,15 +24,15 @@
 </template>
 
 <script setup lang="ts">
-import { TemplateDetailHander, TemplateTreeHandler } from './handler';
+import { TemplateDetailHandler, TemplateTreeHandler } from './handler';
 import { JthComponentHandler, JthTemplateType } from '../JthState';
 import { fixReactive } from '@renderer/fix';
-import { BtnSelector } from '@renderer/components'
+import { VxSelector } from '@renderer/components'
 import VxButton from '@renderer/components/VxButton/VxButton.vue';
 
 
 const props = defineProps<{
-    detail: TemplateDetailHander<any>,
+    detail: TemplateDetailHandler<any>,
     tree: TemplateTreeHandler
 }>()
 

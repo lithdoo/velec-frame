@@ -3,7 +3,7 @@ import { contextMenu } from "@renderer/parts/GlobalContextMenu"
 import { FlatTreeHandler, FlatTreeItem } from "@renderer/widgets/FlatTree"
 import { PopMenuBuilder } from "@renderer/widgets/PopMenu"
 import { nanoid } from "nanoid"
-import { JthComponent, JthTemplate, JthStateModel, JthTemplateElement, JthTemplateType, ValueGenerator, JthComponentHandler, ValueField } from "../JthState"
+import { JthComponent, JthTemplate, JthStateModel, JthTemplateElement, JthTemplateType, ValueGenerator, JthComponentHandler, ValueField, JthTemplateProp, JthTemplateApply, JthTemplateText, JthTemplateCond, JthTemplateLoop } from "../JthState"
 
 export class TemplateTreeHandler {
     static all = new WeakMap<JthComponent, TemplateTreeHandler>()
@@ -129,9 +129,9 @@ export class TemplateTreeHandler {
 
 
 
-export class TemplateDetailHander<T extends JthTemplate> {
+export class TemplateDetailHandler<T extends JthTemplate> {
 
-    static all = new WeakMap<JthTemplate, TemplateDetailHander<JthTemplate>>()
+    static all = new WeakMap<JthTemplate, TemplateDetailHandler<JthTemplate>>()
 
     static create(model: JthStateModel, templateId: string) {
         const template = model.component.templateData(templateId)
@@ -142,14 +142,24 @@ export class TemplateDetailHander<T extends JthTemplate> {
 
 
 
-        const handler = TemplateDetailHander.all.get(template)
+        const handler = TemplateDetailHandler.all.get(template)
 
         if (handler) {
             return handler
         } else if (template.type === JthTemplateType.Element) {
-            return fixReactive(new TemplateDetailElementHander(template, model))
+            return fixReactive(new TemplateDetailElementHandler(template, model))
+        } else if (template.type === JthTemplateType.Prop) {
+            return fixReactive(new TemplateDetailPropHandler(template, model))
+        } else if (template.type === JthTemplateType.Apply) {
+            return fixReactive(new TemplateDetailApplyHandler(template, model))
+        } else if (template.type === JthTemplateType.Text) {
+            return fixReactive(new TemplateDetailTextHandler(template, model))
+        } else if (template.type === JthTemplateType.Cond) {
+            return fixReactive(new TemplateDetailCondHandler(template, model))
+        } else if (template.type === JthTemplateType.Loop) {
+            return fixReactive(new TemplateDetailLoopHandler(template, model))
         } else {
-            return fixReactive(new TemplateDetailHander(template, model))
+            return fixReactive(new TemplateDetailHandler(template, model))
         }
     }
 
@@ -174,12 +184,12 @@ export class TemplateDetailHander<T extends JthTemplate> {
 }
 
 
-export class TemplateDetailElementHander extends TemplateDetailHander<JthTemplateElement> {
+export class TemplateDetailElementHandler extends TemplateDetailHandler<JthTemplateElement> {
 
     tagName() {
         return this.target.tagName
     }
-    attrs(){
+    attrs() {
         return this.target.attrs
     }
 
@@ -200,10 +210,127 @@ export class TemplateDetailElementHander extends TemplateDetailHander<JthTemplat
     }
 
 
-    reload(){
+    reload() {
         const newone = this.model.component.templateData(this.target.id)
-        console.log('newone',newone)
-        if(newone.type !== JthTemplateType.Element) throw new Error('not element')
+        console.log('newone', newone)
+        if (newone.type !== JthTemplateType.Element) throw new Error('not element')
+        this.target = newone
+    }
+
+}
+
+
+export class TemplateDetailApplyHandler extends TemplateDetailHandler<JthTemplateApply> {
+
+
+
+    data() {
+        return this.target.data
+    }
+
+    addField() {
+        const target = this.target
+        const data = target.data
+        const newAttrs: ValueField[] = [{
+            name: 'field',
+            value: JthComponentHandler.staticValue('null')
+        }].concat(data)
+
+        this.model.component.templateData(this.target.id, {
+            ...this.target,
+            data: newAttrs
+        })
+
+        this.reload()
+    }
+
+    setComponent(t: ValueGenerator) {
+        this.target.component = t
+    }
+
+
+    reload() {
+        const newone = this.model.component.templateData(this.target.id)
+        console.log('newone', newone)
+        if (newone.type !== JthTemplateType.Apply) throw new Error('not prop')
+        this.target = newone
+    }
+
+}
+
+export class TemplateDetailPropHandler extends TemplateDetailHandler<JthTemplateProp> {
+
+
+    data() {
+        return this.target.data
+    }
+
+    addField() {
+        const target = this.target
+        const data = target.data
+        const newAttrs: ValueField[] = [{
+            name: 'field',
+            value: JthComponentHandler.staticValue('null')
+        }].concat(data)
+
+        this.model.component.templateData(this.target.id, {
+            ...this.target,
+            data: newAttrs
+        })
+
+        this.reload()
+    }
+
+
+    reload() {
+        const newone = this.model.component.templateData(this.target.id)
+        console.log('newone', newone)
+        if (newone.type !== JthTemplateType.Prop) throw new Error('not prop')
+        this.target = newone
+    }
+
+}
+
+
+export class TemplateDetailTextHandler extends TemplateDetailHandler<JthTemplateText> {
+
+    setText(t: ValueGenerator) {
+        this.target.text = t
+    }
+
+    reload() {
+        const newone = this.model.component.templateData(this.target.id)
+        if (newone.type !== JthTemplateType.Text) throw new Error('not prop')
+        this.target = newone
+    }
+
+}
+
+
+
+export class TemplateDetailCondHandler extends TemplateDetailHandler<JthTemplateCond> {
+
+    setTest(t: ValueGenerator) {
+        this.target.test = t
+    }
+
+    reload() {
+        const newone = this.model.component.templateData(this.target.id)
+        if (newone.type !== JthTemplateType.Cond) throw new Error('not prop')
+        this.target = newone
+    }
+
+}
+
+export class TemplateDetailLoopHandler extends TemplateDetailHandler<JthTemplateLoop> {
+
+    setLoopValue(t: ValueGenerator) {
+        this.target.loopValue = t
+    }
+
+    reload() {
+        const newone = this.model.component.templateData(this.target.id)
+        if (newone.type !== JthTemplateType.Loop) throw new Error('not prop')
         this.target = newone
     }
 
@@ -212,11 +339,88 @@ export class TemplateDetailElementHander extends TemplateDetailHander<JthTemplat
 
 
 
-export class FieldEditorHandler {
+export abstract class BaseEditorHandler<T> {
     options: { key: ValueGenerator['type'], label: string, target: ValueGenerator }[] = []
     currentValue: { key: ValueGenerator['type'], label: string, target: ValueGenerator } | null = null
+
+    target: T | null = null
+
+
+    beginEdit(t: T) {
+        this.target = t
+        const old = this.getVG(t)
+
+
+        this.options = [
+            {
+                key: 'static', label: 'Static',
+                target: old.type === 'static'
+                    ? JSON.parse(JSON.stringify(old))
+                    : { type: 'static', json: '' }
+            },
+            {
+                key: 'dynamic:getter', label: 'Getter',
+                target: old.type === 'dynamic:getter'
+                    ? JSON.parse(JSON.stringify(old))
+                    : { type: 'dynamic:getter', getter: [] }
+            },
+            {
+                key: 'dynamic:script', label: 'Script',
+                target: old.type === 'dynamic:script'
+                    ? JSON.parse(JSON.stringify(old))
+                    : { type: 'dynamic:script', script: '' }
+            },
+        ]
+
+
+        this.currentValue = this.options.find(o => o.key === old.type) ?? null
+
+    }
+
+    submitEdit() {
+        if (!this.target) return
+        if (!this.currentValue) return
+        this.setVG(this.currentValue.target)
+        this.cancelEdit()
+    }
+
+    cancelEdit() {
+        this.target = null
+    }
+
+
+    abstract getVG(t: T): ValueGenerator
+    abstract setVG(t: ValueGenerator): void
+
+}
+
+
+export abstract class ValueEditorHandler extends BaseEditorHandler<ValueGenerator> {
+
+    getVG(t: ValueGenerator): ValueGenerator {
+        return JSON.parse(JSON.stringify(t))
+    }
+
+    setVG(t: ValueGenerator) {
+        return this.onSubmit(t)
+    }
+
+    abstract onSubmit(t: ValueGenerator): void
+}
+
+export class FieldEditorHandler extends BaseEditorHandler<ValueField> {
     currentName: string = ''
     target: ValueField | null = null
+
+    getVG(t: ValueField): ValueGenerator {
+        const old: ValueGenerator = JSON.parse(JSON.stringify(t.value))
+        return old
+    }
+
+    setVG(vg: ValueGenerator) {
+        if (!this.target) return
+        this.target.value = vg
+    }
 
     beginEdit(filed: ValueField) {
         this.target = filed
@@ -247,16 +451,11 @@ export class FieldEditorHandler {
         this.currentName = filed.name
     }
 
-    submitEdit(){
-        if(!this.target) return 
-        if(!this.currentName) return 
-        if(!this.currentValue) return
+    submitEdit() {
+        if (!this.target) return
+        if (!this.currentName) return
+        if (!this.currentValue) return
         this.target.name = this.currentName
-        this.target.value = this.currentValue.target
-        this.cancelEdit()
-    }
-
-    cancelEdit() {
-        this.target = null
+        super.submitEdit()
     }
 }
