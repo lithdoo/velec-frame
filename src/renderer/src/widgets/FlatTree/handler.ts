@@ -111,5 +111,34 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
         this.onItemSelect(item)
     }
 
+    removeNode(id:string){
+        if(this.loadingId === id) {
+            this.loadingId = null
+        }
+        if(this.openKeys.includes(id)){
+            this.openKeys = this.openKeys.filter(v => v !== id)
+        }
+        if(this.selectedKeys.includes(id)){
+            this.selectedKeys = this.selectedKeys.filter(v => v !== id)
+        }
+        this.data = this.data.filter(v => v.id !== id)
+        const children = this.data.filter(v => v.pid === id)
+        if(children.length > 0){
+            children.forEach(v => this.removeNode(v.id))
+        }
+    }
+
+    async reloadNode(id:string){
+        const node = this.data.find(v => v.id === id)
+        if(!node || node.isLeaf) return
+        this.close(id)
+        const children = this.data.filter(v => v.pid === id)
+        if(children.length > 0){
+            children.forEach(v => this.removeNode(v.id))
+        }
+        node.loaded = false
+        await this.open(node.id)
+    }
+
     onload?: (id: T) => Promise<boolean>
 }

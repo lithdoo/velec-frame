@@ -1,5 +1,5 @@
 import { FileType } from "@common/file"
-import { dialog, ipcMain } from "electron"
+import { BrowserWindow, dialog, ipcMain } from "electron"
 import { promises as fsp } from 'fs'
 import { existsSync } from 'fs'
 import * as fs from 'fs'
@@ -9,7 +9,11 @@ import { findAppSettingDir } from "./utils"
 
 
 export class ExplorerService {
-    static install() {
+    static install(window: BrowserWindow) {
+        const emitDirChanged = (url: string) => {
+            window.webContents.send('@explorer/workspace/directory-changed', url)
+        }
+        
         ipcMain.handle('@explorer/workspace/open', async () => {
             const data = await dialog.showOpenDialog({ properties: ['openDirectory'] })
             if (!data.canceled && data.filePaths[0]) {
@@ -82,7 +86,6 @@ export class ExplorerService {
             }
         })
 
-
         ipcMain.handle('@explorer/file/template/list', async (_,) => {
             const settingDir = await findAppSettingDir()
             if (!settingDir) { return [] }
@@ -109,16 +112,16 @@ export class ExplorerService {
 
         })
 
-        ipcMain.handle('@explorer/file/createFromTemplate', async (_, option: {
-            fileName:string,
-            templateUrl:string,
-            dirUrl:string
+        ipcMain.handle('@explorer/file/create-from-template', async (_, option: {
+            fileName: string,
+            templateUrl: string,
+            dirUrl: string
         }) => {
             const templatePath = fileURLToPath(option.templateUrl)
             const dirPath = fileURLToPath(option.dirUrl)
             await fs.promises.copyFile(templatePath, path.join(dirPath, option.fileName))
+            emitDirChanged(option.dirUrl)
         })
 
     }
-
 }

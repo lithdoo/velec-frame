@@ -32,11 +32,13 @@ export const explorerApi = {
         }[]>
     },
     createFileFromTemplate: async (fileName: string, templateUrl: string, dirUrl: string) => {
-        return await ipcRenderer.invoke('@explorer/file/createFromTemplate',{
+        return await ipcRenderer.invoke('@explorer/file/create-from-template', {
             fileName,
             templateUrl,
             dirUrl
         }) as Promise<void>
+    },
+    onDirChanged: (callback: (dirUrl: string) => void) => {
+        ipcRenderer.on('@explorer/workspace/directory-changed', (_, str: string) => { callback(str) })
     }
-
 }

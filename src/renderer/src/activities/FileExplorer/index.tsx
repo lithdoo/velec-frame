@@ -67,8 +67,24 @@ export class ActivFileExplorer implements AppSiderPanel {
         this.list = [newWorkspace, ...extra]
     }
 
+    async reloadWorkspace(rootUrl: string) {
+        const workspace = this.list.find(v => v.rootUrl === rootUrl)
+        if (!workspace) return
+        const newWorkspace = await ExplorerWrokspace.create(rootUrl, this)
+        this.list = this.list.map(v => v=== workspace ? newWorkspace : v)
+    }
+
     init() {
         this.element = <ExplorerSider handler={this}></ExplorerSider>
+        window.explorerApi.onDirChanged((dirUrl) => {
+            this.list.forEach(v => {
+                if(v.rootUrl === dirUrl) {
+                    this.reloadWorkspace(dirUrl)
+                }else{
+                    v.onDirChanged(dirUrl)
+                }
+            })
+        })
     }
 
 
@@ -129,7 +145,7 @@ export class ExplorerWrokspace {
         this.tree.onload = async (node) => {
             const list = await window.explorerApi.readDir(node.url)
             if (!list) {
-                this.tree.data = []
+                this.tree.removeNode(node.id)
                 return true
             }
             this.tree.data = this.tree.data.concat(list.map(v => ({
@@ -203,6 +219,10 @@ export class ExplorerWrokspace {
     }
 
 
+    onDirChanged(dirUrl:string){
+        const node = this.tree.data.find(v=>v.url === dirUrl)
+        if(node){this.tree.reloadNode(node.id)}
+    }
 
     dirContextMenu(ev: MouseEvent, dirUrl: string) {
         contextMenu.open(
@@ -216,38 +236,16 @@ export class ExplorerWrokspace {
     }
 
     async newFile(dirUrl: string) {
-
-        // const list =fixReactive( [{
-        //     key: nanoid(),
-        //     label: 'BlankFile',
-        //     ext: '',
-        //     templateFileUrl: 'https://raw.githubusercontent.com/zhengxiaowai/blank-file/main/blank.txt',
-        // }, {
-        //     key: nanoid(),
-        //     label: 'SqliteDB',
-        //     ext: '.db',
-        //     templateFileUrl: 'https://raw.githubusercontent.com/zhengxiaowai/blank-file/main/blank.txt',
-        // }])
-
         const list = (await window.explorerApi.getFileTemplates()).map(template=>({
             key:nanoid(),
             label:template.name,
             ...template
         }))
 
-        console.log({list})
-
         const input = ref<{
-            template: {
-                key: string;
-                label: string;
-                ext: string;
-                url: string;
-            } | null
-            name: string;
+            template: typeof list ['0'] | null,name: string;
         }>({
-            template: null,
-            name: '',
+            template: null, name: ''
         })
 
         const ext = computed(() => {
@@ -309,7 +307,6 @@ export class ExplorerWrokspace {
         }
 
         const removeFile = () => {
-            alert('关闭窗口')
             this.sider.modal.remove(content.key)
         }
         this.sider.modal.push(content)

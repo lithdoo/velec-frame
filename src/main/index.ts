@@ -43,7 +43,7 @@ async function createWindow() {
   await EditorService.install()
   await SqliteService.install(mainWindow)
   await RunnerService.install()
-  await ExplorerService.install()
+  await ExplorerService.install(mainWindow)
   await JsonDataService.install()
   await RunnerExtService.install()
 
