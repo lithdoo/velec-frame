@@ -227,7 +227,7 @@ export class ExplorerWrokspace {
     dirContextMenu(ev: MouseEvent, dirUrl: string) {
         contextMenu.open(
             PopMenuBuilder.create()
-                .button('createFile', '新建文件', async () => {
+                .button('createFile', '从模板添加文件', async () => {
                     this.newFile(dirUrl)
                 })
                 .build(),
@@ -268,10 +268,10 @@ export class ExplorerWrokspace {
 
         const content: ModalContent = {
             key: nanoid(),
-            title: '新建文件',
+            title: '从模板添加文件',
             content: <div style="min-width: 240px;">
                 {/* {dirUrl.split('/').pop()}
-                <button onClick={() => this.newFile(dirUrl)}>新建文件</button> */}
+                <button onClick={() => this.newFile(dirUrl)}>从模板添加文件</button> */}
                 <VxSelector
                     options={list}
                     v-bind:modelValue={input.value.template}
