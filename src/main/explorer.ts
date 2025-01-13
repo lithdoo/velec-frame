@@ -75,13 +75,53 @@ export class ExplorerService {
             }
         })
 
-        ipcMain.handle('@explorer/json/write', async (_, fileUrl: string, content: any) => {
+        ipcMain.handle('@explorer/content/read', async (_, fileUrl: string) => {
+            if (!existsSync(new URL(fileUrl))) {
+                return null
+            }
+            try {
+                const content = fs.readFileSync(new URL(fileUrl)).toString()
+                return content
+            } catch (_e) {
+                return null
+            }
+        })
+
+        
+
+        ipcMain.handle('@explorer/file/stat', async (_, fileUrl: string) => {
+            if (!existsSync(new URL(fileUrl))) {
+                return null
+            }
+
+            const stat = fs.statSync(new URL(fileUrl))
+            if(stat.isDirectory()){
+                return null
+            }else{
+                return {
+                    size: stat.size,
+                    mtimeMs: stat.mtimeMs
+                }
+            }
+        })
+
+        ipcMain.handle('@explorer/json/write', async (_, fileUrl: string, content: string) => {
             console.log({
                 fileUrl, content
             })
             try {
                 const text = JSON.stringify(content)
                 fs.writeFileSync(new URL(fileUrl), text)
+            } catch (_e) {
+            }
+        })
+
+        ipcMain.handle('@explorer/content/write', async (_, fileUrl: string, content: string) => {
+            console.log({
+                fileUrl, content
+            })
+            try {
+                fs.writeFileSync(new URL(fileUrl), content)
             } catch (_e) {
             }
         })

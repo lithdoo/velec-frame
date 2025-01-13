@@ -14,7 +14,7 @@
             </template>
             <template v-else>
                 <div class="template-field-editor__name-text">
-                    [ {{ field.name }} ] :
+                    -- {{ field.name }} --
                 </div>
                 <div class="template-field-editor__btns  template-field-editor__btns--view">
                     <VxButton only-icon icon="edit" :click="beginEdit"></VxButton>
@@ -41,7 +41,7 @@
             </template>
 
             <template v-else>
-                <span class="template-field-editor__text-type">{{ type(props.field.value.type) }} : </span>
+                <span class="template-field-editor__text-type">[{{ type(props.field.value.type) }}] </span>
                 <span class="template-field-editor__text-value">{{ value }}</span>
             </template>
 
@@ -190,6 +190,7 @@ const current = computed(() => {
 
     .template-field-editor__name-text {
         flex: 1 1 auto;
+        font-weight: bolder;
     }
 
     .template-field-editor__name-edit {

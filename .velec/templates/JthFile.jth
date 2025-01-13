@@ -1,0 +1,22 @@
+{
+  "store": [],
+  "components": [
+    {
+      "keyName": "Component-Rq-eNfLu5WLHjooqRfUgL",
+      "rootId": "ZRf-KhuhOQNp72F9UcCbk"
+    }
+  ],
+  "template": {
+    "data": {
+      "ZRf-KhuhOQNp72F9UcCbk": {
+        "id": "ZRf-KhuhOQNp72F9UcCbk",
+        "type": "Root",
+        "isGroup": true
+      }
+    },
+    "children": {
+      "ZRf-KhuhOQNp72F9UcCbk": []
+    }
+  },
+  "render": []
+}

@@ -3,6 +3,7 @@ import { PageTextEditor } from "@renderer/tabs/TextEditor";
 import { Menu } from "@renderer/widgets/PopMenu";
 import { parseFileName } from "./FileOperation";
 import { PageDBChart } from "@renderer/tabs/DBChart";
+import { PageJthTemplate } from '@renderer/tabs/JsonToHtml';
 
 export const opCopyPath = (fileUrl: string) =>
     Menu.button({ key: 'copyPath', label: '复制路径', action: () => navigator.clipboard.writeText(fileUrl) })
@@ -19,6 +20,14 @@ export const opOpenDBChartTab = (fileUrl: string,) =>
     Menu.button({
         key: 'openEditorTab', label: '打开', action: async () => {
             const tab = await PageDBChart.create(fileUrl);
+            tabControl.addTab(tab)
+        }
+    })
+
+export const opOpenJthTemplateTab = (fileUrl: string) =>
+    Menu.button({
+        key: 'openJthTemplateTab', label: '打开', action: async () => {
+            const tab = await PageJthTemplate.create(fileUrl);
             tabControl.addTab(tab)
         }
     })

@@ -1,3 +1,4 @@
+import { FileControl } from "@renderer/mods/fileUtils"
 import { nanoid } from "nanoid"
 
 export enum JthTemplateType {
@@ -98,20 +99,13 @@ export class JthState {
         return new JthState(blankFile)
     }
 
-    static async fromFile(fileUrl: string) {
-        const file = await window.explorerApi.readJson(fileUrl)
-        return new JthState(file, fileUrl)
-    }
-
     constructor(
-        public file: JthFile,
-        public fileUrl?: string,
+        public file: JthFile
     ) { }
 
-    async reload() {
-        if (this.fileUrl) {
-            this.file = await window.explorerApi.readJson(this.fileUrl)
-        }
+    
+    reload(file: JthFile) {
+        this.file = file
     }
 }
 

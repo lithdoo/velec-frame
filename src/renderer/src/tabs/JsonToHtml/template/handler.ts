@@ -125,6 +125,50 @@ export class TemplateTreeHandler {
 
         this.reload()
     }
+
+    treeText(template: JthTemplate) {
+
+        const renderValue = (vg: ValueGenerator) => {
+            if (vg.type === 'static') {
+                return `[${vg.type}]: ${vg.json}`
+            }
+            if (vg.type === 'dynamic:getter') {
+                return `[${vg.type}]: ${vg.getter.join('.')}`
+            }
+            if (vg.type === 'dynamic:script') {
+                return `[${vg.type}]: ${vg.script}`
+            }
+            return ''
+        }
+
+        if (template.type === JthTemplateType.Element) {
+            return `<${template.tagName} />`
+        }
+
+        if (template.type === JthTemplateType.Text) {
+            return renderValue(template.text)
+        }
+
+        if(template.type === JthTemplateType.Apply){
+            return renderValue(template.component)
+        }
+
+        if(template.type === JthTemplateType.Cond){
+            return renderValue(template.test)
+        }
+
+        if(template.type === JthTemplateType.Loop){
+            return renderValue(template.loopValue)
+        }
+
+        if(template.type === JthTemplateType.Prop){
+            return template.data.map(v=>v.name).join(',')
+        }
+
+
+        return ''
+
+    }
 }
 
 

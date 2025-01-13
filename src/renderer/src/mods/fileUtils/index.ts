@@ -16,22 +16,25 @@ const asyncPromise = <T>(func: () => Promise<T>): Promise<T> => {
 export class FileControl {
 
 
-    static getFileStatus: (fileUrl: string) => Promise<FileStat | null> = async () => {
-        throw new Error('not install')
+    static getFileStatus: (fileUrl: string) => Promise<FileStat | null> = async (fileUrl:string) => {
+        return await window.explorerApi.fileStat(fileUrl)
+        // throw new Error('not install')
     }
 
-    static readFileContent: (fileUrl: string) => Promise<string> = () => {
-        throw new Error('not install')
+    static readFileContent: (fileUrl: string) => Promise<string> = async (fileUrl: string) => {
+        // throw new Error('not install')
+        return (await window.explorerApi.readContent(fileUrl) ?? '')
     }
 
 
-    static saveFileContent: (fileUrl: string, content: string)=> Promise<void> =()=>{
-        throw new Error('not install')
+    static saveFileContent: (fileUrl: string, content: string) => Promise<void> = async(fileUrl: string, content: string) => {
+        // throw new Error('not install')
+        return await window.explorerApi.saveContent(fileUrl,content)
     }
 
     constructor(
         public fileUrl: string,
-    ) {}
+    ) { }
 
     public async saveContent(content: string) {
         await FileControl.saveFileContent(this.fileUrl, content)
@@ -55,7 +58,7 @@ export class FileControl {
         loadStatus: FileLoadStatus
     }> | null = null
 
-    updateFileContent(): Promise<{
+    async loadFileContent(): Promise<{
         success: boolean,
         loadStatus: FileLoadStatus
     }> {
@@ -63,13 +66,14 @@ export class FileControl {
             return this.updatePromise
         }
 
-        return asyncPromise<{
+        return this.updatePromise = asyncPromise<{
             success: boolean,
             loadStatus: FileLoadStatus
         }>(async () => {
             const stat = await FileControl.getFileStatus(this.fileUrl)
             if (!stat) {
                 this.currentStat = null
+                this.updatePromise = null
                 return {
                     success: false,
                     loadStatus: FileLoadStatus.NotExist,
@@ -77,6 +81,7 @@ export class FileControl {
             }
             if (this.currentStat && this.currentStat.mtimeMs === stat.mtimeMs) {
                 this.currentStat = this.lastReadStat = this.currentStat
+                this.updatePromise = null
                 return {
                     success: true,
                     loadStatus: FileLoadStatus.Unchanged,
@@ -85,6 +90,7 @@ export class FileControl {
 
             if (stat.size > this.maxSize) {
                 this.currentStat = stat
+                this.updatePromise = null
                 return {
                     success: false,
                     loadStatus: FileLoadStatus.Oversize,
@@ -95,7 +101,7 @@ export class FileControl {
 
             this.content = content
             this.currentStat = this.lastReadStat = stat
-
+            this.updatePromise = null
             return {
                 success: true,
                 loadStatus: FileLoadStatus.Reloaded,
@@ -103,6 +109,12 @@ export class FileControl {
         })
 
     }
+
+    async saveFileContent(content: string) {
+        await FileControl.saveFileContent(this.fileUrl, content)
+        this.content = content
+    }
+
 }
 
 export class FileWatchControl extends FileControl {

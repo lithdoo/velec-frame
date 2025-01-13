@@ -1,5 +1,5 @@
 import { type MenuItem } from "@renderer/widgets/PopMenu";
-import { opCopyPath, opOpenDBChartTab, opOpenInEditor } from "./common";
+import { opCopyPath, opOpenDBChartTab, opOpenInEditor, opOpenJthTemplateTab } from "./common";
 
 
 export enum FileExtType {
@@ -7,8 +7,10 @@ export enum FileExtType {
     Typescript = 'ts',
     JavaScript = 'js',
     SqliteDB = 'db',
+    JthFile = 'jth',
     Unknown = 'unknown',
 }
+
 
 export const parseFileExt = (fileUrlOrName: string): FileExtType => {
     const fileName = decodeURIComponent(fileUrlOrName).split('/').pop() || '';
@@ -28,6 +30,9 @@ export const parseFileExt = (fileUrlOrName: string): FileExtType => {
     }
     if (ext === 'db') {
         return FileExtType.SqliteDB;
+    }
+    if (ext === 'jth') {
+        return FileExtType.JthFile;
     }
     return FileExtType.Unknown;
 }
@@ -88,4 +93,12 @@ fileHandler.regist(FileExtType.SqliteDB, {
         opOpenDBChartTab(fileUrl).action?.(new MouseEvent('click'))
     },
     operations: (fileUrl: string) => [opCopyPath(fileUrl), opOpenDBChartTab(fileUrl)]
+})
+
+
+fileHandler.regist(FileExtType.JthFile, {
+    onFileOpen: (fileUrl) => {
+        opOpenJthTemplateTab(fileUrl).action?.(new MouseEvent('click'))
+    },
+    operations: (fileUrl: string) => [opCopyPath(fileUrl), opOpenJthTemplateTab(fileUrl)]
 })

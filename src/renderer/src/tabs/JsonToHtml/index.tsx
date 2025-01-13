@@ -1,14 +1,16 @@
 import { TabPage } from "@renderer/parts/PageTab"
 import PageJthTemplateVue from "./PageJthTemplate.vue"
-import { JthState, JthStateModel } from "./JthState"
+import { JthFile, JthState, JthStateModel } from "./JthState"
 import { VNode } from "vue"
 import { fixReactive } from "@renderer/fix"
+import { FileControl } from "@renderer/mods/fileUtils"
 
 
 export class PageJthTemplate implements TabPage {
 
-    static create(title: string) {
-        const page = fixReactive(new PageJthTemplate(title))
+    static create(fileUrl: string) {
+        const page = fixReactive(new PageJthTemplate(fileUrl))
+        page.init()
         return page
     }
 
@@ -17,13 +19,39 @@ export class PageJthTemplate implements TabPage {
     icon = 'del'
     state = JthState.blank()
     model: JthStateModel
+    title: string
+    file: FileControl
 
     constructor(
-        public title: string,
+        public fileUrl: string,
+
     ) {
+        this.title = fileUrl
+        this.file = new FileControl(fileUrl)
         this.state = fixReactive(JthState.blank())
         this.model = fixReactive(new JthStateModel(this.state))
-        this.element = <PageJthTemplateVue model={this.model}></PageJthTemplateVue>
+        this.element = <div></div>
+    }
+
+
+    async init(){
+        this.element = <PageJthTemplateVue page={this}></PageJthTemplateVue>
+        await this.reload()
+    }
+
+
+    async save() {
+        const fileContent = JSON.stringify(this.state.file, null, 2)
+        await this.file.saveContent(fileContent)
+    }
+
+    async reload() {
+        const fileContent = await this.file.loadFileContent()
+        if (fileContent.success) {
+            const file: JthFile = fixReactive(JSON.parse(this.file.content))
+            console.log('fileContent',this.file.content,file)
+            this.state.reload(file)
+        }
     }
 }
 

@@ -3,7 +3,7 @@
         <div class="template-tree__tree">
             <FlatTree :handler="tree.flatTree">
                 <template #item="{ item }">
-                    <div>{{ item.templateData.type }} -- {{ item.templateData.id }}</div>
+                    <div>{{ item.templateData.type }} -- {{ tree.treeText(item.templateData)}}</div>
                 </template>
             </FlatTree>
         </div>
@@ -20,6 +20,8 @@ import TemplateDetail from "./TemplateDetail.vue";
 
 // const props = 
 defineProps<{ tree: TemplateTreeHandler }>()
+
+
 
 </script>
 

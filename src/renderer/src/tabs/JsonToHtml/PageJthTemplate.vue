@@ -24,18 +24,21 @@
 
 <script setup lang="ts">
 import { computed, ref, } from 'vue';
-import { JthStateModel, } from './JthState';
 import { ToolBarBuilder, ToolBar } from '@renderer/widgets/ToolBar';
 import { nanoid } from 'nanoid';
 import VxButton from '@renderer/components/VxButton/VxButton.vue';
 import { TemplateTreeHandler } from './template/handler';
 import TemplateTree from './template/TemplateTree.vue';
+import type { PageJthTemplate } from '.';
 
 const props = defineProps<{
-    model: JthStateModel
+    page: PageJthTemplate
 }>()
 
 const current = ref<string | null>(null)
+
+const model = computed(() => props.page.model)
+
 function focus(id: string) {
     if (current.value === id) current.value = null
     else current.value = id
@@ -44,14 +47,20 @@ function focus(id: string) {
 
 const toolbar = ToolBarBuilder.create()
     .button('addComponent', '添加组件', async () => {
-        await props.model.component.newComponent('Component-' + nanoid())
+        await model.value.component.newComponent('Component-' + nanoid())
+    })
+    .button('reload', '从文件中刷新', async () => {
+        await props.page.reload()
+    })
+    .button('save', '保存', async () => {
+        await props.page.save()
     })
     .build()
 
 
 const trees = computed(() => {
-    const components = props.model.component.allComponents()
-    return components.map(c => TemplateTreeHandler.all.get(c) ?? TemplateTreeHandler.create(props.model, c))
+    const components = model.value.component.allComponents()
+    return components.map(c => TemplateTreeHandler.all.get(c) ?? TemplateTreeHandler.create(model.value, c))
 })
 
 

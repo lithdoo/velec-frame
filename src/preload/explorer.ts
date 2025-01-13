@@ -1,4 +1,4 @@
-import { FileType } from "@common/file"
+import { FileStat, FileType } from "@common/file"
 import { ipcRenderer } from "electron"
 
 export const explorerApi = {
@@ -11,6 +11,10 @@ export const explorerApi = {
     selectDir: async () => {
         return ipcRenderer.invoke('@explorer/dir/select') as Promise<string | null>
     },
+
+    fileStat: async (fileUrl: string) => {
+        return ipcRenderer.invoke('@explorer/file/stat',fileUrl) as Promise<FileStat | null>
+    },
     readDir: async (filename: string) => {
         return await ipcRenderer.invoke('@explorer/dir/read', filename) as Promise<{
             name: string,
@@ -21,8 +25,11 @@ export const explorerApi = {
     readJson: async (filename: string) => {
         return await ipcRenderer.invoke('@explorer/json/read', filename) as Promise<any>
     },
-    saveJson: async (filename: string, json: any) => {
-        return await ipcRenderer.invoke('@explorer/json/write', filename, json) as Promise<void>
+    readContent: async (filename: string) => {
+        return await ipcRenderer.invoke('@explorer/content/read', filename) as Promise<string | null>
+    },
+    saveContent: async (filename: string, content: string) => {
+        return await ipcRenderer.invoke('@explorer/content/write', filename, content) as Promise<void>
     },
     getFileTemplates: async () => {
         return await ipcRenderer.invoke('@explorer/file/template/list') as Promise<{
