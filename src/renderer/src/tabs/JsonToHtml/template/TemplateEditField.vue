@@ -41,7 +41,7 @@
             </template>
 
             <template v-else>
-                <span class="template-field-editor__text-type">[{{ type(props.field.value.type) }}] </span>
+                <span class="template-field-editor__text-type">[{{ type(generator.type) }}] </span>
                 <span class="template-field-editor__text-value">{{ value }}</span>
             </template>
 
@@ -52,14 +52,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ValueField, ValueGenerator } from '../JthState';
+import { ValueField, ValueGenerator } from '../common';
 import { VxSelector, VxInput, VxButton } from '@renderer/components';
 import { FieldEditorHandler } from './handler';
 
 
 const props = defineProps<{
     field: ValueField,
-    editor: FieldEditorHandler
+    editor: FieldEditorHandler,
 }>()
 
 
@@ -75,11 +75,6 @@ const submitEdit = () => {
     props.editor.submitEdit()
 }
 
-const validate = () => {
-
-}
-
-
 const type = (type: ValueGenerator['type']) => {
     if (type === 'static') return 'static'
     if (type === 'dynamic:getter') return 'getter'
@@ -87,13 +82,20 @@ const type = (type: ValueGenerator['type']) => {
     return new Error('unknown type')
 }
 
+const generator = computed(() => {
+    const vg = props.editor.controller.getVG(props.field.value)
+    if (!vg) throw new Error('unknown type')
+    return vg
+})
+
 const value = computed(() => {
-    if (props.field.value.type === 'static') {
-        return props.field.value.json
-    } else if (props.field.value.type === 'dynamic:getter') {
-        return props.field.value.getter.join(',')
-    } else if (props.field.value.type === 'dynamic:script') {
-        return props.field.value.script
+    const vg = generator.value
+    if (vg.type === 'static') {
+        return vg.json
+    } else if (vg.type === 'dynamic:getter') {
+        return vg.getter.join(',')
+    } else if (vg.type === 'dynamic:script') {
+        return vg.script
     }
     throw new Error('unknown type')
 })
@@ -106,9 +108,9 @@ const options = computed(() => {
     return props.editor.options
 })
 
-const current = computed(() => {
-    return props.editor.currentValue
-})
+// const current = computed(() => {
+//     return props.editor.currentValue
+// })
 
 
 </script>
@@ -118,7 +120,7 @@ const current = computed(() => {
     &:hover {
         background-color: rgba(255, 255, 255, 0.1);
 
-        .template-field-editor__btns--view{
+        .template-field-editor__btns--view {
             width: auto;
         }
     }

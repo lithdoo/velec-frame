@@ -3,7 +3,7 @@ import { contextMenu } from "@renderer/parts/GlobalContextMenu"
 import { FlatTreeHandler, FlatTreeItem } from "@renderer/widgets/FlatTree"
 import { PopMenuBuilder } from "@renderer/widgets/PopMenu"
 import { nanoid } from "nanoid"
-import { JthComponent, JthTemplate, JthStateModel, JthTemplateElement, JthTemplateType, ValueGenerator, JthComponentHandler, ValueField, JthTemplateProp, JthTemplateApply, JthTemplateText, JthTemplateCond, JthTemplateLoop } from "../JthState"
+import { JthComponent, JthTemplate, JthStateController, JthTemplateElement, JthTemplateType, ValueGenerator, ValueField, JthTemplateProp, JthTemplateApply, JthTemplateText, JthTemplateCond, JthTemplateLoop, ValueGeneratorRef } from "../common"
 
 export class TemplateTreeHandler {
     static all = new WeakMap<JthComponent, TemplateTreeHandler>()
@@ -13,17 +13,17 @@ export class TemplateTreeHandler {
     showDetailTemplateId: string | null = null
 
     static create(
-        model: JthStateModel,
+        controller: JthStateController,
         component: JthComponent,
     ) {
-        const tree = new TemplateTreeHandler(model, component)
+        const tree = new TemplateTreeHandler(controller, component)
         const t = fixReactive(tree)
         t.init()
         TemplateTreeHandler.all.set(component, t)
         return t
     }
     constructor(
-        public model: JthStateModel,
+        public controller: JthStateController,
         public component: JthComponent,
     ) {
         this.reload()
@@ -45,22 +45,22 @@ export class TemplateTreeHandler {
             }
 
             const addChildrenAfterEach = () => {
-                this.model.component.insertTemplateNode(node, { parent: item.templateData.id })
+                this.controller.insertTemplateNode(node, { parent: item.templateData.id })
                 this.reload()
                 this.flatTree.open(item.id)
                 this.flatTree.select(node.id)
             }
             const addChildrenBeforeEach = () => {
-                const before = this.model.component.templateChildren(item.templateData.id)[0]
+                const before = this.controller.getTNodeChildren(item.templateData.id)[0]
                 if (!before) addChildrenAfterEach()
-                else this.model.component.insertTemplateNode(node, { before })
+                else this.controller.insertTemplateNode(node, { before })
                 this.reload()
                 this.flatTree.open(item.id)
                 this.flatTree.select(node.id)
             }
 
             const inserNodeBefore = () => {
-                this.model.component.insertTemplateNode(node, { before: item.id })
+                this.controller.insertTemplateNode(node, { before: item.id })
                 this.reload()
                 this.flatTree.open(item.id)
                 this.flatTree.select(node.id)
@@ -68,7 +68,7 @@ export class TemplateTreeHandler {
             }
 
             const insertNodeAfter = () => {
-                this.model.component.insertTemplateNode(node, { after: item.id })
+                this.controller.insertTemplateNode(node, { after: item.id })
                 this.reload()
                 this.flatTree.open(item.id)
                 this.flatTree.select(node.id)
@@ -95,7 +95,7 @@ export class TemplateTreeHandler {
     }
 
     reload() {
-        const tree = this.model.component
+        const tree = this.controller
             .getTemplateTreeByParentId(this.component.rootId)
             .map(item => ({
                 ...item,
@@ -108,12 +108,11 @@ export class TemplateTreeHandler {
         this.flatTree.data = tree
         this.flatTree.openKeys = this.flatTree.openKeys.filter(v => groupId.has(v))
         this.flatTree.selectedKeys = this.flatTree.selectedKeys.filter(v => itemId.has(v))
-        console.log('template', this.model.state.file.template)
     }
 
     addTemplateToRoot() {
         console.log('addTemplateToRoot')
-        this.model.component.insertTemplateNode({
+        this.controller.insertTemplateNode({
             id: nanoid(),
             type: JthTemplateType.Element,
             tagName: 'div',
@@ -128,7 +127,10 @@ export class TemplateTreeHandler {
 
     treeText(template: JthTemplate) {
 
-        const renderValue = (vg: ValueGenerator) => {
+        const renderValue = (vgf: ValueGeneratorRef) => {
+            const vg = this.controller.getVG(vgf)
+            if (!vg) return ''
+
             if (vg.type === 'static') {
                 return `[${vg.type}]: ${vg.json}`
             }
@@ -149,20 +151,20 @@ export class TemplateTreeHandler {
             return renderValue(template.text)
         }
 
-        if(template.type === JthTemplateType.Apply){
+        if (template.type === JthTemplateType.Apply) {
             return renderValue(template.component)
         }
 
-        if(template.type === JthTemplateType.Cond){
+        if (template.type === JthTemplateType.Cond) {
             return renderValue(template.test)
         }
 
-        if(template.type === JthTemplateType.Loop){
+        if (template.type === JthTemplateType.Loop) {
             return renderValue(template.loopValue)
         }
 
-        if(template.type === JthTemplateType.Prop){
-            return template.data.map(v=>v.name).join(',')
+        if (template.type === JthTemplateType.Prop) {
+            return template.data.map(v => v.name).join(',')
         }
 
 
@@ -177,8 +179,8 @@ export class TemplateDetailHandler<T extends JthTemplate> {
 
     static all = new WeakMap<JthTemplate, TemplateDetailHandler<JthTemplate>>()
 
-    static create(model: JthStateModel, templateId: string) {
-        const template = model.component.templateData(templateId)
+    static create(controller: JthStateController, templateId: string) {
+        const template = controller.getTNode(templateId)
 
         if (!template) {
             throw new Error('template not found')
@@ -191,25 +193,25 @@ export class TemplateDetailHandler<T extends JthTemplate> {
         if (handler) {
             return handler
         } else if (template.type === JthTemplateType.Element) {
-            return fixReactive(new TemplateDetailElementHandler(template, model))
+            return fixReactive(new TemplateDetailElementHandler(template, controller))
         } else if (template.type === JthTemplateType.Prop) {
-            return fixReactive(new TemplateDetailPropHandler(template, model))
+            return fixReactive(new TemplateDetailPropHandler(template, controller))
         } else if (template.type === JthTemplateType.Apply) {
-            return fixReactive(new TemplateDetailApplyHandler(template, model))
+            return fixReactive(new TemplateDetailApplyHandler(template, controller))
         } else if (template.type === JthTemplateType.Text) {
-            return fixReactive(new TemplateDetailTextHandler(template, model))
+            return fixReactive(new TemplateDetailTextHandler(template, controller))
         } else if (template.type === JthTemplateType.Cond) {
-            return fixReactive(new TemplateDetailCondHandler(template, model))
+            return fixReactive(new TemplateDetailCondHandler(template, controller))
         } else if (template.type === JthTemplateType.Loop) {
-            return fixReactive(new TemplateDetailLoopHandler(template, model))
+            return fixReactive(new TemplateDetailLoopHandler(template, controller))
         } else {
-            return fixReactive(new TemplateDetailHandler(template, model))
+            return fixReactive(new TemplateDetailHandler(template, controller))
         }
     }
 
     constructor(
         public target: T,
-        public model: JthStateModel
+        public controller: JthStateController
     ) { }
 
     isGroup() {
@@ -222,8 +224,16 @@ export class TemplateDetailHandler<T extends JthTemplate> {
 
     getChildren() {
         if (!this.isGroup()) return []
-        return this.model.component.templateChildren(this.target.id)
-            .map(id => this.model.component.templateData(id))
+        return this.controller.getTNodeChildren(this.target.id)
+            .map(id => this.controller.getTNode(id))
+    }
+
+    reload() {
+        const newone = this.controller.getTNode(this.target.id)
+        const currentType = this.target.type
+        console.log('newone', newone)
+        if (newone.type !== currentType) throw new Error('not same type')
+        this.target = newone as T
     }
 }
 
@@ -237,15 +247,15 @@ export class TemplateDetailElementHandler extends TemplateDetailHandler<JthTempl
         return this.target.attrs
     }
 
-    addField() {
+    addAttr() {
         const target = this.target
         const attrs = target.attrs
         const newAttrs: ValueField[] = [{
             name: 'field',
-            value: JthComponentHandler.staticValue('null')
+            value: JthStateController.staticValueRef('null')
         }].concat(attrs)
 
-        this.model.component.templateData(this.target.id, {
+        this.controller.updateTNode({
             ...this.target,
             attrs: newAttrs
         })
@@ -253,13 +263,24 @@ export class TemplateDetailElementHandler extends TemplateDetailHandler<JthTempl
         this.reload()
     }
 
-
-    reload() {
-        const newone = this.model.component.templateData(this.target.id)
-        console.log('newone', newone)
-        if (newone.type !== JthTemplateType.Element) throw new Error('not element')
-        this.target = newone
+    updateAttr(old: ValueField, newone: ValueField) {
+        const hasAttr = this.target.attrs.findIndex(attr => attr === old) >= 0
+        if (!hasAttr) throw new Error('no such attr')
+        this.controller.updateTNode({
+            ...this.target,
+            attrs: this.target.attrs.map(attr => attr === old ? newone : attr)
+        })
     }
+
+    changeTagName(newName: string) {
+        this.controller.updateTNode({
+            ...this.target,
+            tagName: newName
+        })
+        this.reload()
+    }
+
+
 
 }
 
@@ -277,10 +298,10 @@ export class TemplateDetailApplyHandler extends TemplateDetailHandler<JthTemplat
         const data = target.data
         const newAttrs: ValueField[] = [{
             name: 'field',
-            value: JthComponentHandler.staticValue('null')
+            value: JthStateController.staticValueRef('null')
         }].concat(data)
 
-        this.model.component.templateData(this.target.id, {
+        this.controller.updateTNode({
             ...this.target,
             data: newAttrs
         })
@@ -288,17 +309,26 @@ export class TemplateDetailApplyHandler extends TemplateDetailHandler<JthTemplat
         this.reload()
     }
 
-    setComponent(t: ValueGenerator) {
-        this.target.component = t
+    updateAttr(old: ValueField, newone: ValueField) {
+        const hasAttr = this.target.data.findIndex(attr => attr === old) >= 0
+        if (!hasAttr) throw new Error('no such attr')
+        this.controller.updateTNode({
+            ...this.target,
+            data: this.target.data.map(attr => attr === old ? newone : attr)
+        })
+        this.reload()
     }
 
 
-    reload() {
-        const newone = this.model.component.templateData(this.target.id)
-        console.log('newone', newone)
-        if (newone.type !== JthTemplateType.Apply) throw new Error('not prop')
-        this.target = newone
+
+    setComponent(t: ValueGeneratorRef) {
+        this.controller.updateTNode<JthTemplateApply>({
+            ...this.target,
+            component: t
+        })
+        this.reload()
     }
+
 
 }
 
@@ -314,10 +344,10 @@ export class TemplateDetailPropHandler extends TemplateDetailHandler<JthTemplate
         const data = target.data
         const newAttrs: ValueField[] = [{
             name: 'field',
-            value: JthComponentHandler.staticValue('null')
+            value: JthStateController.staticValueRef('null')
         }].concat(data)
 
-        this.model.component.templateData(this.target.id, {
+        this.controller.updateTNode<JthTemplateProp>({
             ...this.target,
             data: newAttrs
         })
@@ -325,28 +355,30 @@ export class TemplateDetailPropHandler extends TemplateDetailHandler<JthTemplate
         this.reload()
     }
 
-
-    reload() {
-        const newone = this.model.component.templateData(this.target.id)
-        console.log('newone', newone)
-        if (newone.type !== JthTemplateType.Prop) throw new Error('not prop')
-        this.target = newone
+    updateAttr(old: ValueField, newone: ValueField) {
+        const hasAttr = this.target.data.findIndex(attr => attr === old) >= 0
+        if (!hasAttr) throw new Error('no such attr')
+        this.controller.updateTNode({
+            ...this.target,
+            data: this.target.data.map(attr => attr === old ? newone : attr)
+        })
+        this.reload()
     }
+
 
 }
 
 
 export class TemplateDetailTextHandler extends TemplateDetailHandler<JthTemplateText> {
 
-    setText(t: ValueGenerator) {
-        this.target.text = t
+    setText(t: ValueGeneratorRef) {
+        this.controller.updateTNode<JthTemplateText>({
+            ...this.target,
+            text: t
+        })
+        this.reload()
     }
 
-    reload() {
-        const newone = this.model.component.templateData(this.target.id)
-        if (newone.type !== JthTemplateType.Text) throw new Error('not prop')
-        this.target = newone
-    }
 
 }
 
@@ -354,46 +386,44 @@ export class TemplateDetailTextHandler extends TemplateDetailHandler<JthTemplate
 
 export class TemplateDetailCondHandler extends TemplateDetailHandler<JthTemplateCond> {
 
-    setTest(t: ValueGenerator) {
-        this.target.test = t
-    }
-
-    reload() {
-        const newone = this.model.component.templateData(this.target.id)
-        if (newone.type !== JthTemplateType.Cond) throw new Error('not prop')
-        this.target = newone
+    setTest(t: ValueGeneratorRef) {
+        this.controller.updateTNode<JthTemplateCond>({
+            ...this.target,
+            test: t
+        })
+        this.reload()
     }
 
 }
 
 export class TemplateDetailLoopHandler extends TemplateDetailHandler<JthTemplateLoop> {
 
-    setLoopValue(t: ValueGenerator) {
-        this.target.loopValue = t
-    }
-
-    reload() {
-        const newone = this.model.component.templateData(this.target.id)
-        if (newone.type !== JthTemplateType.Loop) throw new Error('not prop')
-        this.target = newone
+    setLoopValue(t: ValueGeneratorRef) {
+        this.controller.updateTNode<JthTemplateLoop>({
+            ...this.target,
+            loopValue: t
+        })
+        this.reload()
     }
 
 }
 
 
 
-
-export abstract class BaseEditorHandler<T> {
+export class ValueEditorHandler {
     options: { key: ValueGenerator['type'], label: string, target: ValueGenerator }[] = []
     currentValue: { key: ValueGenerator['type'], label: string, target: ValueGenerator } | null = null
+    target: ValueGeneratorRef | null = null
+    constructor(
+        public controller: JthStateController,
+        protected onChangeField: (oldone: ValueGeneratorRef, newone: ValueGeneratorRef) => void
+    ) { }
 
-    target: T | null = null
-
-
-    beginEdit(t: T) {
-        this.target = t
-        const old = this.getVG(t)
-
+    beginEdit(filed: ValueGeneratorRef) {
+        this.target = filed
+        const old: ValueGenerator = JSON.parse(JSON.stringify(
+            this.controller.getVG(filed)
+        ))
 
         this.options = [
             {
@@ -416,59 +446,43 @@ export abstract class BaseEditorHandler<T> {
             },
         ]
 
-
         this.currentValue = this.options.find(o => o.key === old.type) ?? null
-
     }
+
 
     submitEdit() {
         if (!this.target) return
         if (!this.currentValue) return
-        this.setVG(this.currentValue.target)
-        this.cancelEdit()
+
+        const newone: ValueGeneratorRef = this.controller.newVG(this.currentValue.target)
+
+        this.onChangeField(this.target, newone)
     }
 
     cancelEdit() {
         this.target = null
     }
-
-
-    abstract getVG(t: T): ValueGenerator
-    abstract setVG(t: ValueGenerator): void
-
 }
 
+export class FieldEditorHandler {
 
-export abstract class ValueEditorHandler extends BaseEditorHandler<ValueGenerator> {
-
-    getVG(t: ValueGenerator): ValueGenerator {
-        return JSON.parse(JSON.stringify(t))
-    }
-
-    setVG(t: ValueGenerator) {
-        return this.onSubmit(t)
-    }
-
-    abstract onSubmit(t: ValueGenerator): void
-}
-
-export class FieldEditorHandler extends BaseEditorHandler<ValueField> {
+    options: { key: ValueGenerator['type'], label: string, target: ValueGenerator }[] = []
+    currentValue: { key: ValueGenerator['type'], label: string, target: ValueGenerator } | null = null
     currentName: string = ''
+
     target: ValueField | null = null
 
-    getVG(t: ValueField): ValueGenerator {
-        const old: ValueGenerator = JSON.parse(JSON.stringify(t.value))
-        return old
-    }
 
-    setVG(vg: ValueGenerator) {
-        if (!this.target) return
-        this.target.value = vg
-    }
+    constructor(
+        public controller: JthStateController,
+        protected onChangeField: (oldone: ValueField, newone: ValueField) => void
+    ) { }
 
     beginEdit(filed: ValueField) {
         this.target = filed
-        const old: ValueGenerator = JSON.parse(JSON.stringify(filed.value))
+        const old: ValueGenerator = JSON.parse(JSON.stringify(
+            this.controller.getVG(filed.value)
+        ))
 
         this.options = [
             {
@@ -499,7 +513,16 @@ export class FieldEditorHandler extends BaseEditorHandler<ValueField> {
         if (!this.target) return
         if (!this.currentName) return
         if (!this.currentValue) return
-        this.target.name = this.currentName
-        super.submitEdit()
+
+        const newone: ValueField = {
+            name: this.currentName,
+            value: this.controller.newVG(this.currentValue.target)
+        }
+
+        this.onChangeField(this.target, newone)
+    }
+
+    cancelEdit() {
+        this.target = null
     }
 }

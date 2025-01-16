@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { TemplateDetailHandler, TemplateTreeHandler } from './handler';
-import { JthStateModel, JthTemplateType } from '../JthState';
+import { JthStateController, JthTemplateType } from '../common';
 import TemplateDetailElement from './TemplateDetailElement.vue'
 import TemplateDetailProp from './TemplateDetailProp.vue'
 import TemplateDetailApply from './TemplateDetailApply.vue'
@@ -36,7 +36,7 @@ import TemplateDetailCond from './TemplateDetailCond.vue'
 import TemplateDetailLoop from './TemplateDetailLoop.vue'
 import TemplateDetailCommon from './TemplateDetailCommon.vue'
 
-const props = defineProps<{ templateId: string, model: JthStateModel, tree: TemplateTreeHandler }>()
+const props = defineProps<{ templateId: string, model: JthStateController, tree: TemplateTreeHandler }>()
 
 const detail = computed(() => {
     return TemplateDetailHandler.create(props.model, props.templateId)

@@ -37,7 +37,7 @@ const props = defineProps<{
 
 const current = ref<string | null>(null)
 
-const model = computed(() => props.page.model)
+const controller = computed(() => props.page.controller)
 
 function focus(id: string) {
     if (current.value === id) current.value = null
@@ -47,7 +47,7 @@ function focus(id: string) {
 
 const toolbar = ToolBarBuilder.create()
     .button('addComponent', '添加组件', async () => {
-        await model.value.component.newComponent('Component-' + nanoid())
+        await controller.value.newComponent('Component-' + nanoid())
     })
     .button('reload', '从文件中刷新', async () => {
         await props.page.reload()
@@ -59,8 +59,8 @@ const toolbar = ToolBarBuilder.create()
 
 
 const trees = computed(() => {
-    const components = model.value.component.allComponents()
-    return components.map(c => TemplateTreeHandler.all.get(c) ?? TemplateTreeHandler.create(model.value, c))
+    const components = controller.value.allComponents()
+    return components.map(c => TemplateTreeHandler.all.get(c) ?? TemplateTreeHandler.create(controller.value, c))
 })
 
 

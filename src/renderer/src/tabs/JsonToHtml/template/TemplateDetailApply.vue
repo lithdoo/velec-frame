@@ -8,7 +8,8 @@
             <VxButton only-icon icon="plus" :click="addField" />
         </div>
         <div class="template-element-apply__attr" v-for="field in detail.data()">
-            <TemplateEditField :field="field" :editor="fieldEditor"></TemplateEditField>
+            <TemplateEditField :field="field" :editor="fieldEditor">
+            </TemplateEditField>
         </div>
     </div>
 
@@ -20,17 +21,24 @@ import { FieldEditorHandler, ValueEditorHandler, type TemplateDetailApplyHandler
 import TemplateEditValue from './TemplateEditValue.vue';
 import TemplateEditField from './TemplateEditField.vue';
 import { VxButton } from '@renderer/components'
-import { ValueGenerator } from '../JthState';
 
 const props = defineProps<{ detail: TemplateDetailApplyHandler }>()
 
-const fieldEditor = fixReactive(new FieldEditorHandler())
-
-const compoentEditor = fixReactive(new class extends ValueEditorHandler {
-    onSubmit(t: ValueGenerator): void {
-        props.detail.setComponent(t)
+const fieldEditor = fixReactive(new FieldEditorHandler(
+    props.detail.controller,
+    (oldone, newone) => {
+        if (oldone === newone) return
+        props.detail.updateAttr(oldone, newone)
     }
-})
+))
+
+const compoentEditor = fixReactive(new ValueEditorHandler(
+    props.detail.controller,
+    (oldone, newone) => {
+        if (oldone === newone) return
+        props.detail.setComponent(newone)
+    }
+))
 
 const addField = () => {
     props.detail.addField()

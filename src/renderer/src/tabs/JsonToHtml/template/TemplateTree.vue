@@ -8,7 +8,7 @@
             </FlatTree>
         </div>
         <div class="template-tree__detail" v-if="tree.showDetailTemplateId">
-            <TemplateDetail :model="tree.model" :template-id="tree.showDetailTemplateId" :tree="tree"></TemplateDetail>
+            <TemplateDetail :model="tree.controller" :template-id="tree.showDetailTemplateId" :tree="tree"></TemplateDetail>
         </div>
     </div>
 </template>

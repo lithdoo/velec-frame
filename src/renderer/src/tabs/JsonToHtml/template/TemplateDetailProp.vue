@@ -20,7 +20,13 @@ const props = defineProps<{
     detail: TemplateDetailPropHandler
 }>()
 
-const fieldEditor = fixReactive(new FieldEditorHandler())
+const fieldEditor = fixReactive(new FieldEditorHandler(
+    props.detail.controller,
+    (oldone, newone) => {
+        if (oldone === newone) return
+        props.detail.updateAttr(oldone,newone)
+    }
+))
 
 const addField = () => {
     props.detail.addField()

@@ -1,6 +1,6 @@
 import { TabPage } from "@renderer/parts/PageTab"
 import PageJthTemplateVue from "./PageJthTemplate.vue"
-import { JthFile, JthState, JthStateModel } from "./JthState"
+import { JthFile, JthState, JthStateController } from "./common"
 import { VNode } from "vue"
 import { fixReactive } from "@renderer/fix"
 import { FileControl } from "@renderer/mods/fileUtils"
@@ -18,7 +18,7 @@ export class PageJthTemplate implements TabPage {
     element: VNode
     icon = 'del'
     state = JthState.blank()
-    model: JthStateModel
+    controller: JthStateController
     title: string
     file: FileControl
 
@@ -29,19 +29,19 @@ export class PageJthTemplate implements TabPage {
         this.title = fileUrl
         this.file = new FileControl(fileUrl)
         this.state = fixReactive(JthState.blank())
-        this.model = fixReactive(new JthStateModel(this.state))
+        this.controller = fixReactive(new JthStateController(this.state))
         this.element = <div></div>
     }
 
 
-    async init(){
+    async init() {
         this.element = <PageJthTemplateVue page={this}></PageJthTemplateVue>
         await this.reload()
     }
 
 
     async save() {
-        const fileContent = JSON.stringify(this.state.file, null, 2)
+        const fileContent = JSON.stringify(this.state.fileContent())
         await this.file.saveContent(fileContent)
     }
 

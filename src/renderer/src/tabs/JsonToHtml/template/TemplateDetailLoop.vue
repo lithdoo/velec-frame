@@ -12,17 +12,16 @@
 import { fixReactive } from '@renderer/fix';
 import { TemplateDetailLoopHandler, ValueEditorHandler } from './handler';
 import TemplateEditValue from './TemplateEditValue.vue';
-import { ValueGenerator } from '../JthState';
 
 const props = defineProps<{
     detail: TemplateDetailLoopHandler
 }>()
 
-const textEditor = fixReactive(new class extends ValueEditorHandler {
-    onSubmit(t: ValueGenerator): void {
-        props.detail.setLoopValue(t)
-    }
-})
+const textEditor = fixReactive(new ValueEditorHandler(
+    props.detail.controller,
+    (newone)=> props.detail.setLoopValue(newone)
+))
+
 
 </script>
 

@@ -31,7 +31,7 @@
             </template>
 
             <template v-else>
-                <span class="template-field-editor__text-type">{{ type(props.value.type) }} : </span>
+                <span class="template-field-editor__text-type">{{ type(generator.type) }} : </span>
                 <span class="template-field-editor__text-value">{{ value }}</span>
 
                 <div class="template-field-editor__btns  template-field-editor__btns--view">
@@ -46,13 +46,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ValueGenerator } from '../JthState';
+import { ValueGeneratorRef ,ValueGenerator} from '../common';
 import { VxSelector, VxInput, VxButton } from '@renderer/components';
 import { ValueEditorHandler } from './handler';
 
 
 const props = defineProps<{
-    value: ValueGenerator,
+    value: ValueGeneratorRef,
     editor: ValueEditorHandler
 }>()
 
@@ -69,9 +69,9 @@ const submitEdit = () => {
     props.editor.submitEdit()
 }
 
-const validate = () => {
+// const validate = () => {
 
-}
+// }
 
 
 const type = (type: ValueGenerator['type']) => {
@@ -81,13 +81,20 @@ const type = (type: ValueGenerator['type']) => {
     return new Error('unknown type')
 }
 
+const generator = computed(() => {
+    const vg = props.editor.controller.getVG(props.value)
+    if (!vg) throw new Error('unknown type')
+    return vg
+})
+
 const value = computed(() => {
-    if (props.value.type === 'static') {
-        return props.value.json
-    } else if (props.value.type === 'dynamic:getter') {
-        return props.value.getter.join(',')
-    } else if (props.value.type === 'dynamic:script') {
-        return props.value.script
+    const vg = generator.value
+    if (vg.type === 'static') {
+        return vg.json
+    } else if (vg.type === 'dynamic:getter') {
+        return vg.getter.join(',')
+    } else if (vg.type === 'dynamic:script') {
+        return vg.script
     }
     throw new Error('unknown type')
 })
@@ -100,9 +107,9 @@ const options = computed(() => {
     return props.editor.options
 })
 
-const current = computed(() => {
-    return props.editor.currentValue
-})
+// const current = computed(() => {
+//     return props.editor.currentValue
+// })
 
 
 </script>

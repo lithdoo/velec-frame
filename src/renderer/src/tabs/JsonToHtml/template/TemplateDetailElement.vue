@@ -6,7 +6,7 @@
 
         <div class="template-element-detail__tag">
             <template v-if="currentEditTag === null">
-                <{{ detail.tagName() }} />
+                {{ detail.tagName() }} 
             </template>
             <template v-else>
                 <VxInput v-model="currentEditTag">
@@ -41,10 +41,16 @@ const props = defineProps<{
     detail: TemplateDetailElementHandler
 }>()
 
-const fieldEditor = fixReactive(new FieldEditorHandler())
+const fieldEditor = fixReactive(new FieldEditorHandler(
+    props.detail.controller,
+    (oldone,newone)=>{
+        if(oldone === newone) return
+        props.detail.updateAttr(oldone,newone)
+    }
+))
 
 const addField = () => {
-    props.detail.addField()
+    props.detail.addAttr()
     fieldEditor.beginEdit(props.detail.attrs()[0])
 }
 
@@ -63,7 +69,7 @@ const submitEdit = () => {
     if ((!currentEditTag.value) || (!currentEditTag.value.trim())) {
         return
     }
-    props.detail.target.tagName = currentEditTag.value
+    props.detail.changeTagName(currentEditTag.value)
     cancelEdit()
 }
 
