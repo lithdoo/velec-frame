@@ -1,4 +1,4 @@
-import { MutDomRender, MutValueHandler } from "./dom"
+import { MutDomRender, MutValueHandler } from './dom'
 
 export class MBaseValue<T> {
   private val: T
@@ -19,7 +19,7 @@ export class MBaseValue<T> {
 
   setValue(t: T) {
     this.val = t
-    Array.from(this.onchangeCall.values()).map(v => v(this.val))
+    Array.from(this.onchangeCall.values()).map((v) => v(this.val))
   }
 
   getValue() {
@@ -41,7 +41,7 @@ export class MBaseWacher<T> extends MBaseValue<T> {
   constructor(fn: () => T, list: MBaseValue<any>[]) {
     super(fn())
     this.fn = fn
-    this.cancel = list.map(v => {
+    this.cancel = list.map((v) => {
       const key = v.addListener(() => {
         this.update()
       })
@@ -54,9 +54,8 @@ export class MBaseWacher<T> extends MBaseValue<T> {
   }
 
   dispose() {
-    this.cancel.forEach(v => v())
+    this.cancel.forEach((v) => v())
   }
-
 }
 
 export class MBaseHandler implements MutValueHandler {
@@ -73,7 +72,9 @@ export class MBaseHandler implements MutValueHandler {
 
   onValueChange<T>(value: MBaseValue<T>, onchange: () => void, callOnInit?: boolean) {
     const key = value.addListener(onchange)
-    if (callOnInit) { onchange() }
+    if (callOnInit) {
+      onchange()
+    }
     return () => value.removeListener(key)
   }
 }
@@ -82,12 +83,10 @@ export type MayBeMBase<T> = MBaseValue<T> | T
 
 type MayBeMBaseWatch<T> = MBaseWacher<T> | T
 
-
 export abstract class MBaseRenderFragment {
   abstract readonly nodes: MBaseValue<Node[]>
   abstract dispose(): void
 }
-
 
 export abstract class MBaseRenderNode extends MBaseRenderFragment {
   abstract readonly node: Node
@@ -98,9 +97,8 @@ export abstract class MBaseRenderNode extends MBaseRenderFragment {
   }
 }
 
-
 type MBaseRenderInput = {
-  text: MBaseValue<string>,
+  text: MBaseValue<string>
   className: MBaseValue<string | string[]>
   style: MBaseValue<Partial<CSSStyleDeclaration>>
   attrStyle: MBaseValue<{ [key: string]: string | CSSStyleValue }>
@@ -117,31 +115,35 @@ export class MBaseElementRenderNode<T extends HTMLElement> extends MBaseRenderNo
   node: T
   // created?: (node: T) => void
 
-  constructor(render: MBaseDomRender, option: {
-    node: T,
-    className: MayBeMBaseWatch<string | string[]>,
-    style: MayBeMBaseWatch<Partial<CSSStyleDeclaration>>,
-    attrStyle: MayBeMBaseWatch<{ [key: string]: string | CSSStyleValue }>
-  }) {
+  constructor(
+    render: MBaseDomRender,
+    option: {
+      node: T
+      className: MayBeMBaseWatch<string | string[]>
+      style: MayBeMBaseWatch<Partial<CSSStyleDeclaration>>
+      attrStyle: MayBeMBaseWatch<{ [key: string]: string | CSSStyleValue }>
+    }
+  ) {
     super()
-    const {
-      className, style, attrStyle, node
-    } = option
+    const { className, style, attrStyle, node } = option
 
     this.render = render
     this.node = this.render.htmlElement(node, {
-      className, style, attrStyle
+      className,
+      style,
+      attrStyle
     })
 
-    this.watchers = [className, style, attrStyle].filter(v => v instanceof MBaseWacher) as MBaseWacher<unknown>[]
+    this.watchers = [className, style, attrStyle].filter(
+      (v) => v instanceof MBaseWacher
+    ) as MBaseWacher<unknown>[]
   }
 
   dispose() {
-    this.watchers.forEach(v => v.dispose())
+    this.watchers.forEach((v) => v.dispose())
     this.render.disposeNode(this.node)
   }
 }
-
 
 export class MBaseParentRenderNode<T extends HTMLElement> extends MBaseRenderNode {
   render: MBaseDomRender
@@ -149,14 +151,15 @@ export class MBaseParentRenderNode<T extends HTMLElement> extends MBaseRenderNod
   // children: MBaseWacher<Node[]>
   children: MBaseGroupFragment
 
-  constructor(render: MBaseDomRender, option: {
-    target: MBaseElementRenderNode<T>,
-    children: MBaseGroupFragment
-  }) {
+  constructor(
+    render: MBaseDomRender,
+    option: {
+      target: MBaseElementRenderNode<T>
+      children: MBaseGroupFragment
+    }
+  ) {
     super()
-    const {
-      target, children
-    } = option
+    const { target, children } = option
 
     this.target = target
     this.render = render
@@ -173,9 +176,7 @@ export class MBaseParentRenderNode<T extends HTMLElement> extends MBaseRenderNod
     this.children.dispose()
     this.render.disposeNode(this.target.node)
   }
-
 }
-
 
 export class MBaseTextRenderNode extends MBaseRenderNode {
   render: MBaseDomRender
@@ -190,11 +191,10 @@ export class MBaseTextRenderNode extends MBaseRenderNode {
   }
 
   dispose() {
-    this.watchers.forEach(v => v.dispose())
+    this.watchers.forEach((v) => v.dispose())
     this.render.disposeNode(this.node)
   }
 }
-
 
 export class MBaseGroupFragment implements MBaseRenderFragment {
   fragments: MBaseRenderFragment[]
@@ -203,14 +203,14 @@ export class MBaseGroupFragment implements MBaseRenderFragment {
   constructor(fragments: MBaseRenderFragment[]) {
     this.fragments = fragments
     this.nodes = new MBaseWacher(
-      () => this.fragments.flatMap(v => v.nodes.getValue()),
-      this.fragments.map(v => v.nodes)
+      () => this.fragments.flatMap((v) => v.nodes.getValue()),
+      this.fragments.map((v) => v.nodes)
     )
   }
 
   dispose(): void {
     this.nodes.dispose()
-    this.fragments.forEach(v => v.dispose())
+    this.fragments.forEach((v) => v.dispose())
   }
 }
 
@@ -228,9 +228,10 @@ export class MBaseCondRenderNode implements MBaseRenderFragment {
     this.genrate = genrate
     this.nodes = new MBaseValue<Node[]>([])
     this.update()
-    this.cond.addListener(() => { this.update() })
+    this.cond.addListener(() => {
+      this.update()
+    })
   }
-
 
   private update() {
     const val = this.cond.getValue()
@@ -253,7 +254,8 @@ export class MBaseCondRenderNode implements MBaseRenderFragment {
       }
 
       this.current = {
-        fragment, cancelWatch
+        fragment,
+        cancelWatch
       }
     }
 
@@ -269,20 +271,22 @@ export class MBaseCondRenderNode implements MBaseRenderFragment {
   }
 }
 
-
 export class MBaseLoopRenderNode<T> implements MBaseRenderFragment {
   readonly nodes: MBaseValue<Node[]>
   readonly genrateFragment: (item: T, idx: number) => MBaseRenderFragment
   readonly genrateKey: (item: T, idx: number) => string
   readonly list: MBaseWacher<T[]>
-  currentMap: Map<string, {
-    key: string,
-    item: T
-    fragment: MBaseRenderFragment
-    cancelWatch: () => void
-  }> = new Map()
+  currentMap: Map<
+    string,
+    {
+      key: string
+      item: T
+      fragment: MBaseRenderFragment
+      cancelWatch: () => void
+    }
+  > = new Map()
   currentList: {
-    key: string,
+    key: string
     item: T
     fragment: MBaseRenderFragment
     cancelWatch: () => void
@@ -291,20 +295,21 @@ export class MBaseLoopRenderNode<T> implements MBaseRenderFragment {
   constructor(
     list: MBaseWacher<T[]>,
     genrateFragment: (item: T, idx: number) => MBaseRenderFragment,
-    genrateKey: (item: T, idx: number) => string) {
+    genrateKey: (item: T, idx: number) => string
+  ) {
     this.list = list
     this.genrateFragment = genrateFragment
     this.genrateKey = genrateKey
     this.nodes = new MBaseValue<Node[]>([])
-    this.list.addListener(() => { this.update() })
+    this.list.addListener(() => {
+      this.update()
+    })
     this.update()
   }
-
 
   private update() {
     const currentKeySet = new Set()
     const withKey = this.list.getValue().map((item, idx) => {
-
       let key = this.genrateKey(item, idx)
       if (currentKeySet.has(key)) {
         console.warn(`MBaseLoopRenderNode: loop key named "${key}" has been used!!!`)
@@ -335,17 +340,22 @@ export class MBaseLoopRenderNode<T> implements MBaseRenderFragment {
       }
     })
 
-    this.currentList.forEach(v => {
+    this.currentList.forEach((v) => {
       if (!currentKeySet.has(v.key)) v.cancelWatch()
     })
 
     this.currentList = withFragment
-    this.currentMap = this.currentList.reduce<Map<string, {
-      key: string,
-      item: T
-      fragment: MBaseRenderFragment
-      cancelWatch: () => void
-    }>>((res, val) => {
+    this.currentMap = this.currentList.reduce<
+      Map<
+        string,
+        {
+          key: string
+          item: T
+          fragment: MBaseRenderFragment
+          cancelWatch: () => void
+        }
+      >
+    >((res, val) => {
       res.set(val.key, val)
       return res
     }, new Map())
@@ -354,12 +364,11 @@ export class MBaseLoopRenderNode<T> implements MBaseRenderFragment {
   }
 
   private refresh() {
-    const nodes = this.currentList.flatMap(v => v.fragment.nodes.getValue())
+    const nodes = this.currentList.flatMap((v) => v.fragment.nodes.getValue())
     this.nodes.setValue(nodes)
   }
   dispose() {
-    this.currentList.forEach(v => v.cancelWatch())
+    this.currentList.forEach((v) => v.cancelWatch())
     this.list.dispose()
   }
 }
-

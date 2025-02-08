@@ -1,77 +1,72 @@
-
-
 export type ValueGeneratorRef = {
-    ['_VALUE_GENERATOR_REFERENCE_']: string
+  ['_VALUE_GENERATOR_REFERENCE_']: string
 }
-
 
 export enum JthTemplateType {
-    Apply = "Apply",
-    Element = "Element",
-    Text = "Text",
-    Cond = 'Cond',
-    Loop = 'Loop',
-    Prop = 'Prop',
-    Root = 'Root',
+  Apply = 'Apply',
+  Element = 'Element',
+  Text = 'Text',
+  Cond = 'Cond',
+  Loop = 'Loop',
+  Prop = 'Prop',
+  Root = 'Root'
 }
 
-export type JthTemplateBase<
-    T extends JthTemplateType
-> = {
-    readonly id: string,
-    type: T,
-    isGroup: boolean,
+export type JthTemplateBase<T extends JthTemplateType> = {
+  readonly id: string
+  type: T
+  isGroup: boolean
 }
 
 export type JthTemplateGroup<T extends JthTemplateType> = JthTemplateBase<T> & {
-    type: T,
-    isGroup: true,
+  type: T
+  isGroup: true
 }
 
 export type ValueField = {
-    name: string, value: ValueGeneratorRef
+  name: string
+  value: ValueGeneratorRef
 }
 
 export type JthTemplateElement = JthTemplateGroup<JthTemplateType.Element> & {
-    tagName: string,
-    attrs: ValueField[]
+  tagName: string
+  attrs: ValueField[]
 }
-
 
 export type JthTemplateRoot = JthTemplateGroup<JthTemplateType.Root> & {
-    props: string[]
+  props: string[]
 }
 
-
 export type JthTemplateText = JthTemplateBase<JthTemplateType.Text> & {
-    text: ValueGeneratorRef,
-    isGroup: false,
+  text: ValueGeneratorRef
+  isGroup: false
 }
 
 export type JthTemplateCond = JthTemplateGroup<JthTemplateType.Cond> & {
-    test: ValueGeneratorRef,
+  test: ValueGeneratorRef
 }
 
 export type JthTemplateApply = JthTemplateBase<JthTemplateType.Apply> & {
-    component: ValueGeneratorRef,
-    isGroup: false,
-    data: ValueField[]
+  component: ValueGeneratorRef
+  isGroup: false
+  data: ValueField[]
 }
 
 export type JthTemplateLoop = JthTemplateGroup<JthTemplateType.Loop> & {
-    loopValue: ValueGeneratorRef,
-    valueField: string,
-    indexField: string,
+  loopValue: ValueGeneratorRef
+  valueField: string
+  indexField: string
 }
 
 export type JthTemplateProp = JthTemplateGroup<JthTemplateType.Prop> & {
-    data: ValueField[]
+  data: ValueField[]
 }
 
-export type JthTemplate = JthTemplateProp
-    | JthTemplateLoop
-    | JthTemplateApply
-    | JthTemplateCond
-    | JthTemplateText
-    | JthTemplateElement
-    | JthTemplateRoot
+export type JthTemplate =
+  | JthTemplateProp
+  | JthTemplateLoop
+  | JthTemplateApply
+  | JthTemplateCond
+  | JthTemplateText
+  | JthTemplateElement
+  | JthTemplateRoot

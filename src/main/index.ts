@@ -47,9 +47,7 @@ async function createWindow() {
   await JsonDataService.install()
   await RunnerExtService.install()
 
-
   mainWindow.on('ready-to-show', async () => {
-
     mainWindow.show()
     mainWindow.webContents.openDevTools()
   })
@@ -84,7 +82,6 @@ app.whenReady().then(async () => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
-
 
   await createWindow()
 

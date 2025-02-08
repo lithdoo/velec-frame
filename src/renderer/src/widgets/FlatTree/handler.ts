@@ -1,144 +1,145 @@
-
 export interface FlatTreeItem {
-    id: string, pid?: string, isLeaf?: boolean, loaded?: boolean
+  id: string
+  pid?: string
+  isLeaf?: boolean
+  loaded?: boolean
 }
 
 export class FlatTreeHandler<T extends FlatTreeItem> {
-    data: T[] = []
-    isLeaf: (item: T) => boolean = (item) => !!item.isLeaf
-    autoSelect: 'single' | 'multi' | null = 'single'
+  data: T[] = []
+  isLeaf: (item: T) => boolean = (item) => !!item.isLeaf
+  autoSelect: 'single' | 'multi' | null = 'single'
 
-    virtual: {
-        itemSize: number
-        xScroll: boolean
-    } = {
-            itemSize: 28,
-            xScroll: false,
+  virtual: {
+    itemSize: number
+    xScroll: boolean
+  } = {
+    itemSize: 28,
+    xScroll: false
+  }
+
+  loadingId: string | null = null
+  vScroll = true
+
+  openKeys: string[] = []
+  selectedKeys: string[] = []
+
+  loadTreeData(
+    tree: any[],
+    getId: (data: T) => string,
+    getIsLeaf: (data: any) => boolean = (data) => !data.children,
+    getChildren: (data: any) => any[] = (data) => data.children
+  ) {
+    if (!tree) return
+    const newData: T[] = []
+    const step = (item, pid?: string) => {
+      if (!item) return
+      const id = getId(item)
+      const isLeaf = getIsLeaf(item)
+      const children = getChildren(item)
+      newData.push({ id, pid, ...item, isLeaf })
+
+      if (!isLeaf) {
+        ;(children || []).forEach((element) => {
+          step(element, id)
+        })
+      }
+    }
+    tree.forEach((item) => step(item))
+    this.data = newData
+  }
+  $emitSelect(item: T) {
+    const result = this.onItemSelect?.(item)
+
+    if (result === false) return
+
+    if (this.autoSelect === 'single') {
+      this.selectedKeys = [item.id]
+    } else if (this.autoSelect === 'multi') {
+      this.selectedKeys = this.selectedKeys.concat([item.id])
+    }
+  }
+  $emitHover(item: T) {
+    this.onItemHover?.(item)
+  }
+  $emitLeave(item: T) {
+    this.onItemLeave?.(item)
+  }
+  $emitContextMenu(item: T, ev: MouseEvent) {
+    this.onItemContextMenu?.(item, ev)
+  }
+  onItemSelect: (item: T) => boolean | void = () => {}
+  onItemLeave: (item: T) => boolean | void = () => {}
+  onItemHover: (item: T) => boolean | void = () => {}
+  onItemContextMenu: (item: T, ev: MouseEvent) => boolean | void = () => {}
+
+  async open(id) {
+    if (this.loadingId) return
+    const node = this.data.find((v) => v.id == id)
+    if (!node || node.isLeaf) return
+
+    if (node.loaded === false) {
+      this.loadingId = node.id
+      try {
+        node.loaded = await this.onload?.(node)
+        if (node.loaded) {
+          this.openKeys = this.openKeys.filter((v) => v !== id).concat([id])
         }
-
-    loadingId: string | null = null
-    vScroll = true
-
-    openKeys: string[] = []
-    selectedKeys: string[] = []
-
-    loadTreeData(
-        tree: any[],
-        getId: (data: T) => string,
-        getIsLeaf: (data: any) => boolean = (data) => !data.children,
-        getChildren: (data: any) => any[] = data => data.children
-    ) {
-        if (!tree) return
-        const newData: T[] = []
-        const step = (item, pid?: string) => {
-            if (!item) return
-            const id = getId(item)
-            const isLeaf = getIsLeaf(item)
-            const children = getChildren(item)
-            newData.push({ id, pid, ...item, isLeaf })
-
-            if (!isLeaf) {
-                (children || []).forEach(element => {
-                    step(element, id)
-                });
-            }
-        }
-        tree.forEach(item => step(item))
-        this.data = newData
+      } finally {
+        this.loadingId = null
+      }
+    } else {
+      this.openKeys = this.openKeys.filter((v) => v !== id).concat([id])
     }
-    $emitSelect(item: T) {
-        const result = this.onItemSelect?.(item)
+  }
 
-        if (result === false) return
+  close(id) {
+    this.openKeys = this.openKeys.filter((v) => v !== id)
+  }
 
-        if (this.autoSelect === 'single') {
-            this.selectedKeys = [item.id]
-        } else if (this.autoSelect === 'multi') {
-            this.selectedKeys = this.selectedKeys.concat([item.id])
-        }
+  toggle(id) {
+    if (this.openKeys.findIndex((v) => v === id) >= 0) {
+      this.close(id)
+    } else {
+      this.open(id)
     }
-    $emitHover(item: T) {
-        this.onItemHover?.(item)
-    }
-    $emitLeave(item: T) {
-        this.onItemLeave?.(item)
-    }
-    $emitContextMenu(item: T,ev:MouseEvent) {
-        this.onItemContextMenu?.(item,ev)
-    }
-    onItemSelect: (item: T) => boolean | void = () => { }
-    onItemLeave: (item: T) => boolean | void = () => { }
-    onItemHover: (item: T) => boolean | void = () => { }
-    onItemContextMenu: (item: T,ev:MouseEvent) => boolean | void = () => { }
+  }
 
-    async open(id) {
-        if (this.loadingId) return
-        const node = this.data.find(v => v.id == id)
-        if (!node || node.isLeaf) return
+  select(id) {
+    const item = this.data.find((v) => v.id == id)
+    if (!item) return
+    this.selectedKeys = [id]
+    this.onItemSelect(item)
+  }
 
-        if (node.loaded === false) {
-            this.loadingId = node.id
-            try {
-                node.loaded = await this.onload?.(node)
-                if(node.loaded){
-                    this.openKeys = this.openKeys.filter(v => v !== id).concat([id])
-                }
-            } finally {
-                this.loadingId = null
-            }
-
-        } else {
-            this.openKeys = this.openKeys.filter(v => v !== id).concat([id])
-        }
+  removeNode(id: string) {
+    if (this.loadingId === id) {
+      this.loadingId = null
     }
-
-    close(id) {
-        this.openKeys = this.openKeys.filter(v => v !== id)
+    if (this.openKeys.includes(id)) {
+      this.openKeys = this.openKeys.filter((v) => v !== id)
     }
-
-    toggle(id) {
-        if (this.openKeys.findIndex((v) => v === id) >= 0) {
-            this.close(id)
-        } else {
-            this.open(id)
-        }
+    if (this.selectedKeys.includes(id)) {
+      this.selectedKeys = this.selectedKeys.filter((v) => v !== id)
     }
-
-    select(id){
-        const item = this.data.find(v => v.id == id)
-        if(!item) return
-        this.selectedKeys = [id]
-        this.onItemSelect(item)
+    this.data = this.data.filter((v) => v.id !== id)
+    const children = this.data.filter((v) => v.pid === id)
+    if (children.length > 0) {
+      children.forEach((v) => this.removeNode(v.id))
     }
+  }
 
-    removeNode(id:string){
-        if(this.loadingId === id) {
-            this.loadingId = null
-        }
-        if(this.openKeys.includes(id)){
-            this.openKeys = this.openKeys.filter(v => v !== id)
-        }
-        if(this.selectedKeys.includes(id)){
-            this.selectedKeys = this.selectedKeys.filter(v => v !== id)
-        }
-        this.data = this.data.filter(v => v.id !== id)
-        const children = this.data.filter(v => v.pid === id)
-        if(children.length > 0){
-            children.forEach(v => this.removeNode(v.id))
-        }
+  async reloadNode(id: string) {
+    const node = this.data.find((v) => v.id === id)
+    if (!node || node.isLeaf) return
+    this.close(id)
+    const children = this.data.filter((v) => v.pid === id)
+    if (children.length > 0) {
+      children.forEach((v) => this.removeNode(v.id))
     }
+    node.loaded = false
+    await this.open(node.id)
+  }
 
-    async reloadNode(id:string){
-        const node = this.data.find(v => v.id === id)
-        if(!node || node.isLeaf) return
-        this.close(id)
-        const children = this.data.filter(v => v.pid === id)
-        if(children.length > 0){
-            children.forEach(v => this.removeNode(v.id))
-        }
-        node.loaded = false
-        await this.open(node.id)
-    }
-
-    onload?: (id: T) => Promise<boolean>
+  onload?: (id: T) => Promise<boolean>
 }

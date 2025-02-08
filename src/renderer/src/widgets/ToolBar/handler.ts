@@ -1,61 +1,66 @@
-import { VNode } from "vue";
-import { Menu, MenuButton, MenuDivide } from "../PopMenu";
+import { VNode } from 'vue'
+import { Menu, MenuButton, MenuDivide } from '../PopMenu'
 
-export interface ToolButton extends MenuButton { }
+export interface ToolButton extends MenuButton {}
 
 function isToolButton(obj: any): obj is ToolButton {
-    return obj.type === 'button'
+  return obj.type === 'button'
 }
 
-export interface ToolDivide extends MenuDivide { }
+export interface ToolDivide extends MenuDivide {}
 
 export class ToolBarHandler {
-    list: (ToolButton | ToolDivide)[] = []
+  list: (ToolButton | ToolDivide)[] = []
 
-    constructor(list: (ToolButton | ToolDivide)[] = []) {
-        this.list = list
-    }
+  constructor(list: (ToolButton | ToolDivide)[] = []) {
+    this.list = list
+  }
 
-    emit(key: string,e:MouseEvent) {
-        const button = this.list
-            .filter(v => isToolButton(v))
-            .find(v => (v as ToolButton).key === key)
-        if (button && isToolButton(button)) {
-            button.action?.(e)
-        }
+  emit(key: string, e: MouseEvent) {
+    const button = this.list
+      .filter((v) => isToolButton(v))
+      .find((v) => (v as ToolButton).key === key)
+    if (button && isToolButton(button)) {
+      button.action?.(e)
     }
+  }
 }
 
 export class ToolBarBuilder {
-    static create() { return new ToolBarBuilder() }
+  static create() {
+    return new ToolBarBuilder()
+  }
 
-    list: (ToolButton | ToolDivide)[] = []
+  list: (ToolButton | ToolDivide)[] = []
 
+  constructor(list: (ToolButton | ToolDivide)[] = []) {
+    this.list = list
+  }
 
-    constructor(
-        list: (ToolButton | ToolDivide)[] = []
-    ) {
-        this.list = list
-    }
+  divide() {
+    const item = Menu.divide()
+    return new ToolBarBuilder(this.list.concat([item]))
+  }
 
+  button(
+    key: string,
+    label: string | VNode,
+    action?: (e: MouseEvent) => void,
+    option: {
+      icon?: string
+      disabled?: boolean
+    } = {}
+  ) {
+    const item = Menu.button({
+      key,
+      label,
+      action,
+      ...option
+    })
+    return new ToolBarBuilder(this.list.concat([item]))
+  }
 
-    divide() {
-        const item = Menu.divide()
-        return new ToolBarBuilder(this.list.concat([item]))
-    }
-
-    button(key: string, label: string | VNode, action?: (e:MouseEvent) => void, option: {
-        icon?: string,
-        disabled?: boolean,
-    } = {}) {
-        const item = Menu.button({
-            key, label, action, ...option
-        })
-        return new ToolBarBuilder(this.list.concat([item]))
-    }
-
-
-    build() {
-        return new ToolBarHandler(this.list)
-    }
+  build() {
+    return new ToolBarHandler(this.list)
+  }
 }

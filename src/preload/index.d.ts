@@ -2,7 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import { explorerApi } from './explorer'
 import { editorApi } from './editor'
 import { sqliteApi } from './sqlite'
-import { runnerApi,runerExtApi } from './runner'
+import { runnerApi, runerExtApi } from './runner'
 import { jsonDataApi } from './jsonData'
 
 declare global {
@@ -14,6 +14,6 @@ declare global {
     runnerApi: typeof runnerApi
     jsonDataApi: typeof jsonDataApi
     runerExtApi: typeof runerExtApi
-    api: unknown,
+    api: unknown
   }
 }

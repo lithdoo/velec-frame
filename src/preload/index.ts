@@ -3,13 +3,11 @@ import { electronAPI } from '@electron-toolkit/preload'
 import { explorerApi } from './explorer'
 import { editorApi } from './editor'
 import { sqliteApi } from './sqlite'
-import { runnerApi,runerExtApi } from './runner'
+import { runnerApi, runerExtApi } from './runner'
 import { jsonDataApi } from './jsonData'
 
 // Custom APIs for renderer
-const api = {
-
-}
+const api = {}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue'
 import type { GraphView } from './ChartView'
 
 const props = defineProps<{ view: GraphView }>()
@@ -9,21 +9,20 @@ const view = computed(() => props.view)
 const dom = ref<HTMLDivElement>()
 
 const load = (container: HTMLElement) => {
-    view.value.loadContainer(container)
+  view.value.loadContainer(container)
 }
 
-onMounted(() =>{
-    if(dom.value) load(dom.value)
+onMounted(() => {
+  if (dom.value) load(dom.value)
 })
-
 </script>
 
 <template>
-    <div class="graph-view" ref="dom"></div>
+  <div class="graph-view" ref="dom"></div>
 </template>
 
 <style lang="scss" scoped>
 .graph-view {
-    height: 100%;
+  height: 100%;
 }
 </style>

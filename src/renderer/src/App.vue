@@ -6,13 +6,15 @@ import { ConfigProvider, theme } from 'ant-design-vue'
 </script>
 
 <template>
-  <ConfigProvider :theme="{
-    token: {
-      borderRadius: 0,
-      fontSize: 13,
-    },
-    algorithm: [theme.darkAlgorithm]
-  }">
+  <ConfigProvider
+    :theme="{
+      token: {
+        borderRadius: 0,
+        fontSize: 13
+      },
+      algorithm: [theme.darkAlgorithm]
+    }"
+  >
     <AppFrame />
   </ConfigProvider>
 </template>

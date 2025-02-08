@@ -1,34 +1,40 @@
-import { MBaseElementTemplateNode, MBaseTemplate, MBaseValue, MTemplate, render, RenderScope } from "@renderer/mods/template";
-import { ChartViewState, EntityData } from "./ChartState";
-import { insertCss } from "insert-css";
-import { Edge, Graph, Shape } from "@antv/x6";
-import { Menu, PopMenuListHandler } from "@renderer/widgets/PopMenu";
-import { contextMenu } from "@renderer/parts/GlobalContextMenu";
-import { DBRecordsService } from "./DBService";
+import {
+  MBaseElementTemplateNode,
+  MBaseTemplate,
+  MBaseValue,
+  MTemplate,
+  render,
+  RenderScope
+} from '@renderer/mods/template'
+import { ChartViewState, EntityData } from './ChartState'
+import { insertCss } from 'insert-css'
+import { Edge, Graph, Shape } from '@antv/x6'
+import { Menu, PopMenuListHandler } from '@renderer/widgets/PopMenu'
+import { contextMenu } from '@renderer/parts/GlobalContextMenu'
+import { DBRecordsService } from './DBService'
 
 interface GhJsonStructNodeState {
-    isSelected: MBaseValue<boolean>
-    highlightFields: MBaseValue<Set<string>>
+  isSelected: MBaseValue<boolean>
+  highlightFields: MBaseValue<Set<string>>
 }
 
 type Props = {
-    data: EntityData
-    state: GhJsonStructNodeState;
+  data: EntityData
+  state: GhJsonStructNodeState
 }
 
 export class ChartEntityNode {
+  static maxHeight(fieldLength: number) {
+    const outerBorder = 6
+    const fieldHeight = 30
+    const colorBanner = 6
+    const titleHeight = 32
 
-    static maxHeight(fieldLength: number) {
-        const outerBorder = 6
-        const fieldHeight = 30
-        const colorBanner = 6
-        const titleHeight = 32
+    return outerBorder + titleHeight + colorBanner + fieldHeight * fieldLength + outerBorder
+  }
 
-        return outerBorder + titleHeight + colorBanner + fieldHeight * fieldLength + outerBorder
-    }
-
-    static {
-        insertCss(/*css*/`
+  static {
+    insertCss(/*css*/ `
         .gh-sql-erd{
             border: 3px solid rgb(51 65 85);
             border-radius: 6px;
@@ -91,161 +97,181 @@ export class ChartEntityNode {
             color: rgba(255,255,255,0.45);
         }
         `)
-    }
-    static template: MBaseElementTemplateNode<HTMLDivElement, Props>
-    static {
-
-        const renderIcon = (t: MTemplate<Props>) => {
-            return t.Div('gh-sql-erd__header-icon', {
-                created: (_, ele) => ele.innerHTML = `
+  }
+  static template: MBaseElementTemplateNode<HTMLDivElement, Props>
+  static {
+    const renderIcon = (t: MTemplate<Props>) => {
+      return t.Div('gh-sql-erd__header-icon', {
+        created: (_, ele) =>
+          (ele.innerHTML = `
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#vx-base-table"></use>
                 </svg>
-                ` })
-        }
-
-        const renderHeader = (t: MTemplate<Props>) => {
-            return t.Div('gh-sql-erd__header')(
-                renderIcon(t),
-                t.Text(s => {
-                    const name = s.get('data').render.table_name
-                    const label = s.get('data').table.label ?? ''
-                    return name + (label ? ` ( ${label} )` : '')
-                })
-            )
-        }
-
-        const renderBody = (t: MTemplate<Props>) => {
-            return t.Div('gh-sql-erd__body')(
-                t.loop(s => s.get('data').table.fieldList)(t =>
-                    t.prop(s => ({
-                        field: s.get('_item'),
-                        data: s.get('data')
-                    }))(t => renderField(t))
-                )
-            )
-        }
-
-        const renderField = (t: MTemplate<{
-            field: {
-                name: string;
-                label: string;
-                type: any;                // 类型
-                // foreignKey: boolean        // 是否外键
-                primaryKey: boolean        // 是否主键
-                notNull: boolean
-                unique: boolean
-            },
-            data: EntityData
-        }>) => {
-            return t.Div('gh-sql-erd__field')(
-                t.Div('gh-sql-erd__field-name')(t.Text(s => {
-                    const name = s.get('field').name
-                    const label = s.get('field').label ?? ''
-                    return name + (label ? ` ( ${label} )` : '')
-                })),
-                t.Div('gh-sql-erd__field-type')(t.Text(s => `${s.get('field').type}${s.get('field').unique ? ' UNIQUE' : ''}${s.get('field').notNull ? ' NOT NULL' : ''}`))
-            )
-        }
-
-        const renderNode = (t: MTemplate<Props>) => {
-            return t.Div('gh-sql-erd')(
-                t.Div('gh-sql-erd__color')(),
-                renderHeader(t),
-                renderBody(t),
-            )
-        }
-        ChartEntityNode.template = renderNode(new MBaseTemplate()).build()
+                `)
+      })
     }
-    static finder: WeakMap<EntityData, ChartEntityNode> = new WeakMap()
-    static {
-        Shape.HTML.register({
-            shape: 'GH_SQLERD_ENTITY_NODE',
-            effect: [],
-            html(cell) {
-                const data = cell.getData() as EntityData
-                const node = ChartEntityNode.finder.get(data) ?? new ChartEntityNode(data)
-                return node.element
-            },
+
+    const renderHeader = (t: MTemplate<Props>) => {
+      return t.Div('gh-sql-erd__header')(
+        renderIcon(t),
+        t.Text((s) => {
+          const name = s.get('data').render.table_name
+          const label = s.get('data').table.label ?? ''
+          return name + (label ? ` ( ${label} )` : '')
         })
+      )
     }
 
-    template = ChartEntityNode.template
-    data: EntityData
-    state: GhJsonStructNodeState
-    element: HTMLElement
+    const renderBody = (t: MTemplate<Props>) => {
+      return t.Div('gh-sql-erd__body')(
+        t.loop((s) => s.get('data').table.fieldList)((t) =>
+          t.prop((s) => ({
+            field: s.get('_item'),
+            data: s.get('data')
+          }))((t) => renderField(t))
+        )
+      )
+    }
 
-    constructor(data: EntityData) {
-        ChartEntityNode.finder.set(data, this)
-        this.data = data
-        this.state = {
-            isSelected: new MBaseValue(false),
-            highlightFields: new MBaseValue(new Set())
+    const renderField = (
+      t: MTemplate<{
+        field: {
+          name: string
+          label: string
+          type: any // 类型
+          // foreignKey: boolean        // 是否外键
+          primaryKey: boolean // 是否主键
+          notNull: boolean
+          unique: boolean
         }
-        const scope = RenderScope.create({ state: this.state, data: this.data })
-        const renderNode = render<Props>(this.template, scope)
-        this.element = renderNode.nodes.getValue()[0] as HTMLElement
-        this.element.oncontextmenu = (ev) => { this.oncontextmenu?.(ev) }
+        data: EntityData
+      }>
+    ) => {
+      return t.Div('gh-sql-erd__field')(
+        t.Div('gh-sql-erd__field-name')(
+          t.Text((s) => {
+            const name = s.get('field').name
+            const label = s.get('field').label ?? ''
+            return name + (label ? ` ( ${label} )` : '')
+          })
+        ),
+        t.Div('gh-sql-erd__field-type')(
+          t.Text(
+            (s) =>
+              `${s.get('field').type}${s.get('field').unique ? ' UNIQUE' : ''}${s.get('field').notNull ? ' NOT NULL' : ''}`
+          )
+        )
+      )
     }
 
-    private getRecordService() {
-        const state = ChartViewState.get(this.data.viewId)
-        const url = state.service?.dbUrl
-        return url ? new DBRecordsService(url) : null
+    const renderNode = (t: MTemplate<Props>) => {
+      return t.Div('gh-sql-erd')(t.Div('gh-sql-erd__color')(), renderHeader(t), renderBody(t))
     }
+    ChartEntityNode.template = renderNode(new MBaseTemplate()).build()
+  }
+  static finder: WeakMap<EntityData, ChartEntityNode> = new WeakMap()
+  static {
+    Shape.HTML.register({
+      shape: 'GH_SQLERD_ENTITY_NODE',
+      effect: [],
+      html(cell) {
+        const data = cell.getData() as EntityData
+        const node = ChartEntityNode.finder.get(data) ?? new ChartEntityNode(data)
+        return node.element
+      }
+    })
+  }
 
-    private getControl() {
-        const state = ChartViewState.get(this.data.viewId)
-        return state.control
-    }
+  template = ChartEntityNode.template
+  data: EntityData
+  state: GhJsonStructNodeState
+  element: HTMLElement
 
-    oncontextmenu(ev: MouseEvent) {
-        const service = this.getRecordService()
-        if (!service) return
-        contextMenu.open(PopMenuListHandler.create([
-            Menu.button({
-                icon: 'del', key: 'viewData', label: '浏览数据', action: async () => {
-                    await this.getControl().emit('table:showDataGrid', this.data.table.name, 'view')
-                }
-            }),
-            Menu.button({
-                icon: 'del', key: 'insertTable', label: '添加数据', action: async () => {
-                    await this.getControl().emit('table:showDataGrid', this.data.table.name, 'insert')
-                }
-            }),
-            Menu.button({
-                icon: 'del', key: 'deleteTable', label: '删除', action: async () => {
-                    const control = this.getControl()
-                    await control.emit('table:delete', this.data.table.name)
-                }
-            })
-        ]), ev)
+  constructor(data: EntityData) {
+    ChartEntityNode.finder.set(data, this)
+    this.data = data
+    this.state = {
+      isSelected: new MBaseValue(false),
+      highlightFields: new MBaseValue(new Set())
     }
+    const scope = RenderScope.create({ state: this.state, data: this.data })
+    const renderNode = render<Props>(this.template, scope)
+    this.element = renderNode.nodes.getValue()[0] as HTMLElement
+    this.element.oncontextmenu = (ev) => {
+      this.oncontextmenu?.(ev)
+    }
+  }
+
+  private getRecordService() {
+    const state = ChartViewState.get(this.data.viewId)
+    const url = state.service?.dbUrl
+    return url ? new DBRecordsService(url) : null
+  }
+
+  private getControl() {
+    const state = ChartViewState.get(this.data.viewId)
+    return state.control
+  }
+
+  oncontextmenu(ev: MouseEvent) {
+    const service = this.getRecordService()
+    if (!service) return
+    contextMenu.open(
+      PopMenuListHandler.create([
+        Menu.button({
+          icon: 'del',
+          key: 'viewData',
+          label: '浏览数据',
+          action: async () => {
+            await this.getControl().emit('table:showDataGrid', this.data.table.name, 'view')
+          }
+        }),
+        Menu.button({
+          icon: 'del',
+          key: 'insertTable',
+          label: '添加数据',
+          action: async () => {
+            await this.getControl().emit('table:showDataGrid', this.data.table.name, 'insert')
+          }
+        }),
+        Menu.button({
+          icon: 'del',
+          key: 'deleteTable',
+          label: '删除',
+          action: async () => {
+            const control = this.getControl()
+            await control.emit('table:delete', this.data.table.name)
+          }
+        })
+      ]),
+      ev
+    )
+  }
 }
 
 export class ChartRelationEdge {
-    static {
-        class ErdEdge extends Edge {
-            getSourcePoint() {
-                const point = super.getSourcePoint()
-                return point
-            }
-        }
-        ErdEdge.config({
-            attrs: {
-                wrap: {
-                    connection: true,
-                    strokeWidth: 10,
-                    strokeLinejoin: 'round',
-                },
-                line: {
-                    connection: true,
-                    stroke: '#999',
-                    strokeWidth: 2,
-                    strokeLinejoin: 'round',
-                },
-            },
-        })
-        Graph.registerEdge('GH_SQLERD_RELATIONSHIP_EDGE', ErdEdge)
+  static {
+    class ErdEdge extends Edge {
+      getSourcePoint() {
+        const point = super.getSourcePoint()
+        return point
+      }
     }
+    ErdEdge.config({
+      attrs: {
+        wrap: {
+          connection: true,
+          strokeWidth: 10,
+          strokeLinejoin: 'round'
+        },
+        line: {
+          connection: true,
+          stroke: '#999',
+          strokeWidth: 2,
+          strokeLinejoin: 'round'
+        }
+      }
+    })
+    Graph.registerEdge('GH_SQLERD_RELATIONSHIP_EDGE', ErdEdge)
+  }
 }

@@ -1,4 +1,4 @@
-import { VNode } from "vue";
+import { VNode } from 'vue'
 
 // export interface ConfirmModalButton {
 //     type: 'link' | 'default' | 'danger' | 'primary'
@@ -14,7 +14,7 @@ import { VNode } from "vue";
 //     title: string | VNode
 //     message: string | VNode
 //     icon?: string | VNode
-//     buttons: ConfirmModalButton[] 
+//     buttons: ConfirmModalButton[]
 //     secordary?: ConfirmModalButton[] | VNode
 // }
 
@@ -34,20 +34,19 @@ import { VNode } from "vue";
 //     }
 // }
 
-
 export class ViewModalHandler {
-    stacks: ModalContent[] = []
-    push(content: ModalContent) {
-        this.stacks = [content, ...this.stacks]
-    }
-    remove(key: string) {
-        this.stacks = this.stacks.filter(c => c.key !== key)
-    }
+  stacks: ModalContent[] = []
+  push(content: ModalContent) {
+    this.stacks = [content, ...this.stacks]
+  }
+  remove(key: string) {
+    this.stacks = this.stacks.filter((c) => c.key !== key)
+  }
 }
 
 export interface ModalContent {
-    key: string
-    title: string | VNode
-    icon?: string | VNode
-    content: VNode | HTMLElement
+  key: string
+  title: string | VNode
+  icon?: string | VNode
+  content: VNode | HTMLElement
 }

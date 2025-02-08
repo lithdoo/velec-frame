@@ -1,1 +1,1 @@
-export { default as AutoDrawer} from './AutoDrawer.vue'
+export { default as AutoDrawer } from './AutoDrawer.vue'
