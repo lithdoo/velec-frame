@@ -126,7 +126,6 @@ export class JthState {
     if (node.type === JthTemplateType.Text) {
       return [node.text]
     }
-
     return []
   }
 
