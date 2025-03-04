@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { TemplateDetailHandler, TemplateTreeHandler } from './handler'
-import { JthStateController, JthTemplateType } from '../common'
+import { JthStateController, JthTemplateType } from '../../common'
 import { fixReactive } from '@renderer/fix'
 import { VxSelector } from '@renderer/components'
 import VxButton from '@renderer/components/VxButton/VxButton.vue'

@@ -6,18 +6,32 @@ export interface MutVal<T> {
     removeCallback(cb: () => void): void
 }
 
-export class Mut<T> implements MutVal<T> {
-    private listeners: (() => void)[] = []
-    constructor(private value: T) { }
-    val() { return this.value }
+
+
+export abstract class MutBase<T> implements MutVal<T> {
+    protected abstract value: T
+    protected listeners: (() => void)[] = []
+
     onchanged(cb: () => void): void {
         this.listeners = this.listeners
             .filter(v => v === cb)
             .concat([cb])
     }
+
     removeCallback(cb: () => void): void {
         this.listeners = this.listeners
             .filter(v => v === cb)
+    }
+
+    val() {
+        return this.value
+    }
+}
+
+
+export class Mut<T> extends MutBase<T> {
+    constructor(protected value: T) {
+        super()
     }
 
     change(value: T) {
@@ -26,9 +40,32 @@ export class Mut<T> implements MutVal<T> {
     }
 }
 
+export class MutTable<T extends Object> extends MutBase<T> {
+
+    private mutListener: Map<Mut<unknown>, () => void> = new Map()
+    protected value: T
+
+    constructor(private target: { [Key in keyof T]: MutVal<T[Key]> }) {
+        super()
+        this.value = {} as T
+        Object.entries(target).forEach(([key, mut]) => {
+            this.value[key] = mut.val()
+            const listener = () => { this.update(key) }
+            mut.onchanged(listener)
+            this.mutListener.set(mut, listener)
+        })
+    }
+
+    private update(key: string) {
+        const val = this.target[key]?.val()
+        this.value[key] = val
+        this.listeners.forEach(v => v())
+    }
+}
+
 export abstract class JthViewNode {
     isDestoryed: boolean = false
-    abstract readonly target: MutVal<JthRenderNode[]>
+    abstract readonly target: MutVal<JthWrapedNode[]>
     destory() {
         this.isDestoryed = true
     }
@@ -36,9 +73,9 @@ export abstract class JthViewNode {
 
 export class JthViewFragment extends JthViewNode {
 
-    current: MutVal<JthRenderNode[]>[]
+    current: MutVal<JthWrapedNode[]>[]
 
-    readonly target: Mut<JthRenderNode[]>
+    readonly target: Mut<JthWrapedNode[]>
     readonly onListChanged: () => void
     readonly onCurrentChanged: () => void
 
@@ -75,11 +112,11 @@ export class JthViewFragment extends JthViewNode {
 }
 
 export class JthViewElement extends JthViewNode {
-    elementNode: JthRenderElement
-    readonly target: Mut<JthRenderNode[]>
+    elementNode: JthWarpedElement
+    readonly target: Mut<JthWrapedNode[]>
     readonly onChilrenChanged = () => { this.updateChildren() }
     readonly onAttrChanged = () => { this.updateAttr() }
-    private currentChildren: JthRenderNode[] = []
+    private currentChildren: JthWrapedNode[] = []
 
     constructor(
         public readonly tagName: string,
@@ -87,7 +124,7 @@ export class JthViewElement extends JthViewNode {
         public readonly children: JthViewFragment
     ) {
         super()
-        this.elementNode = JthRenderNode.element(tagName)
+        this.elementNode = JthWrapedNode.element(tagName)
         this.target = new Mut([this.elementNode])
         this.children.target.onchanged(this.onChilrenChanged)
         this.attr.onchanged(this.onAttrChanged)
@@ -120,15 +157,15 @@ export class JthViewElement extends JthViewNode {
 }
 
 export class JthViewText extends JthViewNode {
-    target: Mut<JthRenderNode[]> = new Mut([])
+    target: Mut<JthWrapedNode[]> = new Mut([])
     readonly onTextChanged = () => { this.onchangeText() }
-    private textNode: JthRenderTextNode
+    private textNode: JthWarpedText
 
     constructor(
         public text: MutVal<string>
     ) {
         super()
-        this.textNode = JthRenderNode.text(text.val())
+        this.textNode = JthWrapedNode.text(text.val())
         this.target = new Mut([this.textNode])
         this.text.onchanged(this.onTextChanged)
     }
@@ -144,7 +181,7 @@ export class JthViewText extends JthViewNode {
 }
 
 export class JthViewLoop extends JthViewNode {
-    readonly target: Mut<JthRenderNode[]> = new Mut([])
+    readonly target: Mut<JthWrapedNode[]> = new Mut([])
     current: JthViewFragment[] = []
 
     readonly onCurrentChanged = () => { this.updateTarget() }
@@ -187,7 +224,7 @@ export class JthViewLoop extends JthViewNode {
 
 export class JthViewCondition extends JthViewNode {
 
-    readonly target: Mut<JthRenderNode[]> = new Mut([])
+    readonly target: Mut<JthWrapedNode[]> = new Mut([])
     current?: JthViewFragment
 
     readonly onCurrenChanged: () => void
@@ -248,9 +285,9 @@ export class JthViewCondition extends JthViewNode {
 
 }
 
-export abstract class JthRenderNode {
-    static element(tagName: string) { return new JthRenderElement(tagName) }
-    static text(tagName: string) { return new JthRenderTextNode(tagName) }
+export abstract class JthWrapedNode {
+    static element(tagName: string) { return new JthWarpedElement(tagName) }
+    static text(tagName: string) { return new JthWarpedText(tagName) }
 
     protected abstract node(): Node
 
@@ -264,14 +301,14 @@ export abstract class JthRenderNode {
     }
 }
 
-export class JthRenderElement extends JthRenderNode {
+export class JthWarpedElement extends JthWrapedNode {
     target: HTMLElement
     constructor(tagName: string) {
         super()
         this.target = document.createElement(tagName)
     }
 
-    appendChildren(list: JthRenderNode[]) {
+    appendChildren(list: JthWrapedNode[]) {
         const fragment = document.createDocumentFragment()
         list.forEach(v => v.appendTo(fragment))
     }
@@ -285,7 +322,7 @@ export class JthRenderElement extends JthRenderNode {
     }
 }
 
-export class JthRenderTextNode extends JthRenderNode {
+export class JthWarpedText extends JthWrapedNode {
     target: Text
     constructor(text: string) {
         super()

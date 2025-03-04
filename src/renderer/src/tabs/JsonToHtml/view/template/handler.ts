@@ -17,7 +17,7 @@ import {
   JthTemplateCond,
   JthTemplateLoop,
   ValueGeneratorRef
-} from '../common'
+} from '../../common'
 
 export class TemplateTreeHandler {
   static all = new WeakMap<JthComponent, TemplateTreeHandler>()

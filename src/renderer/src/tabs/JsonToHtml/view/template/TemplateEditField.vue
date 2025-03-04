@@ -1,5 +1,22 @@
 <template>
   <div class="template-field-editor">
+    <div class="template-field-editor__name">
+      <template v-if="isEdit">
+        <div class="template-field-editor__name-edit">
+          <VxInput v-model="editor.currentName"></VxInput>
+        </div>
+        <div class="template-field-editor__btns">
+          <VxButton only-icon icon="done" :click="submitEdit"></VxButton>
+          <VxButton only-icon icon="clear" :click="cancelEdit"></VxButton>
+        </div>
+      </template>
+      <template v-else>
+        <div class="template-field-editor__name-text">-- {{ field.name }} --</div>
+        <div class="template-field-editor__btns template-field-editor__btns--view">
+          <VxButton only-icon icon="edit" :click="beginEdit"></VxButton>
+        </div>
+      </template>
+    </div>
     <div class="template-field-editor__value">
       <template v-if="isEdit">
         <div class="template-field-editor__selector">
@@ -8,32 +25,18 @@
 
         <div class="template-field-editor__input">
           <template v-if="editor.currentValue?.target.type === 'dynamic:script'">
-            <VxInput v-model="editor.currentValue.target.script">
-              <template #suffix>
-                <VxButton only-icon icon="done" :click="submitEdit"></VxButton>
-                <VxButton only-icon icon="clear" :click="cancelEdit"></VxButton>
-              </template>
-            </VxInput>
+            <VxInput v-model="editor.currentValue.target.script"></VxInput>
           </template>
 
           <template v-if="editor.currentValue?.target.type === 'static'">
-            <VxInput v-model="editor.currentValue.target.json">
-              <template #suffix>
-                <VxButton only-icon icon="done" :click="submitEdit"></VxButton>
-                <VxButton only-icon icon="clear" :click="cancelEdit"></VxButton>
-              </template>
-            </VxInput>
+            <VxInput v-model="editor.currentValue.target.json"></VxInput>
           </template>
         </div>
       </template>
 
       <template v-else>
-        <span class="template-field-editor__text-type">{{ type(generator.type) }} : </span>
+        <span class="template-field-editor__text-type">[{{ type(generator.type) }}] </span>
         <span class="template-field-editor__text-value">{{ value }}</span>
-
-        <div class="template-field-editor__btns template-field-editor__btns--view">
-          <VxButton only-icon icon="edit" :click="beginEdit"></VxButton>
-        </div>
       </template>
     </div>
   </div>
@@ -41,17 +44,17 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ValueGeneratorRef, ValueGenerator } from '../common'
+import { ValueField, ValueGenerator } from '../../common'
 import { VxSelector, VxInput, VxButton } from '@renderer/components'
-import { ValueEditorHandler } from './handler'
+import { FieldEditorHandler } from './handler'
 
 const props = defineProps<{
-  value: ValueGeneratorRef
-  editor: ValueEditorHandler
+  field: ValueField
+  editor: FieldEditorHandler
 }>()
 
 const beginEdit = () => {
-  props.editor.beginEdit(props.value)
+  props.editor.beginEdit(props.field)
 }
 
 const cancelEdit = () => {
@@ -62,10 +65,6 @@ const submitEdit = () => {
   props.editor.submitEdit()
 }
 
-// const validate = () => {
-
-// }
-
 const type = (type: ValueGenerator['type']) => {
   if (type === 'static') return 'static'
   if (type === 'dynamic:getter') return 'getter'
@@ -74,7 +73,7 @@ const type = (type: ValueGenerator['type']) => {
 }
 
 const generator = computed(() => {
-  const vg = props.editor.controller.getVG(props.value)
+  const vg = props.editor.controller.getVG(props.field.value)
   if (!vg) throw new Error('unknown type')
   return vg
 })
@@ -92,7 +91,7 @@ const value = computed(() => {
 })
 
 const isEdit = computed(() => {
-  return props.editor.target === props.value
+  return props.editor.target === props.field
 })
 
 const options = computed(() => {
@@ -174,6 +173,7 @@ const options = computed(() => {
 
   .template-field-editor__name-text {
     flex: 1 1 auto;
+    font-weight: bolder;
   }
 
   .template-field-editor__name-edit {

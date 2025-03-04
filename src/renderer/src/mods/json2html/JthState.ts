@@ -279,15 +279,6 @@ export class JthState {
   }
 }
 
-// export class JthStateModel {
-//     component: JthComponentHandler
-//     constructor(
-//         public state: JthState,
-//     ) {
-//         this.component = new JthComponentHandler(this.state)
-//     }
-// }
-
 // State 对外的业务接口
 export class JthStateController {
   static staticValueRef(

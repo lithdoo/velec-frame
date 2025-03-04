@@ -58,6 +58,7 @@ defineProps<{ tree: TemplateTreeHandler }>()
     top: 0;
     bottom: 0;
     background-color: antiquewhite;
+    padding: 36px;
 
     &[data-show="false"] {
       display: none;
