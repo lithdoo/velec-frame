@@ -12,7 +12,9 @@ import '@codingame/monaco-vscode-theme-defaults-default-extension'
 import './ts-highlight-0.0.1.vsix'
 
 const install = async () => {
+  console.log(1)
   await configureMonacoWorkers()
+  console.log(2)
   await initVscodeServices({
     serviceConfig: {
       userServices: {
@@ -23,10 +25,14 @@ const install = async () => {
       debugLogging: true
     }
   })
+  console.log(3)
 
   await initWebSocketAndStartClient('ws://localhost:30001/typescript', ['typescript'])
+  console.log(4)
   await initWebSocketAndStartClient('ws://localhost:30001/json', ['json'])
+  console.log(5)
   await initWebSocketAndStartClient('ws://localhost:30001/sql', ['sql'])
+  console.log(6)
 
   monaco.languages.register({
     id: 'typescript',
@@ -34,6 +40,8 @@ const install = async () => {
     aliases: ['Typescript', 'ts']
     // mimetypes: ['application/json']
   })
+
+  console.log(7)
 
   monaco.languages.register({
     id: 'sql',
@@ -44,10 +52,14 @@ const install = async () => {
 
 setTimeout(() => {
   install()
-}, 1000)
+}, 10000)
 
 export class TextEditorHandler {
   editor?: monaco.editor.IStandaloneCodeEditor
+
+  private manacoResolve: (manaco: monaco.editor.IStandaloneCodeEditor) => void = () => { }
+
+  monaco: Promise<monaco.editor.IStandaloneCodeEditor>
   constructor(
     public content: string,
     public lang: string,
@@ -55,6 +67,10 @@ export class TextEditorHandler {
   ) {
     this.lang = lang
     this.content = content
+
+    this.monaco = new Promise(res => [
+      this.manacoResolve = res
+    ])
   }
 
   protected createModel(): {
@@ -69,6 +85,7 @@ export class TextEditorHandler {
     return { language, value: content, uri }
   }
 
+
   initEditor(element: HTMLElement) {
     const { value, language, uri } = this.createModel()
     this.editor = markRaw(
@@ -78,11 +95,16 @@ export class TextEditorHandler {
         wordBasedSuggestions: 'off'
       })
     )
+    this.manacoResolve(this.editor)
   }
 
   setContent(content: string) {
     this.content = content
     this.editor?.setValue(this.content)
+  }
+
+  getContent(){
+    return  this.editor?.getValue() || ''
   }
 
   destory() {
@@ -108,6 +130,7 @@ const initWebSocketAndStartClient = (
   languageIds: string[],
   cb?: (client: MonacoLanguageClient) => void
 ) => {
+  console.log('initWebSocketAndStartClient')
   const webSocket = new WebSocket(url)
   webSocket.onopen = () => {
     const socket = toSocket(webSocket)

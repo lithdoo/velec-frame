@@ -11,21 +11,23 @@ import {
 export type JthComponent = {
   keyName: string
   rootId: string
+  testJson: { name: string, json: string }[]
+  testDefaultJson: string
 }
 
 export type ValueGenerator =
   | {
-      type: 'static'
-      json: string
-    }
+    type: 'static'
+    json: string
+  }
   | {
-      type: 'dynamic:script'
-      script: string
-    }
+    type: 'dynamic:script'
+    script: string
+  }
   | {
-      type: 'dynamic:getter'
-      getter: string[]
-    }
+    type: 'dynamic:getter'
+    getter: string[]
+  }
 
 export const isValueGeneratorRef = (x: any): x is ValueGeneratorRef => {
   return x?._VALUE_GENERATOR_REFERENCE_ !== undefined
@@ -57,7 +59,7 @@ export class Snapshot<T> {
   old: T[] = []
   idx: number = -1
 
-  constructor(public lastest: T) {}
+  constructor(public lastest: T) { }
 
   current() {
     const old = this.old[this.idx]
@@ -129,7 +131,7 @@ export class JthState {
     return []
   }
 
-  constructor() {}
+  constructor() { }
 
   private snapNodes: Map<string, Snapshot<JthTemplate>> = new Map()
   private snapTree: Snapshot<Tree> = new Snapshot({})
@@ -233,7 +235,7 @@ export class JthState {
   //     }
   // }
 
-  updateTemplate() {}
+  updateTemplate() { }
 
   insertNode(node: JthTemplate) {
     if (this.snapNodes.has(node.id)) {
@@ -376,7 +378,7 @@ export class JthStateController {
     } else return node
   }
 
-  constructor(public state: JthState) {}
+  constructor(public state: JthState) { }
 
   newComponent(keyName: string) {
     const root: JthTemplateRoot = {
@@ -386,7 +388,7 @@ export class JthStateController {
       props: []
     }
 
-    this.state.components.push({ keyName, rootId: root.id })
+    this.state.components.push({ keyName, rootId: root.id, testJson: [], testDefaultJson: '' })
     this.state.insertNode(root)
   }
 

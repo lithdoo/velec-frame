@@ -112,6 +112,17 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
     this.onItemSelect(item)
   }
 
+  expandAll(){
+    this.openKeys = this.data
+      .filter(v=>v.loaded !== false)
+      .filter(v=>!v.isLeaf)
+      .map(v=>v.id)
+  }
+
+  collapseAll(){
+    this.openKeys = []
+  }
+
   removeNode(id: string) {
     if (this.loadingId === id) {
       this.loadingId = null

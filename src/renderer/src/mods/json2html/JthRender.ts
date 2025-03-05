@@ -13,6 +13,7 @@ export abstract class JthRenderState {
 export abstract class JthRenderScope {
     abstract state: JthRenderState
     abstract table: Map<string, ValueGenerator>
+
     abstract children(): JthRenderScope
     abstract add(trans: { key: string, value: any }[]): JthRenderScope
 

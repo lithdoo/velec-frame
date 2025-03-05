@@ -23,6 +23,8 @@ import { JthComponent, JthStateController } from '../../common';
 import TemplateTree from '../template/TemplateTree.vue'
 import { TemplateTreeHandler } from '../template/handler';
 import VxButton from '@renderer/components/VxButton/VxButton.vue';
+import { fixReactive } from '@renderer/fix';
+import StateJsonEditor, { StateJsonEditorHandler } from '../state/StateJsonEditor.vue';
 
 const props = defineProps<{
     handler: ComponentBodyHandler
@@ -33,6 +35,10 @@ const tree = computed(() =>
     ?? TemplateTreeHandler.create(props.handler.controler, props.handler.component)
 )
 
+const editor = computed(() => {
+    return fixReactive(new StateJsonEditorHandler(props.handler.component))
+})
+
 
 </script>
 
@@ -41,31 +47,46 @@ const tree = computed(() =>
         <div class="jth-component-body__toolbar">
             <VxButton :data-actived.native="handler.isCurTemplate()" :click="() => handler.showTemplate()">Template Tree
             </VxButton>
-            <VxButton :data-actived.native="handler.isCurDefState()" :click="() => handler.showDefState()">State
-                (default)</VxButton>
+            <VxButton :data-actived.native="handler.isCurDefState()" :click="() => handler.showDefState()">Test Json</VxButton>
             <VxButton :data-actived.native="handler.isCurRender()" :click="() => handler.showRender()">Render View
             </VxButton>
 
             <div class="jth-component-body__toolbar-divide"></div>
 
-            <template v-if="handler.isCurTemplate()">
+            <template v-show="handler.isCurTemplate()">
                 <VxButton icon="plus" :click="() => tree.addTemplateToRoot()">
                     添加根节点
                 </VxButton>
+                <VxButton v-if="!tree.flatTree.openKeys.length" icon="plus" :click="() => tree.flatTree.expandAll()">
+                    展开全部
+                </VxButton>
+                <VxButton v-else icon="plus" :click="() => tree.flatTree.collapseAll()">
+                    收起全部
+                </VxButton>
             </template>
 
-            
+            <template v-if="handler.isCurDefState()">
+                <VxButton icon="refresh" :click="() => tree.addTemplateToRoot()">
+                    刷新渲染
+                </VxButton>
+            </template>
+
             <template v-if="handler.isCurRender()">
                 <VxButton icon="refresh" :click="() => tree.addTemplateToRoot()">
                     刷新渲染
                 </VxButton>
             </template>
+
+
         </div>
 
         <div class="jth-component-body__content">
-            <template v-if="handler.isCurTemplate()">
+            <div v-show="handler.isCurTemplate()">
                 <TemplateTree :tree="tree" />
-            </template>
+            </div>
+            <div v-show="handler.isCurDefState()">
+                <StateJsonEditor :handler="editor"></StateJsonEditor>
+            </div>
         </div>
     </div>
 </template>
@@ -101,7 +122,9 @@ const tree = computed(() =>
     .jth-component-body__content {
         height: 0;
         flex: 1 1 0;
-
+        >div{
+            height: 100%;
+        }
     }
 }
 </style>
