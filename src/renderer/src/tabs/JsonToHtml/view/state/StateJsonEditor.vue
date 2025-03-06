@@ -7,30 +7,8 @@ export class StateJsonEditorHandler {
         this.text = new TextEditorHandler(this.component.testDefaultJson, 'JSON')
     }
 
-    async init() {
-        const manaco = await this.text.monaco
-        manaco.onDidChangeModelContent(() => {
-            this.updateContent()
-        })
-    }
-
-
-    updateContentTimeout: any
-    updateContent() {
-        if (this.updateContentTimeout) {
-            clearTimeout(this.updateContentTimeout)
-        }
-        this.updateContentTimeout = setTimeout(async () => {
-            this.updateContentTimeout = null
-            const manaco = await this.text.monaco
-            const content = manaco.getValue() ?? ''
-            this.curContent = content
-            console.log({content})
-        }, 200)
-    }
-
     isChanged() {
-        return this.component.testDefaultJson === this.curContent
+        return this.component.testDefaultJson === this.text.getContent()
     }
 
     curContent: string = ''

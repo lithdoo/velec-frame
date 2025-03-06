@@ -98,7 +98,7 @@ export class DBChartModel {
         ToolBarBuilder.create()
           .button('close', '关闭', () => tabControl.removeTab(editPage.tabId))
           .button('execute', '执行', async () => {
-            const sql = editPage.handler.editor?.getValue().toString()
+            const sql = editPage.handler.getContent()
             if (sql) {
               try {
                 await window.sqliteApi.sqlRunList(
@@ -115,7 +115,7 @@ export class DBChartModel {
             }
           })
           .button('query', '查询并保存到文件', async () => {
-            const sql = editPage.handler.editor?.getValue().toString()
+            const sql = editPage.handler.getContent()
             if (sql) {
               try {
                 await window.sqliteApi.sqlSelectAlltoFile(this.service.dbUrl, sql)

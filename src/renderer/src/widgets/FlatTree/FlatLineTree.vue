@@ -38,7 +38,7 @@ const renderGrid = computed(() => {
     // 虽然返回了 Place，但只需要返回的 row
     const step = (node: T, start: Place, option: { isFirst: boolean, isRoot: boolean }): Place => {
         console.log('step', node.id, node)
-        const place = { ...start, ...option }
+        // const place = { ...start, ...option }
         nodePlace.set(node.id, { ...start, ...option })
         const isLeaf = node.isLeaf
         if (isLeaf) return start
