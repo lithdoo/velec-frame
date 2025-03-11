@@ -71,6 +71,9 @@ export abstract class JthViewNode {
     }
 }
 
+
+
+
 export class JthViewFragment extends JthViewNode {
 
     current: MutVal<JthWrapedNode[]>[]
@@ -112,6 +115,9 @@ export class JthViewFragment extends JthViewNode {
 }
 
 export class JthViewElement extends JthViewNode {
+
+
+
     elementNode: JthWarpedElement
     readonly target: Mut<JthWrapedNode[]>
     readonly onChilrenChanged = () => { this.updateChildren() }
@@ -286,10 +292,16 @@ export class JthViewCondition extends JthViewNode {
 }
 
 export abstract class JthWrapedNode {
+    static wrap(element: HTMLElement) {
+        const node = new JthWarpedElement('div')
+        node.target = element
+        return node
+    }
+
     static element(tagName: string) { return new JthWarpedElement(tagName) }
     static text(tagName: string) { return new JthWarpedText(tagName) }
 
-    protected abstract node(): Node
+    abstract node(): Node
 
     remove(): void {
         const node = this.node()
@@ -311,6 +323,7 @@ export class JthWarpedElement extends JthWrapedNode {
     appendChildren(list: JthWrapedNode[]) {
         const fragment = document.createDocumentFragment()
         list.forEach(v => v.appendTo(fragment))
+        this.target.appendChild(fragment)
     }
 
     attr(key: string, value: string) {

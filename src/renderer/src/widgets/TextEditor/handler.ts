@@ -1,3 +1,4 @@
+import { fixReactive } from '@renderer/fix'
 import { MonacoEditor } from '@renderer/mods/lspClient'
 
 export class TextEditorHandler {
@@ -23,22 +24,24 @@ export class TextEditorHandler {
 
 
   async initEditor(element: HTMLElement) {
+
+    (window as any).initEditor = this;
     const language = this.lang
     // const isJson = language.toLocaleLowerCase() === 'json'
     const content = this.content
 
-    const editor = new class extends MonacoEditor {
+    const editor = fixReactive(new class extends MonacoEditor {
       content = content
       language = language
       ext = ''
       element = element
       uri = undefined
       langClientConfigs = {}
-    }
+    })
 
     this.editor = editor
     await this.editor.init()
-    this.resolveEditor(editor)
+    this.resolveEditor(this.editor)
 
   }
 
@@ -48,6 +51,8 @@ export class TextEditorHandler {
   }
 
   getContent() {
+    
+    console.log((window as any).initEditor === this)
     if (!this.editor) {
       return this.content
     } else {

@@ -55,11 +55,13 @@ export abstract class MonacoEditor {
 	private updateContentTimeout: any | null = null
 
 	updateContent() {
+		console.log('start update')
 		if (this.updateContentTimeout) {
 			clearTimeout(this.updateContentTimeout)
 		}
 		this.updateContentTimeout = setTimeout(() => {
 			this.content = this.editor?.getValue().toString() ?? ''
+			console.log('finish update',this.editor?.getValue().toString())
 		})
 	}
 
@@ -67,6 +69,10 @@ export abstract class MonacoEditor {
 		await this.editor?.dispose()
 	}
 
+
+	getContent(){
+		return this.editor?.getValue().toString() ?? ''
+	}
 
 	setContent(text: string) {
 		this.editor?.setValue(text)

@@ -1,21 +1,46 @@
-import { JthComponent, ValueGenerator } from "./JthState"
+import { JthComponent, JthFile, ValueGenerator } from "./JthState"
 import { JthTemplate, ValueGeneratorRef, ValueField, JthTemplateType } from "./JthTemplate"
 import { Mut, JthViewNode, JthViewText, JthViewElement, JthViewCondition, JthViewLoop, JthViewFragment, MutTable, MutVal } from "./JthViewNode"
 
 
-export abstract class JthRenderState {
-    protected abstract target: Object
+export class JthRenderState {
+    constructor(
+        private readonly target: Record<string, any>,
+        readonly upper?: JthRenderState
+    ) { }
+
+    getTarget() {
+        const upper = this.upper?.getTarget() ?? {}
+        const target = this.target
+        return { ...upper, ...target }
+    }
+
     get(func: (val: Object) => void) {
-        return func(this.target)
+        return func(this.getTarget())
     }
 }
 
-export abstract class JthRenderScope {
-    abstract state: JthRenderState
-    abstract table: Map<string, ValueGenerator>
 
-    abstract children(): JthRenderScope
-    abstract add(trans: { key: string, value: any }[]): JthRenderScope
+
+export class JthRenderScope {
+
+    constructor(
+        private state: JthRenderState,
+        private table: Map<string, ValueGenerator>
+    ) { }
+
+    children() {
+        return new JthRenderScope(this.state, this.table)
+    }
+    add(trans: { key: string, value: any }[]) {
+        return new JthRenderScope(
+            new JthRenderState(
+                trans.reduce((res, cur) => ({ ...res, [cur.key]: cur.value }), {}),
+                this.state
+            ),
+            this.table
+        )
+    }
 
     val(ref: ValueGeneratorRef) {
         const vg = this.table.get(ref._VALUE_GENERATOR_REFERENCE_)
@@ -34,6 +59,7 @@ export abstract class JthRenderScope {
     }
 
     private getStaticVal(json: string) {
+        console.log({ json })
         return new Mut(JSON.parse(json))
     }
 
@@ -54,6 +80,54 @@ export abstract class JthRenderScope {
 
 
 export class JthRender {
+
+    static fromJsonState(file: JthFile, componentId: string, value: string) {
+
+
+        const state = JSON.parse(value)
+        const component = file.components.find(v => v.rootId === componentId)
+        if (!component) {
+            throw new Error('unknown component id')
+        }
+
+        if (!state || state instanceof Array || (typeof state !== 'object')) {
+            throw new Error('state need a object')
+        }
+
+        const template_node: {
+            [key: string]: JthTemplate
+        } = {}
+
+        const template_tree: {
+            [key: string]: string[]
+        } = {}
+
+        const walk = (id: string) => {
+            const template = file.template_node[id]
+            const children = file.template_tree[id] ?? []
+            if (!template) {
+                throw new Error('unknown template id')
+            }
+            template_node[id] = template
+            template_tree[id] = children
+
+            children.forEach(v => walk(v))
+        }
+
+        walk(componentId)
+
+        const render = new JthRender(
+            template_node, template_tree, component
+        )
+
+        const table = new Map(Object.entries(file.vg_store))
+
+        const scope = new JthRenderScope(new JthRenderState(state), table)
+
+        return render.renderRoot(scope)
+
+    }
+
     constructor(
         public readonly template_node: {
             [key: string]: JthTemplate
@@ -142,3 +216,4 @@ export class JthRender {
         return fragment
     }
 }
+

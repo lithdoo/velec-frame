@@ -17,8 +17,10 @@ const props = defineProps<{
 }>()
 
 const textEditor = fixReactive(
-  new ValueEditorHandler(props.detail.controller, (newone) => props.detail.setText(newone))
+  new ValueEditorHandler(props.detail.controller, (_,newone) => props.detail.setText(newone))
 )
+
+
 </script>
 
 <style lang="scss" scoped>

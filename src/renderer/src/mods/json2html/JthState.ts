@@ -538,4 +538,8 @@ export class JthStateController {
     }
     return tree
   }
+
+  file(){
+    return this.state.fileContent()
+  }
 }

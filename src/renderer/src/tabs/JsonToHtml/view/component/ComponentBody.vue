@@ -5,7 +5,10 @@ export abstract class ComponentBodyHandler {
     abstract component: JthComponent
 
     isCurTemplate() { return this.current === 'template' }
-    showTemplate() { this.current = 'template' }
+    showTemplate() {
+        console.log('showTemplate')
+        this.current = 'template'
+    }
 
     isCurDefState() { return this.current === 'defstate' }
     showDefState() { this.current = 'defstate' }
@@ -19,12 +22,13 @@ export abstract class ComponentBodyHandler {
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { JthComponent, JthStateController } from '../../common';
+import { JthComponent, JthFile, JthStateController } from '../../common';
 import TemplateTree from '../template/TemplateTree.vue'
 import { TemplateTreeHandler } from '../template/handler';
 import VxButton from '@renderer/components/VxButton/VxButton.vue';
 import { fixReactive } from '@renderer/fix';
 import StateJsonEditor, { StateJsonEditorHandler } from '../state/StateJsonEditor.vue';
+import RenderTestView, { RenderTestHandler } from '../render/RenderTestView.vue';
 
 const props = defineProps<{
     handler: ComponentBodyHandler
@@ -35,9 +39,14 @@ const tree = computed(() =>
     ?? TemplateTreeHandler.create(props.handler.controler, props.handler.component)
 )
 
-const editor = computed(() => {
-    return fixReactive(new StateJsonEditorHandler(props.handler.component))
+const editor = fixReactive(new StateJsonEditorHandler(props.handler.component))
+
+const render = fixReactive(new class extends RenderTestHandler {
+    componet: JthComponent = props.handler.component
+    file() { return props.handler.controler.file() }
 })
+
+
 
 
 </script>
@@ -47,7 +56,8 @@ const editor = computed(() => {
         <div class="jth-component-body__toolbar">
             <VxButton :data-actived.native="handler.isCurTemplate()" :click="() => handler.showTemplate()">Template Tree
             </VxButton>
-            <VxButton :data-actived.native="handler.isCurDefState()" :click="() => handler.showDefState()">Test Json</VxButton>
+            <VxButton :data-actived.native="handler.isCurDefState()" :click="() => handler.showDefState()">{{
+                editor.isChanged() ? '*' : '' }} Test Json</VxButton>
             <VxButton :data-actived.native="handler.isCurRender()" :click="() => handler.showRender()">Render View
             </VxButton>
 
@@ -66,13 +76,13 @@ const editor = computed(() => {
             </template>
 
             <template v-if="handler.isCurDefState()">
-                <VxButton icon="refresh" :click="() => tree.addTemplateToRoot()">
-                    刷新渲染
+                <VxButton icon="refresh" :click="() => editor.updateToComponent()">
+                    更新到组件
                 </VxButton>
             </template>
 
             <template v-if="handler.isCurRender()">
-                <VxButton icon="refresh" :click="() => tree.addTemplateToRoot()">
+                <VxButton icon="refresh" :click="() => render.render()">
                     刷新渲染
                 </VxButton>
             </template>
@@ -86,6 +96,9 @@ const editor = computed(() => {
             </div>
             <div v-show="handler.isCurDefState()">
                 <StateJsonEditor :handler="editor"></StateJsonEditor>
+            </div>
+            <div v-show="handler.isCurRender()">
+                <RenderTestView :handler="render"></RenderTestView>
             </div>
         </div>
     </div>
@@ -122,7 +135,8 @@ const editor = computed(() => {
     .jth-component-body__content {
         height: 0;
         flex: 1 1 0;
-        >div{
+
+        >div {
             height: 100%;
         }
     }

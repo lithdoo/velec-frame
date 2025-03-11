@@ -82,6 +82,11 @@ export class TemplateTreeHandler {
         this.flatTree.select(node.id)
       }
 
+      const removeTNode = () => {
+        this.controller.removeTNode(item.templateData.id)
+        this.reload()
+      }
+
       if (item.templateData.isGroup) {
         builder = builder.button('addChildrenBeforeEach', '添加子节点于起首', addChildrenBeforeEach)
         builder = builder.button('addChildrenAfterEach', '添加子节点于末尾', addChildrenAfterEach)
@@ -89,6 +94,8 @@ export class TemplateTreeHandler {
 
       builder = builder.button('addChildrenBeforeEach', '向前插入节点', inserNodeBefore)
       builder = builder.button('addChildrenAfterEach', '向后插入节点', insertNodeAfter)
+      builder = builder.divide()
+      builder = builder.button('removeTNode', '删除节点', removeTNode)
 
       contextMenu.open(builder.build(), ev)
     }
@@ -213,7 +220,7 @@ export class TemplateDetailHandler<T extends JthTemplate> {
   constructor(
     public target: T,
     public controller: JthStateController
-  ) {}
+  ) { }
 
   isGroup() {
     return this.target.isGroup
@@ -387,6 +394,31 @@ export class TemplateDetailLoopHandler extends TemplateDetailHandler<JthTemplate
     })
     this.reload()
   }
+
+  valueField() {
+    return this.target.valueField
+  }
+
+  indexField() {
+    return this.target.indexField
+  }
+
+  setValueField(valueField: string) {
+    this.controller.updateTNode<JthTemplateLoop>({
+      ...this.target, valueField
+    })
+    this.reload()
+    return
+  }
+
+  setIndexField(indexField: string){
+    this.controller.updateTNode<JthTemplateLoop>({
+      ...this.target, indexField
+    })
+    this.reload()
+    return
+  }
+
 }
 
 export class ValueEditorHandler {
@@ -396,7 +428,7 @@ export class ValueEditorHandler {
   constructor(
     public controller: JthStateController,
     protected onChangeField: (oldone: ValueGeneratorRef, newone: ValueGeneratorRef) => void
-  ) {}
+  ) { }
 
   beginEdit(filed: ValueGeneratorRef) {
     this.target = filed
@@ -437,6 +469,7 @@ export class ValueEditorHandler {
     const newone: ValueGeneratorRef = this.controller.newVG(this.currentValue.target)
 
     this.onChangeField(this.target, newone)
+    this.target = null
   }
 
   cancelEdit() {
@@ -454,7 +487,7 @@ export class FieldEditorHandler {
   constructor(
     public controller: JthStateController,
     protected onChangeField: (oldone: ValueField, newone: ValueField) => void
-  ) {}
+  ) { }
 
   beginEdit(filed: ValueField) {
     this.target = filed
