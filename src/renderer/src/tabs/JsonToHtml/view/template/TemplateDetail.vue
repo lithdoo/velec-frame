@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { TemplateDetailHandler, TemplateTreeHandler } from './handler'
-import { JthStateController, JthTemplateType } from '../../common'
+import { JthStateController, JthTemplateType } from '../base'
 import TemplateDetailElement from './TemplateDetailElement.vue'
 import TemplateDetailProp from './TemplateDetailProp.vue'
 import TemplateDetailApply from './TemplateDetailApply.vue'

@@ -1,67 +1,175 @@
 <script lang="ts">
-export abstract class RenderTestHandler {
+export class RenderTestHandler {
 
+    cntr = document.createElement('div')
 
-    abstract file(): JthFile
-    abstract componet: JthComponent
+    renderRoot?: JthRenderRoot
 
-    viewNode?: JthViewFragment
-
+    constructor(
+        public caseItem: {
+            rootId: string;
+            caseId: string;
+            jsonData: string;
+        },
+        public state: () => JthFileState,
+    ) { }
 
     render() {
+        if (this.renderRoot) {
+            this.renderRoot.despose()
+        }
 
-        const res = JthRender.fromJsonState(
-            this.file(),
-            this.componet.rootId,
-            this.componet.testDefaultJson
+        const renderer = new JthFileRenderer(this.state())
+
+        this.renderRoot = renderer.renderJson(
+            this.caseItem.rootId, this.caseItem.jsonData
         )
 
-        console.log(res)
-        this.viewNode = res
+        this.renderRoot.bind(this.cntr = document.createElement('div'))
+        this.cntr.style.height = '100%'
+        this.cntr.style.overflow = '100%'
+        this.cntr.style.background = '#efefef'
     }
 
 }
+
+
+
+
 </script>
 
 
 <script setup lang="ts">
-import { JthRender } from '@renderer/mods/json2html/JthRender';
-import { JthComponent, JthFile } from '../../common';
-import { JthViewFragment, JthWrapedNode } from '@renderer/mods/json2html/JthViewNode';
-import { computed, ref, watch } from 'vue';
+import { JthFileRenderer, JthRenderRoot } from '@renderer/mods/json2html/render';
+import { JthComponent, JthFileState, JthRenderController, TestRenderRoot } from '../base';
+import { computed, ref } from 'vue';
+import { fixReactive } from '@renderer/fix';
+import { HTMLElementInject } from '@renderer/components';
+import { VxButton } from '@renderer/components';
 
 const props = defineProps<{
-    handler: RenderTestHandler
+    controller: JthRenderController,
+    component: JthComponent
 }>()
 
-const container = ref<HTMLDivElement | null>(null)
 
-const viewNode = computed(() => {
-    return props.handler.viewNode
+const caseList = computed(() => {
+    return props.controller.getTestList(props.component.rootId)
 })
 
-watch(viewNode, () => {
-    console.log('viewNode')
-    const containerDiv = container.value
-    console.log('viewNode',containerDiv)
-    if (!containerDiv) return
-    containerDiv.innerHTML = ''
-    console.log('viewNode',containerDiv.innerHTML)
-    const list = viewNode.value?.list.val() ?? []
-    console.log('viewNode',list)
-    list.forEach((vn) => {
-        const list = vn.target.val().map(v=>v.node())
-        list.forEach(e=>{
-            containerDiv.appendChild(e)
-        })
+const cntrMap = new Map<string, TestRenderRoot>()
+
+
+const renderList = computed(() => {
+
+    return caseList.value.map(caseItem => {
+        const { caseId, rootId } = caseItem
+
+        const cache = cntrMap.get(caseId)
+        if (cache) {
+            console.warn('cache')
+            return cache
+        }
+
+        const target = fixReactive(new TestRenderRoot(props.controller, rootId, caseId))
+
+        cntrMap.set(caseId, target)
+
+        return target
     })
 })
+
+const currentEditor = computed(() => {
+    return renderList.value.find(v => v.caseId === current.value)
+})
+
+
+const current = ref<string>('')
+
 
 </script>
 
 
 <template>
     <div class="render-test-view">
-        <div ref="container"></div>
+        <div class="render-test-view__tab-list">
+            <VxButton class="render-test-view__tab" v-for="(val) in caseList"
+                :data-actived.native="current === val.caseId" :click="() => current = val.caseId">
+                <div class="render-test-view__tab-text">{{ val.caseId }}</div>
+            </VxButton>
+
+            <div class="jth-component-body__toolbar-divide"></div>
+
+            <template v-if="currentEditor">
+                <VxButton icon="refresh" :click="() => currentEditor?.update()">
+                    刷新
+                </VxButton>
+            </template>
+        </div>
+
+        <div class="render-test-view__editor-list">
+            <div v-if="!currentEditor" class="render-test-view-empty">{{ caseList.length ? "请选择用例" : "请添加用例" }}</div>
+            <div class="render-test-view__editor" v-for="(val) in renderList" v-show="current == val.caseId">
+                <HTMLElementInject :style="{ height: '100%' }" :target="val.element()"></HTMLElementInject>
+            </div>
+        </div>
     </div>
 </template>
+
+
+<style lang="scss" scoped>
+.render-test-view {
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    .render-test-view__tab-list {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        padding: 12px 6px;
+
+        [data-actived="true"] {
+            outline: 2px solid #fff;
+            font-weight: bolder;
+        }
+
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        .jth-component-body__toolbar-divide {
+            height: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .render-test-view__tab-text {
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-wrap: nowrap;
+            cursor: pointer;
+        }
+
+    }
+
+    .render-test-view__editor-list {
+        flex: 1 1 0;
+        height: 0;
+
+        .render-test-view__editor {
+            height: 100%;
+        }
+
+        .render-test-view-empty {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+    }
+}
+</style>

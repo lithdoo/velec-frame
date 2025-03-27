@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ValueField, ValueGenerator } from '../../common'
+import { ValueField, ValueGenerator } from '../base'
 import { VxSelector, VxInput, VxButton } from '@renderer/components'
 import { FieldEditorHandler } from './handler'
 

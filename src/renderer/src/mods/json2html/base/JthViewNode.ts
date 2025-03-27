@@ -72,7 +72,34 @@ export abstract class JthViewNode {
 }
 
 
+export class JthRenderRoot {
+    shadow: ShadowRoot
+    viewNode?: JthViewNode
+    
+    private updateFn = ()=>{this.update()}
+    constructor(
+        public cntr = document.createElement('div')
+    ){
+        this.shadow = this.cntr.attachShadow({ mode: 'open' })
+    }
 
+
+    inject(viewNode:JthViewNode){
+        if(this.viewNode){
+            this.viewNode.target.removeCallback(this.updateFn)
+        }
+        this.viewNode = viewNode
+        this.viewNode.target.onchanged(this.updateFn)
+        this.update()
+    }
+
+    update(){
+        this.shadow.innerHTML = ''
+        this.viewNode?.target.val().forEach(node => {
+            node.appendTo(this.shadow)
+        })
+    }
+}
 
 export class JthViewFragment extends JthViewNode {
 

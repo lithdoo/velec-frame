@@ -5,8 +5,8 @@ import {
   JthTemplateGroup,
   JthTemplateRoot,
   JthTemplateType,
-  ValueGeneratorRef
-} from './JthTemplate'
+} from '../base/JthTemplate'
+import { ValueGeneratorRef } from '../base'
 
 export type JthComponent = {
   keyName: string
@@ -148,11 +148,6 @@ export class JthState {
     this.vg_store = file.vg_store
   }
 
-  // get file() {
-  //     const snapshot = this.snapshot[this.currentSnapshotIndex]
-  //     return snapshot ?? this.current
-  // }
-
   fileContent() {
     const components: JthFile['components'] = this.components
     const vg_store: JthFile['vg_store'] = {
@@ -204,36 +199,8 @@ export class JthState {
     }
 
     return file
-
-    // export type JthFile = {
-    //     vg_store: {
-    //         [key: string]: ValueGenerator,
-    //         ['null']: ValueGenerator,
-    //         ["blank_string"]: ValueGenerator,
-    //         ["empty_array"]: ValueGenerator,
-    //         ["empty_object"]: ValueGenerator,
-    //         ['true']: ValueGenerator,
-    //         ['false']: ValueGenerator,
-    //     },
-
-    //     template_node: {
-    //         [key: string]: JthTemplate
-    //     }
-
-    //     template_tree: {
-    //         [key: string]: string[]
-    //     }
-
-    //     components: JthComponent[]
-    // }
   }
 
-  // updateVG(ref: ValueGeneratorRef, value: ValueGenerator) {
-  //     const refKey = ref._VALUE_GENERATOR_REFERENCE_
-  //     if (!this.file.vg_store[refKey]) {
-  //         throw new Error(`ValueGeneratorRef ${refKey} not found`)
-  //     }
-  // }
 
   updateTemplate() { }
 

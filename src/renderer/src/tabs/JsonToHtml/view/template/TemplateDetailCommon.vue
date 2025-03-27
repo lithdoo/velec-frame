@@ -25,10 +25,11 @@
 
 <script setup lang="ts">
 import { TemplateDetailHandler, TemplateTreeHandler } from './handler'
-import { JthStateController, JthTemplateType } from '../../common'
+import { JthTemplateType } from '../base'
 import { fixReactive } from '@renderer/fix'
 import { VxSelector } from '@renderer/components'
 import VxButton from '@renderer/components/VxButton/VxButton.vue'
+import { createBlankNode } from '@renderer/mods/json2html/utils'
 
 const props = defineProps<{
   detail: TemplateDetailHandler<any>
@@ -60,7 +61,7 @@ const changeType = fixReactive(
     submit() {
       if (!this.currentType) return
       if (this.currentType.key === props.detail.type()) return
-      const node = JthStateController.createBlankNode(this.currentType.key)
+      const node = createBlankNode(this.currentType.key)
       props.detail.controller.updateTNode({
         ...node,
         id: props.detail.target.id

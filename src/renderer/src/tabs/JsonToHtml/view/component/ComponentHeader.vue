@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { fixReactive } from '@renderer/fix';
-import { JthComponent } from '@renderer/mods/json2html/JthState';
+import { JthComponent } from '@renderer/mods/json2html/base/JthState';
 import InputText, { InputTextHandler } from '../common/InputText.vue'
 
 const props = defineProps<{

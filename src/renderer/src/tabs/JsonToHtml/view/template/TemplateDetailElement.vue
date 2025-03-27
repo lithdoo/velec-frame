@@ -25,6 +25,14 @@
     <div class="template-element-detail__attr" v-for="field in detail.attrs()">
       <TemplateEditField :field="field" :editor="fieldEditor"></TemplateEditField>
     </div>
+    <div class="template-element-detail__sub-title">
+      BEM Style
+      <VxButton only-icon icon="plus" :click="() => bemBinderHandler.newTag()" />
+    </div>
+    <div class="template-element-detail__bem">
+      <!-- <BEMSelector :bem="detail.controller.bem"></BEMSelector> -->
+      <BEMBinder :handler="bemBinderHandler"></BEMBinder>
+    </div>
   </div>
 </template>
 
@@ -34,7 +42,9 @@ import { FieldEditorHandler, type TemplateDetailElementHandler } from './handler
 import TemplateEditField from './TemplateEditField.vue'
 import { VxButton } from '@renderer/components'
 import { VxInput } from '@renderer/components'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import BEMBinder, { BEMElementBinderHandler } from '../bemStyle/BEMElementBinder.vue'
+import { JthModValueStore, JthStateController } from '../base'
 
 const props = defineProps<{
   detail: TemplateDetailElementHandler
@@ -69,6 +79,15 @@ const submitEdit = () => {
   props.detail.changeTagName(currentEditTag.value)
   cancelEdit()
 }
+
+const bemBinderHandler = computed(() => fixReactive(
+  new class extends BEMElementBinderHandler {
+    templateId: string = props.detail.id()
+    bem = props.detail.controller.bem
+    store: JthModValueStore = props.detail.controller.store
+    controller: JthStateController = props.detail.controller
+  })
+)
 </script>
 
 <style lang="scss" scoped>
@@ -93,6 +112,10 @@ const submitEdit = () => {
     flex-direction: column;
     justify-content: center;
     font-weight: bolder;
+  }
+
+  .template-element-detail__bem {
+    padding: 0 8px;
   }
 }
 </style>

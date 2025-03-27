@@ -5,7 +5,8 @@ const model = defineModel<T | null>()
 const inputRef = ref<typeof Select | null>(null)
 const props = defineProps<{
   options: T[]
-  placeholder?: string
+  placeholder?: string,
+  disabled?:boolean
   mounted?: (el: { focus: () => void }) => void
 }>()
 
@@ -36,6 +37,7 @@ onMounted(() => {
       ref="inputRef"
       @change="(val) => onchange(val as any)"
       style="width: 100%"
+      :disabled="disabled"
       :placeholder="placeholder"
     >
       <SelectOption v-for="item in options" :key="item.key" :value="item.key">{{

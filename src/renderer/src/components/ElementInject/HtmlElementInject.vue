@@ -14,6 +14,7 @@ const props = defineProps<{
 const target = computed(() => props.target)
 
 watch(target, () => {
+  console.log('target changed')
   if (container.value) container.value.innerHTML = ''
   if (target.value && container.value) {
     container.value.appendChild(target.value)

@@ -1,0 +1,226 @@
+import { JthFileMod, JthFileState, JthRenderMod, JthRenderState, ValueGeneratorRef } from "../base"
+import { staticValueRef } from "../utils"
+import { JthRenderModlTemplateTree } from "./Template"
+import { JthRenderModValueStore } from "./ValueStore"
+
+export const BEM_STYLE_NAMESPACE: "BEM_STYLE" = "BEM_STYLE"
+
+export type BlockTag = string
+export type ElementTag = string
+export type ModifierTag = string
+
+export type BemTag = [BlockTag, ElementTag | null, ModifierTag | null]
+
+export interface BEMStyleData {
+    last_mod_ts: number
+    list: {
+        readonly tag: BemTag,
+        targets: {
+            templateId: string,
+            cond: ValueGeneratorRef
+        }[],
+        content: string
+    }[]
+}
+
+export class JthModBEMStyle extends JthFileMod<BEMStyleData> {
+    static tagClass(tag: BemTag) {
+        const block = tag[0]
+        const element = tag[1] ? `__${tag[1]}` : ''
+        const modifier = tag[2] ? `--${tag[2]}` : ''
+        return block + element + modifier
+    }
+    static equalTag(source: BemTag, target: BemTag) {
+        return source[0] === target[0] && source[1] === target[1] && source[2] === target[2]
+    }
+    static namespace: 'BEM_STYLE' = 'BEM_STYLE'
+    readonly namespace: "BEM_STYLE" = JthModBEMStyle.namespace
+    static blankData(): BEMStyleData {
+        return { last_mod_ts: new Date().getTime(), list: [] }
+    }
+
+    data: BEMStyleData = JthModBEMStyle.blankData()
+
+    constructor(
+        file: JthFileState
+    ) {
+        super(file)
+        this.reload()
+    }
+
+    reload() {
+        this.data = this.getData() ?? JthModBEMStyle.blankData()
+    }
+
+    private update() {
+        this.data.last_mod_ts = new Date().getTime()
+        this.setData({
+            last_mod_ts: this.data.last_mod_ts,
+            list: this.data.list.map(v => ({ ...v }))
+        })
+    }
+
+    addTag(tag: BemTag, content: string = '') {
+        console.log({ tag })
+        const [block, element, modifier] = tag
+
+        if (this.data.list.find(v => JthModBEMStyle.equalTag(v.tag, tag))) return
+
+
+        if (block && element && modifier) {
+            const ele = this.data.list.find(
+                v => v.tag[0] === block && v.tag[1] === element
+            )
+
+            if (!ele) {
+                throw new Error(`element "${block}__${element}" is not found!`)
+            }
+            const mod = this.data.list.find(v => JthModBEMStyle.equalTag(v.tag, tag))
+
+            if (mod) {
+                throw new Error(`modifier "${block}__${element}--${modifier}" is exist!`)
+            }
+
+            this.data.list = this.data.list.concat([{
+                tag: [block, element, modifier], targets: [], content
+            }])
+
+
+        } else if (block && (element || modifier)) {
+            const blk = this.data.list.find(
+                v => v.tag[0] === block
+            )
+
+            if (!blk) {
+                throw new Error(`block "${block}" is not found!`)
+            }
+            const mod = this.data.list.find(v => JthModBEMStyle.equalTag(v.tag, tag))
+
+            if (mod) {
+                throw new Error(`modifier "${block}__${element ?? ''}--${mod ?? ''}" is exist!`)
+            }
+
+        } else if (block) {
+
+            const blk = this.data.list.find(
+                v => v.tag[0] === block
+            )
+
+            if (blk) {
+                throw new Error(`block "${block}" is exist!`)
+            }
+
+        } else {
+            throw new Error('unknown tag')
+        }
+
+
+        this.data.list = this.data.list.concat([{
+            tag: tag, targets: [], content
+        }])
+
+        this.update()
+    }
+
+    delTag(tag: BemTag) {
+        const [block, element, modifier] = tag
+
+        this.data.list = this.data.list.filter(item => {
+            if (modifier) {
+                return !JthModBEMStyle.equalTag(item.tag, tag)
+            } else if (element) {
+                return !(block === item.tag[0] && element === item.tag[1])
+            } else {
+                return !(block === item.tag[0])
+            }
+        })
+
+        this.update()
+    }
+
+    addTagTemplate(tag: BemTag, templateId: string, cond: ValueGeneratorRef = staticValueRef('true')) {
+        console.warn({
+            tag,
+            list: this.data.list
+        })
+        const tagItem = this.data.list.find(v => JthModBEMStyle.equalTag(v.tag, tag))
+        if (tagItem) {
+            tagItem.targets = tagItem.targets
+                .filter(v => v[0] !== templateId)
+                .concat([{ templateId, cond }])
+        }
+
+        this.update()
+    }
+
+    delTagTemplate(tag: BemTag, templateId: string) {
+        const tagItem = this.data.list.find(v => JthModBEMStyle.equalTag(v.tag, tag))
+        if (tagItem) {
+            tagItem.targets = tagItem.targets
+                .filter(v => v.templateId !== templateId)
+        }
+
+        this.update()
+    }
+
+    getAllTag(): BemTag[] {
+        return this.data.list.map(v => [...v.tag])
+    }
+
+    getTagsByTemplateId(templateId) {
+        return this.data.list.flatMap(({ tag, targets }) => targets.map(({ templateId, cond }) => ({
+            templateId, cond, tag
+        }))).filter(v => v.templateId === templateId)
+    }
+
+    fetchContent(tag: BemTag) {
+
+        const item = this.data.list.find(v => JthModBEMStyle.equalTag(tag, v.tag))
+        if (item) {
+            return item.content
+        } else {
+            throw new Error('error tag')
+        }
+    }
+
+    updateContent(tag: BemTag, content: string) {
+        const item = this.data.list.find(v => JthModBEMStyle.equalTag(tag, v.tag))
+        if (item) {
+            item.content = content
+            this.update()
+        }
+    }
+}
+
+export class JthRenderModBEMStyle extends JthRenderMod<BEMStyleData> {
+
+    static replace(cssText: string, tag: BemTag) {
+        return cssText.replace(/([^{]+?)(\s*\{)/g, (_match, selectors, rest) => {
+            const replacedSelectors = selectors.replace(/&/g, `.${JthModBEMStyle.tagClass(tag)}`);
+            return replacedSelectors + rest;
+        });
+    }
+
+    readonly namespace: "BEM_STYLE" = JthModBEMStyle.namespace
+
+    constructor(
+        file: JthFileState,
+        public template: JthRenderModlTemplateTree,
+        public stroe: JthRenderModValueStore
+    ) {
+        super(file)
+    }
+
+
+    css() {
+        const data = this.getData() ?? JthModBEMStyle.blankData()
+        const { list } = data
+
+        return list.map(({ tag, content }) => {
+            return JthRenderModBEMStyle.replace(content, tag)
+        })
+    }
+
+
+
+}

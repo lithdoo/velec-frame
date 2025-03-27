@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ValueGeneratorRef, ValueGenerator } from '../../common'
+import { ValueGeneratorRef, ValueGenerator } from '../base'
 import { VxSelector, VxInput, VxButton } from '@renderer/components'
 import { ValueEditorHandler } from './handler'
 

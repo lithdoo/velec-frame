@@ -4,20 +4,21 @@ import { FlatTreeHandler, FlatTreeItem } from '@renderer/widgets/FlatTree'
 import { PopMenuBuilder } from '@renderer/widgets/PopMenu'
 import { nanoid } from 'nanoid'
 import {
-  JthComponent,
   JthTemplate,
-  JthStateController,
   JthTemplateElement,
   JthTemplateType,
-  ValueGenerator,
   ValueField,
   JthTemplateProp,
   JthTemplateApply,
   JthTemplateText,
   JthTemplateCond,
   JthTemplateLoop,
-  ValueGeneratorRef
-} from '../../common'
+} from '../base'
+
+import { ValueGeneratorRef, ValueGenerator } from '@renderer/mods/json2html/base'
+import { JthComponent } from '@renderer/mods/json2html/mods'
+import { JthStateController } from '../base'
+import { staticValueRef } from '@renderer/mods/json2html/utils'
 
 export class TemplateTreeHandler {
   static all = new WeakMap<JthComponent, TemplateTreeHandler>()
@@ -54,7 +55,7 @@ export class TemplateTreeHandler {
       }
 
       const addChildrenAfterEach = () => {
-        this.controller.insertTemplateNode(node, { parent: item.templateData.id })
+        this.controller.insertTNode(node, { parent: item.templateData.id })
         this.reload()
         this.flatTree.open(item.id)
         this.flatTree.select(node.id)
@@ -62,21 +63,21 @@ export class TemplateTreeHandler {
       const addChildrenBeforeEach = () => {
         const before = this.controller.getTNodeChildren(item.templateData.id)[0]
         if (!before) addChildrenAfterEach()
-        else this.controller.insertTemplateNode(node, { before })
+        else this.controller.insertTNode(node, { before })
         this.reload()
         this.flatTree.open(item.id)
         this.flatTree.select(node.id)
       }
 
       const inserNodeBefore = () => {
-        this.controller.insertTemplateNode(node, { before: item.id })
+        this.controller.insertTNode(node, { before: item.id })
         this.reload()
         this.flatTree.open(item.id)
         this.flatTree.select(node.id)
       }
 
       const insertNodeAfter = () => {
-        this.controller.insertTemplateNode(node, { after: item.id })
+        this.controller.insertTNode(node, { after: item.id })
         this.reload()
         this.flatTree.open(item.id)
         this.flatTree.select(node.id)
@@ -125,7 +126,7 @@ export class TemplateTreeHandler {
 
   addTemplateToRoot() {
     console.log('addTemplateToRoot')
-    this.controller.insertTemplateNode(
+    this.controller.insertTNode(
       {
         id: nanoid(),
         type: JthTemplateType.Element,
@@ -230,6 +231,10 @@ export class TemplateDetailHandler<T extends JthTemplate> {
     return this.target.type
   }
 
+  id(){
+    return this.target.id
+  }
+
   getChildren() {
     if (!this.isGroup()) return []
     return this.controller
@@ -260,7 +265,7 @@ export class TemplateDetailElementHandler extends TemplateDetailHandler<JthTempl
     const newAttrs: ValueField[] = [
       {
         name: 'field',
-        value: JthStateController.staticValueRef('null')
+        value: staticValueRef('null')
       }
     ].concat(attrs)
 
@@ -301,7 +306,7 @@ export class TemplateDetailApplyHandler extends TemplateDetailHandler<JthTemplat
     const newAttrs: ValueField[] = [
       {
         name: 'field',
-        value: JthStateController.staticValueRef('null')
+        value: staticValueRef('null')
       }
     ].concat(data)
 
@@ -343,7 +348,7 @@ export class TemplateDetailPropHandler extends TemplateDetailHandler<JthTemplate
     const newAttrs: ValueField[] = [
       {
         name: 'field',
-        value: JthStateController.staticValueRef('null')
+        value: staticValueRef('null')
       }
     ].concat(data)
 

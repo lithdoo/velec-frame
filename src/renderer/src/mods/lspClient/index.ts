@@ -55,7 +55,6 @@ export abstract class MonacoEditor {
 	private updateContentTimeout: any | null = null
 
 	updateContent() {
-		console.log('start update')
 		if (this.updateContentTimeout) {
 			clearTimeout(this.updateContentTimeout)
 		}

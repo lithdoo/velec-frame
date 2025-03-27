@@ -1,7 +1,6 @@
+import { nanoid } from "nanoid"
+import { ValueGeneratorRef } from "./JthFile"
 
-export type ValueGeneratorRef = {
-  ['_VALUE_GENERATOR_REFERENCE_']: string
-}
 
 export enum JthTemplateType {
   Apply = 'Apply',
@@ -71,5 +70,3 @@ export type JthTemplate =
   | JthTemplateText
   | JthTemplateElement
   | JthTemplateRoot
-
-

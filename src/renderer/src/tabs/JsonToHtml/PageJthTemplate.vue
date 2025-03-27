@@ -1,5 +1,6 @@
 <template>
   <div class="page-jth-template">
+    <ModalStack :handler="modal"></ModalStack>
     <div class="page-jth-template__toolbar">
       <ToolBar :handler="toolbar"></ToolBar>
     </div>
@@ -25,18 +26,22 @@ import { ToolBarBuilder, ToolBar } from '@renderer/widgets/ToolBar'
 import { nanoid } from 'nanoid'
 import { TemplateTreeHandler } from './view/template/handler'
 import type { PageJthTemplate } from '.'
-import { JthComponent, JthStateController } from './common'
+import { JthComponent, JthStateController } from './view/base'
 import { fixReactive } from '@renderer/fix'
 import ComponentHeader from './view/component/ComponentHeader.vue'
 import ComponentBody, { ComponentBodyHandler } from './view/component/ComponentBody.vue'
+import { ModalStack } from '@renderer/widgets/ModalStack/index'
+import { PageJthBase } from './pageBase'
 
 const props = defineProps<{
   page: PageJthTemplate
 }>()
 
 const current = ref<string | null>(null)
-
 const controller = computed(() => props.page.controller)
+const modal = computed(()=>{
+  return PageJthBase.modal(props.page.controller)
+})
 
 function focus(id: string) {
   if (current.value === id) current.value = null
