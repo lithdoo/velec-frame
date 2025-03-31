@@ -3,8 +3,8 @@ export * from '@renderer/mods/json2html/mods'
 // export { JthStateController, JthState } from '@renderer/mods/json2html/mods/JthState'
 
 
-import { JthFileState, JthRenderRoot, JthTemplate, JthTemplateBase, JthTemplateGroup, JthTemplateRoot, JthTemplateType, ValueGenerator, ValueGeneratorRef } from '@renderer/mods/json2html/base'
-import { JthModBEMStyle, JthModComponent, JthModTemplateTree, JthModTestCase, JthModValueStore, JthRenderModBEMStyle, JthRenderModComponent, JthRenderModlTemplateTree, JthRenderModTestCase, JthRenderModValueStore, TemplateNodeTree } from '@renderer/mods/json2html/mods';
+import { JthFileState, JthRenderMod, JthRenderRoot, JthTemplate, JthTemplateBase, JthTemplateGroup, JthTemplateRoot, JthTemplateType, ValueGenerator, ValueGeneratorRef } from '@renderer/mods/json2html/base'
+import { JthModBEMStyle, JthModComponent, JthModTemplateTree, JthModTestCase, JthModValueStore, JthRenderModBEMStyle, JthRenderModComponent, JthRenderModlTemplateTree, JthRenderModTestCase, JthRenderModValueStore } from '@renderer/mods/json2html/mods';
 import { nanoid } from 'nanoid';
 
 
@@ -25,7 +25,9 @@ export class JthStateController {
         public component: JthModComponent = new JthModComponent(fileState),
         public test: JthModTestCase = new JthModTestCase(fileState, component),
         public bem: JthModBEMStyle = new JthModBEMStyle(fileState)
-    ) { }
+    ) {
+
+    }
 
     getFileState() {
         return this.fileState.clone()
@@ -248,19 +250,46 @@ export class JthRenderController {
     constructor(
         public fileState: JthFileState,
         public store = new JthRenderModValueStore(fileState),
-        public template = new JthRenderModlTemplateTree(fileState, this.store),
-        public component = new JthRenderModComponent(fileState, this.template, this.store),
+        public template = new JthRenderModlTemplateTree(fileState, store),
+        public component = new JthRenderModComponent(fileState, template, store),
         public test = new JthRenderModTestCase(fileState),
-        public bem = new JthRenderModBEMStyle(fileState, this.template, this.store)
-    ) { }
+        public bem = new JthRenderModBEMStyle(fileState, template, store)
+    ) {
+        console.log(this.component)
+        console.log(this.store)
+        console.log(this)
+    }
 
     getTestList(rootId: string) {
         return this.test.getTestList(rootId)
     }
 
-    createTestRender(caseId: string) {
-
+    preRender() {
+        [
+            this.store,
+            this.template,
+            this.component,
+            this.test,
+            this.bem,
+        ].forEach(v => v[JthRenderMod.preRender]())
     }
+
+    dealRoot(root: ShadowRoot) {
+        [
+            this.store,
+            this.template,
+            this.component,
+            this.test,
+            this.bem,
+        ].forEach(v => v[JthRenderMod.dealRoot](root))
+    }
+
+    renderByJson(root: ShadowRoot, rootId: string, json: string) {
+        this.preRender()
+        this.dealRoot(root)
+        return this.component.renderByJson(rootId, json)
+    }
+
 
 }
 
@@ -282,9 +311,13 @@ export class TestRenderRoot {
 
     update() {
         const json = this.json()
-        const vnode = this.controller.component.renderByJson(this.rootId, json)
+        const vnode = this.controller.renderByJson(
+            this.root.shadow,
+            this.rootId,
+            json
+        )
         this.root.inject(vnode)
     }
 
-    element(){return this.root.cntr}
+    element() { return this.root.cntr }
 }

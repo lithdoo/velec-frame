@@ -237,6 +237,8 @@ export class JthModTemplateTree extends JthFileMod<JthTemplateTreeNodeData> {
 
 export class JthRenderModlTemplateTree extends JthRenderMod<JthTemplateTreeNodeData> {
 
+
+
     readonly namespace: 'TEMPLATE_TREE_NODE' = JthModTemplateTree.namespace
 
     constructor(
@@ -265,7 +267,28 @@ export class JthRenderModlTemplateTree extends JthRenderMod<JthTemplateTreeNodeD
         return new MutTable(val)
     }
 
-    render(id: string, scope: JthRenderScope): JthViewNode {
+    renderRoot(rootId: string, scope: JthRenderScope) {
+        const node = this.nodes[rootId]
+        if (!node)
+            throw new Error('error root id!')
+        if (node.type !== JthTemplateType.Root)
+            throw new Error('error root id!')
+
+        return this.renderChildren(rootId, scope)
+    }
+
+
+    transElementAttr: Map<string,
+        (
+            source: MutVal<{ [key: string]: any; }>,
+            val: (ref: ValueGeneratorRef) => MutVal<any>
+        ) => MutVal<{ [key: string]: any; }>
+    > = new Map()
+
+
+
+
+    private render(id: string, scope: JthRenderScope): JthViewNode {
         const node = this.nodes[id]
         if (!node)
             throw new Error('error node id!')
@@ -279,8 +302,10 @@ export class JthRenderModlTemplateTree extends JthRenderMod<JthTemplateTreeNodeD
         if (node.type === JthTemplateType.Element) {
             const tagName = node.tagName
             const attrs = this.getObjValue(node.attrs, scope)
+            const trans = this.transElementAttr.get(id)
+            const tranAttr = trans ? trans(attrs, (ref) => this.getValue(ref, scope)) : attrs
             const children = this.renderChildren(id, scope)
-            const vnode = new JthViewElement(tagName, attrs, children)
+            const vnode = new JthViewElement(tagName, tranAttr, children)
             return vnode
         }
 
@@ -311,6 +336,7 @@ export class JthRenderModlTemplateTree extends JthRenderMod<JthTemplateTreeNodeD
             // todo
         }
 
+        console.error(node)
         throw new Error('unknown node type')
     }
 
@@ -321,4 +347,8 @@ export class JthRenderModlTemplateTree extends JthRenderMod<JthTemplateTreeNodeD
         return fragment
     }
 
+
+    [JthRenderMod.preRender](){
+        this.transElementAttr = new Map()
+    }
 }

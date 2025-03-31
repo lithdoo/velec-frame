@@ -1,4 +1,5 @@
-import { JthFileMod, JthFileState, JthRenderMod, JthRenderState, ValueGeneratorRef } from "../base"
+import { className } from "@antv/x6/lib/registry/highlighter/class"
+import { MutComputed, JthFileMod, JthFileState, JthRenderMod, ValueGeneratorRef } from "../base"
 import { staticValueRef } from "../utils"
 import { JthRenderModlTemplateTree } from "./Template"
 import { JthRenderModValueStore } from "./ValueStore"
@@ -221,6 +222,46 @@ export class JthRenderModBEMStyle extends JthRenderMod<BEMStyleData> {
         })
     }
 
+
+
+    [JthRenderMod.preRender]() {
+        const data = this.getData() ?? JthModBEMStyle.blankData()
+        const { list } = data
+
+        list.flatMap(({ tag, targets }) => targets.map(val => ({ ...val, tag })))
+            .forEach(({ tag, templateId, cond }) => {
+                const trans = this.template.transElementAttr.get(templateId)
+                const className = JthModBEMStyle.tagClass(tag)
+                if (trans) {
+                    // todo
+                } else {
+                    this.template.transElementAttr.set(templateId, (upper, val) => {
+                        const condtion = val(cond)
+                        return new MutComputed<[{ [key: string]: any; }, any], any>
+                            ([upper, condtion], (attr, cond) => {
+                                return {
+                                    ...attr,
+                                    class: `${attr?.class ?? ''} ${cond ? className : ''}`
+                                }
+                            })
+
+                    })
+                }
+            })
+    }
+
+    [JthRenderMod.dealRoot](root) {
+        this.css()
+            .map(cssHtml => {
+                console.log({cssHtml})
+                const style = document.createElement('style')
+                style.innerHTML = cssHtml
+                return style
+            })
+            .forEach(style => {
+                root.appendChild(style)
+            })
+    }
 
 
 }

@@ -70,7 +70,7 @@ import { computed } from 'vue';
 import { BemTag, JthModBEMStyle, JthModValueStore, JthStateController } from '../base';
 import VxButton from '@renderer/components/VxButton/VxButton.vue';
 import BEMSelector from './BEMSelector.vue';
-import { PageJthBase } from '../../pageBase';
+import { PageJthBase } from '../../PageBase';
 
 const props = defineProps<{ handler: BEMElementBinderHandler }>()
 const list = computed(() => props.handler.tagList())

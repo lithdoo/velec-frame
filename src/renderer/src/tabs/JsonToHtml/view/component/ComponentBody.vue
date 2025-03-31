@@ -2,6 +2,7 @@
 export abstract class ComponentBodyHandler {
     current: 'template' | 'defstate' | "render" = 'template'
     abstract controler: JthStateController
+    abstract renderer: JthRenderController
     abstract component: JthComponent
 
     isCurTemplate() { return this.current === 'template' }
@@ -17,7 +18,7 @@ export abstract class ComponentBodyHandler {
     showRender() { this.current = 'render' }
 
 
-    addTest(){
+    addTest() {
         this.controler.addTestCase(this.component.rootId)
         console.log(this.controler)
     }
@@ -28,7 +29,7 @@ export abstract class ComponentBodyHandler {
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { JthComponent, JthStateController } from '../base';
+import { JthComponent, JthRenderController, JthStateController } from '../base';
 import TemplateTree from '../template/TemplateTree.vue'
 import { TemplateTreeHandler } from '../template/handler';
 import VxButton from '@renderer/components/VxButton/VxButton.vue';
@@ -53,7 +54,8 @@ const tree = computed(() =>
         <div class="jth-component-body__toolbar">
             <VxButton :data-actived.native="handler.isCurTemplate()" :click="() => handler.showTemplate()">Template Tree
             </VxButton>
-            <VxButton :data-actived.native="handler.isCurDefState()" :click="() => handler.showDefState()">Test Json</VxButton>
+            <VxButton :data-actived.native="handler.isCurDefState()" :click="() => handler.showDefState()">Test Json
+            </VxButton>
             <VxButton :data-actived.native="handler.isCurRender()" :click="() => handler.showRender()">Render View
             </VxButton>
 
@@ -94,7 +96,7 @@ const tree = computed(() =>
                 <StateJsonEditor :component="handler.component" :controller="handler.controler"></StateJsonEditor>
             </div>
             <div v-show="handler.isCurRender()">
-                <RenderTestView :component="handler.component" :controller="handler.controler"></RenderTestView>
+                <RenderTestView :component="handler.component" :controller="handler.renderer"></RenderTestView>
             </div>
         </div>
     </div>

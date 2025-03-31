@@ -1,11 +1,11 @@
 import { TabPage } from '@renderer/parts/PageTab'
 import PageJthTemplateVue from './PageJthTemplate.vue'
-import { JthFileState, JthStateController } from './view/base'
+import { JthFileState, JthRenderController, JthStateController } from './view/base'
 import { VNode } from 'vue'
 import { fixReactive } from '@renderer/fix'
 import { FileControl } from '@renderer/mods/fileUtils'
 import { ModalStackHandler } from '@renderer/widgets/ModalStack/index'
-import { PageJthBase } from './pageBase'
+import { PageJthBase } from './PageBase'
 
 export class PageJthTemplate implements TabPage {
 
@@ -18,7 +18,9 @@ export class PageJthTemplate implements TabPage {
   tabId: string = Math.random().toString()
   element: VNode
   icon = 'del'
-  controller: JthStateController
+  readonly controller: JthStateController
+  readonly renderer: JthRenderController
+  readonly fileState: JthFileState
   title: string
   file: FileControl
   modal: ModalStackHandler = fixReactive(new ModalStackHandler())
@@ -26,7 +28,9 @@ export class PageJthTemplate implements TabPage {
   constructor(public fileUrl: string) {
     this.title = fileUrl
     this.file = new FileControl(fileUrl)
-    this.controller = fixReactive(new JthStateController(new JthFileState()))
+    this.fileState = fixReactive(new JthFileState())
+    this.controller = fixReactive(new JthStateController(this.fileState))
+    this.renderer = fixReactive(new JthRenderController(this.fileState))
     this.element = <div></div>
   }
 

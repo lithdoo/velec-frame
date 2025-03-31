@@ -26,12 +26,12 @@ import { ToolBarBuilder, ToolBar } from '@renderer/widgets/ToolBar'
 import { nanoid } from 'nanoid'
 import { TemplateTreeHandler } from './view/template/handler'
 import type { PageJthTemplate } from '.'
-import { JthComponent, JthStateController } from './view/base'
+import { JthComponent, JthRenderController, JthStateController } from './view/base'
 import { fixReactive } from '@renderer/fix'
 import ComponentHeader from './view/component/ComponentHeader.vue'
 import ComponentBody, { ComponentBodyHandler } from './view/component/ComponentBody.vue'
 import { ModalStack } from '@renderer/widgets/ModalStack/index'
-import { PageJthBase } from './pageBase'
+import { PageJthBase } from './PageBase'
 
 const props = defineProps<{
   page: PageJthTemplate
@@ -39,6 +39,7 @@ const props = defineProps<{
 
 const current = ref<string | null>(null)
 const controller = computed(() => props.page.controller)
+const renderer = computed(() => props.page.renderer)
 const modal = computed(()=>{
   return PageJthBase.modal(props.page.controller)
 })
@@ -71,6 +72,7 @@ const genBodyHandler = (component:JthComponent)=>{
     return fixReactive(new class extends ComponentBodyHandler {
         controler: JthStateController = controller.value
         component: JthComponent = component
+        renderer: JthRenderController = renderer.value
     })
 } 
 

@@ -13,11 +13,11 @@ export interface ModalInfoOption {
 
 
 <script setup lang="ts">
-import { computed, VNode } from 'vue'
+import {  VNode } from 'vue'
 // import { VxIcon } from '@renderer/components'
 import { ElementInject } from '@renderer/components'
 
-const props = defineProps<{ info: ModalInfoOption }>()
+defineProps<{ info: ModalInfoOption }>()
 </script>
 
 <template>

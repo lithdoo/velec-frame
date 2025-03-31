@@ -19,8 +19,16 @@ export abstract class JthRenderState {
 }
 
 
+const preRender = Symbol()
+const dealRoot = Symbol()
+
 export abstract class JthRenderMod<T> {
+    static preRender = preRender
+    static dealRoot = dealRoot
+
+
     abstract readonly namespace: string
+
 
     constructor(
         protected readonly file: JthFileState
@@ -30,4 +38,6 @@ export abstract class JthRenderMod<T> {
         return this.file.getModData<T>(this.namespace)
     }
 
+    [preRender]() { }
+    [dealRoot](_root: ShadowRoot): void { }
 }

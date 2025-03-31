@@ -89,7 +89,7 @@ export class JthRenderModComponent extends JthRenderMod<JthComponentData> {
     constructor(
         public file: JthFileState,
         public template: JthRenderModlTemplateTree,
-        public stroe: JthRenderModValueStore
+        public store: JthRenderModValueStore
     ) {
         super(file)
     }
@@ -99,8 +99,8 @@ export class JthRenderModComponent extends JthRenderMod<JthComponentData> {
     }
 
     renderByJson(rootId: string, json: string) {
-        const scope = this.stroe.createScopeFromjson(json)
-        return this.template.render(rootId, scope)
+        const scope = this.store.createScopeFromjson(json)
+        return this.template.renderRoot(rootId, scope)
     }
 
 }

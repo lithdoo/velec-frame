@@ -159,6 +159,7 @@ const current = ref<string>('')
 
         .render-test-view__editor {
             height: 100%;
+            background: #fff;
         }
 
         .render-test-view-empty {

@@ -8,7 +8,7 @@ import { markRaw } from 'vue';
 import * as monaco from 'monaco-editor'
 
 window.MonacoEnvironment = {
-	getWorker: function (moduleId, label) {
+	getWorker: function (_moduleId, label) {
 		if (label === 'json') {
 			return new jsonWorker();
 		}
