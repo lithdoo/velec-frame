@@ -6,7 +6,8 @@ export type JtjTestCaseData = {
     test_case_list: {
         rootId: string,
         caseId: string,
-        jsonData: string
+        jsonData: string,
+        type?: 'script' | 'text'
     }[]
 }
 
@@ -41,6 +42,10 @@ export class JthModTestCase extends JthFileMod<JtjTestCaseData> {
         return this.data.test_case_list.find(v => v.caseId === caseId)?.jsonData ?? ''
     }
 
+    getTestJsonType(caseId:string){
+        return  this.data.test_case_list.find(v => v.caseId === caseId)?.type ?? 'text'
+    }
+
     addTestCase(testCase: JtjTestCaseData['test_case_list']['0']) {
         const { rootId, caseId } = testCase
         const all = this.component.allComponents()
@@ -64,15 +69,17 @@ export class JthModTestCase extends JthFileMod<JtjTestCaseData> {
     }
 
     updateCaseData(caseId: string, jsonData: string) {
-
-        if (!this.data.test_case_list.find(v => v.caseId === caseId)) {
+        const item = this.data.test_case_list.find(v => v.caseId === caseId)
+        if (! item) {
             throw new Error(`caseid "${caseId}" is not found!`)
         }
 
-        try {
-            JSON.parse(jsonData)
-        } catch (e: any) {
-            throw new Error(`json is not valid: ${e.message}`)
+        if(item.type !== 'script'){
+            try {
+                JSON.parse(jsonData)
+            } catch (e: any) {
+                throw new Error(`json is not valid: ${e.message}`)
+            }
         }
 
         this.data.test_case_list = this.data.test_case_list.map(v => v.caseId == caseId
@@ -106,7 +113,15 @@ export class JthRenderModTestCase extends JthRenderMod<JtjTestCaseData> {
         return (this.getData()?.test_case_list ?? []).filter(v => v.rootId === rootId)
     }
 
-    getCaseJson(caseId:string){
-        return (this.getData()?.test_case_list?? []).filter(v=>v.caseId === caseId)[0]?.jsonData
+    getCaseJson(caseId: string) {
+        const caseItem = (this.getData()?.test_case_list ?? []).find(v => v.caseId === caseId)
+        if (!caseItem) return "{}"
+        if (caseItem.type === 'script') {
+            const fn = new Function(caseItem.jsonData)
+            return JSON.stringify(fn())
+        } else {
+            return caseItem.jsonData
+        }
+        // return (this.getData()?.test_case_list ?? []).filter(v => v.caseId === caseId)[0]?.jsonData
     }
 }

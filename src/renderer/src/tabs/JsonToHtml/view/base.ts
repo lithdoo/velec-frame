@@ -58,8 +58,9 @@ export class JthStateController {
         })
 
         this.template.insertNode(root)
-    }
 
+        return root.id
+    }
 
     removeComponent(keyName: string) {
         const component = this.component.allComponents().find((v) => v.keyName === keyName)
@@ -216,12 +217,13 @@ export class JthStateController {
         return this.test.getAllTestList().filter(v => v.rootId === rootId)
     }
 
-    addTestCase(rootId: string) {
+    addTestCase(rootId: string, isScript: boolean = false) {
         const caseId = nanoid()
         const jsonData = "{}"
 
         this.test.addTestCase({
-            rootId, caseId, jsonData
+            rootId, caseId, jsonData,
+            type: isScript ? 'script' : 'text'
         })
     }
 
@@ -231,6 +233,9 @@ export class JthStateController {
 
     getTestJsonData(caseId: string) {
         return this.test.getTestJsonData(caseId)
+    }
+    getTestJsonType(caseId: string) {
+        return this.test.getTestJsonType(caseId)
     }
     setTestJsonData(caseId: string, json: string) {
         return this.test.updateCaseData(caseId, json)

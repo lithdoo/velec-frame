@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import { fixReactive } from '@renderer/fix';
-// import { JthComponent } from '@renderer/mods/json2html/base/JthState';
 import InputText, { InputTextHandler } from '../common/InputText.vue'
-import { JthComponent } from '../base';
+import { JthComponent, JthModComponent } from '../base';
 
 const props = defineProps<{
     component: JthComponent,
+    mod: JthModComponent
     actived: boolean,
     active: () => void
 }>()
 
 const inputText = fixReactive(new class extends InputTextHandler {
-    text() { return props.component.keyName }
-    submit(text: string): void { props.component.keyName = text }
+    text() { 
+        return props.component.keyName 
+    }
+    submit(text: string): void { 
+        // props.component.keyName = text 
+        props.mod.renameComponent(
+            props.component.rootId,
+            text
+        )
+    }
 })
 
 </script>

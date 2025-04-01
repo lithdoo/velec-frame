@@ -21,6 +21,7 @@ class TestJsonEditorHandler {
     }
 
     text: TextEditorHandler
+    type: JtjTestCaseData['test_case_list'][0]['type']
 
     constructor(
         public rootId: string,
@@ -31,7 +32,10 @@ class TestJsonEditorHandler {
             this.rootId, this.caseId, this.controller
         ), fixReactive(this))
         const content = this.controller.getTestJsonData(this.caseId)
-        this.text = new TextEditorHandler(content, 'JSON')
+        this.type = this.controller.getTestJsonType(this.caseId)
+        this.text = new TextEditorHandler(content,
+            this.type === 'script' ? 'javascript' : 'json'
+        )
     }
 
     reload() {
@@ -57,7 +61,7 @@ class TestJsonEditorHandler {
 
 <script setup lang="ts">
 import { TextEditor, TextEditorHandler } from '@renderer/widgets/TextEditor';
-import { JthComponent, JthStateController } from '../base';
+import { JthComponent, JthStateController, JtjTestCaseData } from '../base';
 import { fixReactive } from '@renderer/fix';
 import { computed, ref } from 'vue';
 import { VxButton } from '@renderer/components';

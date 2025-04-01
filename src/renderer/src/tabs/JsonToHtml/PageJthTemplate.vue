@@ -9,7 +9,7 @@
       <div class="page-jth-template__component" v-for="tree in trees" :key="tree.id"
         :data-current="tree.id === current">
 
-        <ComponentHeader :active="() => focus(tree.id)" :actived="tree.id === current" :component="tree.component">
+        <ComponentHeader :active="() => focus(tree.id)" :actived="tree.id === current" :mod="controller.component" :component="tree.component">
         </ComponentHeader>
 
         <div class="page-jth-template__component-content">
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { ToolBarBuilder, ToolBar } from '@renderer/widgets/ToolBar'
 import { nanoid } from 'nanoid'
 import { TemplateTreeHandler } from './view/template/handler'
@@ -51,7 +51,9 @@ function focus(id: string) {
 
 const toolbar = ToolBarBuilder.create()
   .button('addComponent', '添加组件', async () => {
-    await controller.value.newComponent('Component-' + nanoid())
+    const id = await controller.value.newComponent('Component-' + nanoid())
+    console.log(id)
+    focus(id)
   })
   .button('reload', '从文件中刷新', async () => {
     await props.page.reload()
@@ -66,6 +68,14 @@ const trees = computed(() => {
   return components.map(
     (c) => TemplateTreeHandler.all.get(c) ?? TemplateTreeHandler.create(controller.value, c)
   )
+})
+
+
+watch(trees,()=>{
+  if(current.value) return 
+  const first = trees.value[0]
+  if(!first) return 
+  focus(first.id)
 })
 
 const genBodyHandler = (component:JthComponent)=>{

@@ -98,6 +98,7 @@ export class JthRenderModComponent extends JthRenderMod<JthComponentData> {
         return this.getData()?.components
     }
 
+
     renderByJson(rootId: string, json: string) {
         const scope = this.store.createScopeFromjson(json)
         return this.template.renderRoot(rootId, scope)

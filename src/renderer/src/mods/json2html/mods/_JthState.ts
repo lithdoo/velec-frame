@@ -506,7 +506,7 @@ export class JthStateController {
     return tree
   }
 
-  file(){
+  file() {
     return this.state.fileContent()
   }
 }

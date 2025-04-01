@@ -39,6 +39,7 @@ export class TemplateTreeHandler {
     public component: JthComponent
   ) {
     this.reload()
+    this.id = component.rootId
   }
 
   init() {

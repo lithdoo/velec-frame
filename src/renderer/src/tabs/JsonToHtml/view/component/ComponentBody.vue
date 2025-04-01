@@ -18,9 +18,12 @@ export abstract class ComponentBodyHandler {
     showRender() { this.current = 'render' }
 
 
-    addTest() {
+    addTextTest() {
         this.controler.addTestCase(this.component.rootId)
-        console.log(this.controler)
+    }
+
+    addScriptTest() {
+        this.controler.addTestCase(this.component.rootId, true)
     }
 }
 </script>
@@ -74,8 +77,11 @@ const tree = computed(() =>
             </template>
 
             <template v-if="handler.isCurDefState()">
-                <VxButton icon="refresh" :click="() => handler.addTest()">
-                    添加用例
+                <VxButton icon="refresh" :click="() => handler.addTextTest()">
+                    添加 Text 用例
+                </VxButton>
+                <VxButton icon="refresh" :click="() => handler.addScriptTest()">
+                    添加 Sciprt 用例
                 </VxButton>
             </template>
 
