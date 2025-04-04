@@ -1,7 +1,13 @@
 <template>
   <div class="template-element-apply">
     <div class="template-element-apply__sub-title">Component</div>
-    <div class="template-element-apply__component">
+    <div class="" style="padding: 8px;">
+
+      <VxSelector :options="components" :model-value="current" @update:model-value="val => onchange(val)"></VxSelector>
+    </div>
+
+
+    <!-- <div class="template-element-apply__component">
       <TemplateEditValue
         :value="detail.target.component"
         :editor="compoentEditor"
@@ -13,37 +19,29 @@
     </div>
     <div class="template-element-apply__attr" v-for="field in detail.data()">
       <TemplateEditField :field="field" :editor="fieldEditor"> </TemplateEditField>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script setup lang="ts">
-import { fixReactive } from '@renderer/fix'
-import { FieldEditorHandler, ValueEditorHandler, type TemplateDetailApplyHandler } from './handler'
-import TemplateEditValue from './TemplateEditValue.vue'
-import TemplateEditField from './TemplateEditField.vue'
-import { VxButton } from '@renderer/components'
+import { type TemplateDetailApplyHandler } from './handler'
+import { computed } from 'vue'
+import VxSelector from '@renderer/components/VxInput/VxSelector.vue'
 
 const props = defineProps<{ detail: TemplateDetailApplyHandler }>()
 
-const fieldEditor = fixReactive(
-  new FieldEditorHandler(props.detail.controller, (oldone, newone) => {
-    if (oldone === newone) return
-    props.detail.updateAttr(oldone, newone)
-  })
-)
+const components = computed(() => props.detail.components().map(val => ({
+  key: val.rootId, label: val.keyName
+})))
 
-const compoentEditor = fixReactive(
-  new ValueEditorHandler(props.detail.controller, (oldone, newone) => {
-    if (oldone === newone) return
-    props.detail.setComponent(newone)
-  })
-)
+const current = computed(() => {
+  return components.value.find(v => v.key === props.detail.target.target)
+})
 
-const addField = () => {
-  props.detail.addField()
-  fieldEditor.beginEdit(props.detail.data()[0])
+const onchange = (val?: { key: string } | null) => {
+  props.detail.updateTarget(val?.key ?? '')
 }
+
 </script>
 
 <style lang="scss" scoped>

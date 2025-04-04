@@ -109,7 +109,8 @@ export class JthState {
 
   static getNodeVgRefs(node: JthTemplate): ValueGeneratorRef[] {
     if (node.type === JthTemplateType.Apply) {
-      return [node.component, ...node.data.map((v) => v.value)]
+      // return [node.component, ...node.data.map((v) => v.value)]
+      return []
     } else if (node.type === JthTemplateType.Cond) {
       return [node.test]
     }
@@ -312,8 +313,9 @@ export class JthStateController {
         id: nanoid(),
         type,
         isGroup: false,
-        data: [],
-        component: JthStateController.staticValueRef('null')
+        target:''
+        // data: [],
+        // component: JthStateController.staticValueRef('null')
       }
     } else if (type === JthTemplateType.Loop) {
       node = {

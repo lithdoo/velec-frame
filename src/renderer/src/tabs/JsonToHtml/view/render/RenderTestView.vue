@@ -1,37 +1,37 @@
 <script lang="ts">
-export class RenderTestHandler {
+// export class RenderTestHandler {
 
-    cntr = document.createElement('div')
+//     cntr = document.createElement('div')
 
-    renderRoot?: JthRenderRoot
+//     renderRoot?: JthRenderRoot
 
-    constructor(
-        public caseItem: {
-            rootId: string;
-            caseId: string;
-            jsonData: string;
-        },
-        public state: () => JthFileState,
-    ) { }
+//     constructor(
+//         public caseItem: {
+//             rootId: string;
+//             caseId: string;
+//             jsonData: string;
+//         },
+//         public state: () => JthFileState,
+//     ) { }
 
-    render() {
-        if (this.renderRoot) {
-            this.renderRoot.despose()
-        }
+//     render() {
+//         if (this.renderRoot) {
+//             this.renderRoot.despose()
+//         }
 
-        const renderer = new JthFileRenderer(this.state())
+//         const renderer = new JthFileRenderer(this.state())
 
-        this.renderRoot = renderer.renderJson(
-            this.caseItem.rootId, this.caseItem.jsonData
-        )
+//         this.renderRoot = renderer.renderJson(
+//             this.caseItem.rootId, this.caseItem.jsonData
+//         )
 
-        this.renderRoot.bind(this.cntr = document.createElement('div'))
-        this.cntr.style.height = '100%'
-        this.cntr.style.overflow = '100%'
-        this.cntr.style.background = '#efefef'
-    }
+//         this.renderRoot.bind(this.cntr = document.createElement('div'))
+//         this.cntr.style.height = '100%'
+//         this.cntr.style.overflow = '100%'
+//         this.cntr.style.background = '#efefef'
+//     }
 
-}
+// }
 
 
 
@@ -40,8 +40,8 @@ export class RenderTestHandler {
 
 
 <script setup lang="ts">
-import { JthFileRenderer, JthRenderRoot } from '@renderer/mods/json2html/render';
-import { JthComponent, JthFileState, JthRenderController, TestRenderRoot } from '../base';
+// import { JthFileRenderer, JthRenderRoot } from '@renderer/mods/json2html/render';
+import { JthComponent, JthRenderController, TestRenderRoot } from '../base';
 import { computed, ref } from 'vue';
 import { fixReactive } from '@renderer/fix';
 import { HTMLElementInject } from '@renderer/components';

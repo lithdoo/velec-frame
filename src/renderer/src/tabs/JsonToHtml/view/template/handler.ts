@@ -169,7 +169,7 @@ export class TemplateTreeHandler {
     }
 
     if (template.type === JthTemplateType.Apply) {
-      return renderValue(template.component)
+      // return renderValue(template.component)
     }
 
     if (template.type === JthTemplateType.Cond) {
@@ -297,44 +297,15 @@ export class TemplateDetailElementHandler extends TemplateDetailHandler<JthTempl
 }
 
 export class TemplateDetailApplyHandler extends TemplateDetailHandler<JthTemplateApply> {
-  data() {
-    return this.target.data
+  components(){
+    return this.controller.component.allComponents()
   }
 
-  addField() {
-    const target = this.target
-    const data = target.data
-    const newAttrs: ValueField[] = [
-      {
-        name: 'field',
-        value: staticValueRef('null')
-      }
-    ].concat(data)
-
+  updateTarget(rootId:string){
     this.controller.updateTNode({
       ...this.target,
-      data: newAttrs
+      target:rootId
     })
-
-    this.reload()
-  }
-
-  updateAttr(old: ValueField, newone: ValueField) {
-    const hasAttr = this.target.data.findIndex((attr) => attr === old) >= 0
-    if (!hasAttr) throw new Error('no such attr')
-    this.controller.updateTNode({
-      ...this.target,
-      data: this.target.data.map((attr) => (attr === old ? newone : attr))
-    })
-    this.reload()
-  }
-
-  setComponent(t: ValueGeneratorRef) {
-    this.controller.updateTNode<JthTemplateApply>({
-      ...this.target,
-      component: t
-    })
-    this.reload()
   }
 }
 

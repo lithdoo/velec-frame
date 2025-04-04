@@ -137,6 +137,7 @@ export class JthRenderRoot {
     constructor(
         public cntr = document.createElement('div')
     ) {
+        this.cntr.style.height = '100%'
         this.shadow = this.cntr.attachShadow({ mode: 'open' })
     }
 

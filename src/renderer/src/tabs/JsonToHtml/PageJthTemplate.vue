@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { ToolBarBuilder, ToolBar } from '@renderer/widgets/ToolBar'
 import { nanoid } from 'nanoid'
 import { TemplateTreeHandler } from './view/template/handler'

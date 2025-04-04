@@ -1,4 +1,3 @@
-import { className } from "@antv/x6/lib/registry/highlighter/class"
 import { MutComputed, JthFileMod, JthFileState, JthRenderMod, ValueGeneratorRef } from "../base"
 import { staticValueRef } from "../utils"
 import { JthRenderModlTemplateTree } from "./Template"

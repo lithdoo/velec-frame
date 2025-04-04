@@ -46,9 +46,7 @@ export type JthTemplateCond = JthTemplateGroup<JthTemplateType.Cond> & {
 }
 
 export type JthTemplateApply = JthTemplateBase<JthTemplateType.Apply> & {
-  component: ValueGeneratorRef
-  isGroup: false
-  data: ValueField[]
+  target: string
 }
 
 export type JthTemplateLoop = JthTemplateGroup<JthTemplateType.Loop> & {

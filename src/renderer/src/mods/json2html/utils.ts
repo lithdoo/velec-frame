@@ -59,8 +59,7 @@ export function createBlankNode(type: JthTemplateType) {
             id: nanoid(),
             type,
             isGroup: false,
-            data: [],
-            component: staticValueRef('null')
+            target: '',
         }
     } else if (type === JthTemplateType.Loop) {
         node = {

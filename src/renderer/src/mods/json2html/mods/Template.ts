@@ -5,11 +5,8 @@ import { JthRenderModValueStore } from "./ValueStore"
 
 export type JthTemplateTreeNodeData = {
     last_mod_ts: number
-
     template_node: templateNodeTable
-
     template_tree: TemplateNodeTree
-
 }
 
 export type templateNodeTable = {
@@ -50,6 +47,21 @@ export class JthRenderScope {
     children() {
         return new JthRenderScope(this.state, this.table)
     }
+
+    gen(data: ValueField[]) {
+        const target = data.map(({ name, value }) => {
+            const raw = this.val(value).val()
+            return { name, raw }
+        }).reduce<Record<string, any>>((res, cur) => {
+            return { ...res, [cur.name]: cur.raw }
+        }, {})
+
+        console.warn(target)
+        return new JthRenderScope(
+            new JthRenderScopeState(target), this.table
+        )
+    }
+
     add(trans: { key: string, value: any }[]) {
         return new JthRenderScope(
             new JthRenderScopeState(
@@ -208,7 +220,7 @@ export class JthModTemplateTree extends JthFileMod<JthTemplateTreeNodeData> {
             data?.template_node ?? {}
         )].flatMap(node => {
             if (node.type === JthTemplateType.Apply) {
-                return [node.component, ...node.data.map((v) => v.value)]
+                return []
             } else if (node.type === JthTemplateType.Cond) {
                 return [node.test]
             }
@@ -329,11 +341,14 @@ export class JthRenderModlTemplateTree extends JthRenderMod<JthTemplateTreeNodeD
         }
 
         if (node.type === JthTemplateType.Prop) {
-            // todo
+            const list = node.data
+            const next = scope.gen(list)
+            return this.renderChildren(node.id, next)
         }
 
         if (node.type === JthTemplateType.Apply) {
-            // todo
+            const target = node.target
+            return this.renderChildren(target, scope)
         }
 
         console.error(node)
@@ -348,7 +363,7 @@ export class JthRenderModlTemplateTree extends JthRenderMod<JthTemplateTreeNodeD
     }
 
 
-    [JthRenderMod.preRender](){
+    [JthRenderMod.preRender]() {
         this.transElementAttr = new Map()
     }
 }
