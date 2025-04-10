@@ -3,6 +3,7 @@ import { ModalStackHandlerBase } from './ModalStack.vue'
 import { TextEditorHandler } from '../TextEditor'
 import ModalEditor from './ModalEditor.vue'
 import { nanoid } from 'nanoid'
+import { fixReactive } from '@renderer/fix'
 
 export {
     default as ModalStack,
@@ -18,7 +19,6 @@ export type {
 } from './ModalInfo.vue'
 
 
-
 export interface TextEditorOption {
     content: string,
     lang: string,
@@ -32,18 +32,19 @@ export interface TextEditorOption {
 
 export class ModalStackHandler extends ModalStackHandlerBase {
 
-    textEditor(option: TextEditorOption) {
+    async textEditor(option: TextEditorOption) {
         const { content, lang, title, icon } = option
-        const text = new TextEditorHandler(content, lang)
+        const text = fixReactive(new TextEditorHandler(content, lang))
+        await text.init()
         const key = nanoid()
         const submit = () => {
             const content =  text.getContent()
-            alert(content)
             option.submit?.(content)
         }
         const close = () => { 
             option.cancel?.()
             this.remove(key)
+            text.destory()
         }
         const inner = <ModalEditor option={{
             key, title, icon, text, close, submit

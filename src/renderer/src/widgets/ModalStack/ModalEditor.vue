@@ -16,7 +16,7 @@ export interface ModalEditorOption {
 
 <script setup lang="ts">
 import { VNode } from 'vue'
-// import { VxIcon } from '@renderer/components'
+import { VxIcon } from '@renderer/components'
 import { ElementInject } from '@renderer/components'
 import { TextEditorHandler, TextEditor } from '../TextEditor'
 
@@ -37,8 +37,8 @@ import { TextEditorHandler, TextEditor } from '../TextEditor'
       <div class="confirm-modal__title">{{ option.title }}</div>
     </div>
     <div class="confirm-modal__body">
-      <!-- <ElementInject :target="info.content" /> -->
-      <TextEditor :handler="option.text"></TextEditor>
+      <ElementInject :target="option.text.cntr" :style="{height:'100%'}"/>
+      <!-- <TextEditor :handler="option.text"></TextEditor> -->
     </div>
     <div class="confirm-modal__footer">
       <div class="confirm-modal__buttons">

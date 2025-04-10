@@ -42,7 +42,7 @@ export abstract class MonacoEditor {
 
 	async init() {
 		this.editor = markRaw(monaco.editor.create(this.element, {
-			model: monaco.editor.createModel(this.content, this.language, this.uri),
+			model: monaco.editor.createModel(this.content, this.language),
 			automaticLayout: true,
 			wordBasedSuggestions: 'off'
 		}))

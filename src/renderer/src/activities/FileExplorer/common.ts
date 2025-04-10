@@ -4,6 +4,7 @@ import { Menu } from '@renderer/widgets/PopMenu'
 import { parseFileName } from './FileOperation'
 import { PageDBChart } from '@renderer/tabs/DBChart'
 import { PageJthTemplate } from '@renderer/tabs/JsonToHtml'
+import { PageMutVTemplate } from '@renderer/tabs/MutView/page/handler'
 
 export const opCopyPath = (fileUrl: string) =>
   Menu.button({
@@ -41,3 +42,24 @@ export const opOpenJthTemplateTab = (fileUrl: string) =>
       tabControl.addTab(tab)
     }
   })
+
+
+export const opOpenMutViewTempltateTab = (fileUrl:string)=>
+  Menu.button({
+    key: 'opOpenMutViewTempltateTab',
+    label: '编辑',
+    action: async () => {
+      const tab = await PageMutVTemplate.create(fileUrl)
+      tabControl.addTab(tab)
+    }
+  })
+
+  export const opOpenMutViewRenderTab = (fileUrl:string)=>
+    Menu.button({
+      key: 'opOpenMutViewTempltateTab',
+      label: '打开',
+      action: async () => {
+        // const tab = await PageJthTemplate.create(fileUrl)
+        // tabControl.addTab(tab)
+      }
+    })

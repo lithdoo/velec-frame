@@ -1,14 +1,15 @@
 <template>
-  <HtmlElementInject v-if="target?.element" :target="target.element" />
+  <HtmlElementInject v-if="target?.element" :target="target.element"  :style="props.style" />
   <component v-if="target?.vnode" :is="target.vnode"></component>
 </template>
 
 <script setup lang="ts">
-import { VNode, computed } from 'vue'
+import { CSSProperties, VNode, computed } from 'vue'
 import HtmlElementInject from './HtmlElementInject.vue'
 
 const props = defineProps<{
-  target: HTMLElement | VNode | null
+  target: HTMLElement | VNode | null,
+  style?: Partial<CSSProperties>,
 }>()
 
 const target = computed(() => {

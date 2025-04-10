@@ -8,6 +8,8 @@ export class TextEditorHandler {
   waitter: Promise<MonacoEditor> | undefined
   editor?: MonacoEditor
 
+  cntr = document.createElement('div')
+
   constructor(
     private content: string,
     public lang: string,
@@ -22,22 +24,27 @@ export class TextEditorHandler {
   }
 
 
-
   async initEditor(element: HTMLElement) {
+    element.appendChild(this.cntr)
+  }
 
+  async init() {
+    console.log('initEditor');
     (window as any).initEditor = this;
     const language = this.lang
     // const isJson = language.toLocaleLowerCase() === 'json'
     const content = this.content
+    const cntr = this.cntr
+    cntr.style.height = '100%'
 
-    const editor = fixReactive(new class extends MonacoEditor {
+    const editor = new class extends MonacoEditor {
       content = content
       language = language
       ext = ''
-      element = element
+      element = cntr
       uri = undefined
       langClientConfigs = {}
-    })
+    }
 
     this.editor = editor
     await this.editor.init()
@@ -62,6 +69,7 @@ export class TextEditorHandler {
 
 
   destory() {
+    console.log('destory')
     this.editor?.dispose()
   }
 }

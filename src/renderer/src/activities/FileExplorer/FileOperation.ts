@@ -1,5 +1,5 @@
 import { type MenuItem } from '@renderer/widgets/PopMenu'
-import { opCopyPath, opOpenDBChartTab, opOpenInEditor, opOpenJthTemplateTab } from './common'
+import { opCopyPath, opOpenDBChartTab, opOpenInEditor, opOpenJthTemplateTab, opOpenMutViewRenderTab, opOpenMutViewTempltateTab } from './common'
 
 export enum FileExtType {
   JSON = 'json',
@@ -7,7 +7,8 @@ export enum FileExtType {
   JavaScript = 'js',
   SqliteDB = 'db',
   JthFile = 'jth',
-  Unknown = 'unknown'
+  Unknown = 'unknown',
+  MutView = 'muv'
 }
 
 export const parseFileExt = (fileUrlOrName: string): FileExtType => {
@@ -31,6 +32,9 @@ export const parseFileExt = (fileUrlOrName: string): FileExtType => {
   }
   if (ext === 'jth') {
     return FileExtType.JthFile
+  }
+  if (ext === 'muv') {
+    return FileExtType.MutView
   }
   return FileExtType.Unknown
 }
@@ -98,4 +102,16 @@ fileHandler.regist(FileExtType.JthFile, {
     opOpenJthTemplateTab(fileUrl).action?.(new MouseEvent('click'))
   },
   operations: (fileUrl: string) => [opCopyPath(fileUrl), opOpenJthTemplateTab(fileUrl)]
+})
+
+
+fileHandler.regist(FileExtType.MutView,{
+  onFileOpen:(fileUrl)=>{
+    opOpenMutViewRenderTab(fileUrl).action?.(new MouseEvent('click'))
+  },
+  operations: (fileUrl: string) => [
+    opCopyPath(fileUrl), 
+    opOpenMutViewTempltateTab(fileUrl), 
+    opOpenMutViewRenderTab(fileUrl)
+  ]
 })

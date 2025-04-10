@@ -70,7 +70,6 @@ const trees = computed(() => {
   )
 })
 
-
 watch(trees,()=>{
   if(current.value) return 
   const first = trees.value[0]
