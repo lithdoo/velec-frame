@@ -1,5 +1,5 @@
 import { EvalRef, EvalVal, EvalValStore } from "../mutv-eval"
-import { MVFileMod, MVFileState } from "./base"
+import { MVFileMod, MVFileState, MVRenderMod } from "./base"
 
 export type MVValueStoreData = {
     last_mod_ts: number
@@ -10,7 +10,8 @@ export class MVModValueStore extends MVFileMod<MVValueStoreData> {
 
     static namespace = 'VALUE_STORE_V0'
     readonly namespace = MVModValueStore.namespace
-    static blank() { return { last_mod_ts: new Date().getTime(), store: {} } }
+    static blank() { return { last_mod_ts: new Date().getTime(), data: {} } }
+
 
     public store = new EvalValStore()
 
@@ -51,36 +52,23 @@ export class MVModValueStore extends MVFileMod<MVValueStoreData> {
 }
 
 
-// export class MVRenderModValueStore extends MVRenderMod<MVValueStoreData> {
-//     readonly namespace = 'VALUE_STORE'
+export class MVRenderValueStore extends MVRenderMod<MVValueStoreData> {
+    readonly namespace = MVModValueStore.namespace
 
-//     cache: MVValueStoreData = blankStoreData()
+    public store = new EvalValStore()
 
-//     update() {
-//         const data = this.getData()
-//         if (data && (data.last_mod_ts !== this.cache.last_mod_ts)) {
-//             this.cache = data
-//         }
-//     }
+    reload(): void {
+        const data = this.file.getModData<MVValueStoreData>(this.namespace)?.data ?? {}
+        this.store = new EvalValStore(data)
+    }
 
-//     getValueGenerator(ref: ValueGeneratorRef) {
-//         this.update()
-//         const vg = this.cache.data[ref._VALUE_GENERATOR_REFERENCE_]
-//         if (!vg) {
-//             throw new Error('ref not exist!')
-//         } else {
-//             return vg
-//         }
-//     }
+    get(ref: EvalRef) {
+        return this.store.val(ref)
+    }
 
-
-//     createScopeFromjson(json: string = 'null') {
-//         this.update()
-//         const scope = new MVRenderScope(
-//             new MVRenderScopeState(JSON.parse(json) ?? {}),
-//             new Map(Object.entries(this.cache.data))
-//         )
-//         return scope
-//     }
-
-// }
+    table(){
+        this.reload()
+        return new Map(Object.entries(this.store.table()))
+    }
+    
+}

@@ -11,15 +11,15 @@
 import { EvalRef } from '@renderer/mods/mutv-eval';
 import EditValue from '../common/EditValue.vue'
 import { MVFileController } from '../controller';
-import { MVTemplateScope } from '@renderer/mods/mutv-template';
+import { MVTemplateContext } from '@renderer/mods/mutv-template';
 
 const props = defineProps<{
     controller: MVFileController,
-    template: MVTemplateScope
+    template: MVTemplateContext
 }>()
 
 const onChangeBind = (bind:EvalRef)=>{
-    props.controller.template.updateNode<MVTemplateScope>(props.template.id,(node)=>{
+    props.controller.template.updateNode<MVTemplateContext>(props.template.id,(node)=>{
         return { ...node , bind }
     })
 }

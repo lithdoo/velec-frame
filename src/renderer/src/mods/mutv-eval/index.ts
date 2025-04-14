@@ -6,7 +6,20 @@ export type EvalVal =
     | { type: 'json', content: string }
     | { type: 'eval:js', content: string }
 
-// export abstract class EvalData = 
+
+export const isEvalRef = (data: any): data is EvalRef => {
+    if (!data) return false
+    if (typeof data !== "object") return false
+    return typeof data['_VALUE_GENERATOR_REFERENCE_'] === 'string'
+}
+
+export const isEvalVal = (data: any): data is EvalVal => {
+    if (!data) return false
+    if (typeof data !== "object") return false
+    if (data.type !== 'json' && data.type !== 'eval:js') return false
+    if (typeof data.content !== 'string') return false
+    return true
+}
 
 export const StaticEvalVal: {
     ['null']: EvalVal
@@ -42,12 +55,12 @@ export class EvalValStore {
     }
 
 
-    set(ref:EvalRef,val: EvalVal) {
+    set(ref: EvalRef, val: EvalVal) {
         const refKey = ref['_VALUE_GENERATOR_REFERENCE_']
         this.all[refKey] = val
     }
 
-    clear(refs: EvalRef[] = []){
+    clear(refs: EvalRef[] = []) {
         const set = new Set(refs.map(v => v._VALUE_GENERATOR_REFERENCE_));
         [...Object.keys(this.all)].map(name => {
             if (!set.has(name)) {
@@ -56,11 +69,12 @@ export class EvalValStore {
         })
     }
 
-    table(){
-        return {...this.all}
+    table() {
+        return { ...this.all }
     }
 
 }
+
 
 export class EvalValDataStore extends EvalValStore {
 
@@ -80,8 +94,8 @@ export class EvalValDataStore extends EvalValStore {
         if (val.type === 'eval:js') {
             const argus = [...Object.keys(scope)]
             const input = [...Object.values(scope)]
-            const func = new Function(...argus,val.content)
-            return func.apply(null,input)
+            const func = new Function(...argus, val.content)
+            return func.apply(null, input)
         }
 
         throw new Error(`unknown eval_ref type!`)

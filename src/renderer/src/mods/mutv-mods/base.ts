@@ -9,6 +9,7 @@ export class MVFileState {
 
     getModData<T>(namspace: string) {
         const data = this.file[namspace]
+        console.log(data)
         if (!data) return null
         else return JSON.parse(JSON.stringify(data)) as T
     }
@@ -74,6 +75,6 @@ export abstract class MVRenderMod<T> {
         return this.file.getModData<T>(this.namespace)
     }
 
-    protected onBeforeRender(){}
-    protected onRootCompleted(){}
+    onBeforeRender() { }
+    onRootCompleted(_root: ShadowRoot) { }
 }

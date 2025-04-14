@@ -351,7 +351,6 @@ export class JthRenderModlTemplateTree extends JthRenderMod<JthTemplateTreeNodeD
             return this.renderChildren(target, scope)
         }
 
-        console.error(node)
         throw new Error('unknown node type')
     }
 

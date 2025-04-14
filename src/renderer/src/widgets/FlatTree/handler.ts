@@ -106,7 +106,6 @@ export class FlatTreeHandler<T extends FlatTreeItem> {
   }
 
   select(id) {
-    debugger
     const item = this.data.find((v) => v.id == id)
     if (!item) return
     console.log({item})

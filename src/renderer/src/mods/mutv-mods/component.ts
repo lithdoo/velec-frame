@@ -1,12 +1,17 @@
 import { nanoid } from "nanoid"
-import { MVFileMod, MVFileState } from "./base"
-import { MVModTemplate } from "./template"
-import { MVTemplateRoot } from "../mutv-template"
+import { MVFileMod, MVFileState, MVRenderMod } from "./base"
+import { MVModTemplate, MVRenderTemplate } from "./template"
+import { MVTemplateComponentType, MVTemplateRoot } from "../mutv-template"
+import { Mut, MutBase } from "../mutv/mut"
+import { RenderContext } from "./context"
+import { MVRenderValueStore } from "./store"
 
 export type MVComponent = {
     keyName: string
     rootId: string
 }
+
+
 
 export type MVComponentData = {
     last_mod_ts: number
@@ -49,7 +54,7 @@ export class MVModComponent extends MVFileMod<MVComponentData> {
         const rootId = nanoid()
         const component = { keyName, rootId }
         const templateNode: MVTemplateRoot = {
-            id: rootId, type: 'MVTemplateRoot', isLeaf: false, props: []
+            id: rootId, type: MVTemplateComponentType.Root, isLeaf: false, props: []
         }
         this.template.insertNode(templateNode)
         this.data.components = this.data.components.concat([component])
@@ -89,26 +94,37 @@ export class MVModComponent extends MVFileMod<MVComponentData> {
 
 }
 
-// export class MVRenderModComponent extends MVRenderMod<MVComponentData> {
+export class MVRenderComponent extends MVRenderMod<MVComponentData> {
 
-//     readonly namespace: "COMPONENT" = MVModComponent.namespace
+    readonly namespace: "COMPONENT" = MVModComponent.namespace
 
-//     constructor(
-//         public file: MVFileState,
-//         public template: MVRenderModlTemplateTree,
-//         public store: MVRenderModValueStore
-//     ) {
-//         super(file)
-//     }
-
-//     list() {
-//         return this.getData()?.components
-//     }
+    constructor(
+        public file: MVFileState,
+        public template: MVRenderTemplate,
+        public store: MVRenderValueStore
+    ) {
+        super(file)
+    }
 
 
-//     renderByJson(rootId: string, json: string) {
-//         const scope = this.store.createScopeFromjson(json)
-//         return this.template.renderRoot(rootId, scope)
-//     }
+    allComponents() {
+        return this.getData()?.components ?? []
+    }
 
-// }
+
+    render(rootId: string, prop: Mut<unknown>) {
+
+        const state = MutBase.split(prop)
+            .reduce((res, { name, value }) => {
+                return { ...res, [name]: value }
+            }, {} as Record<string, Mut<unknown>>)
+
+        const table = this.store.table()
+        const context = new RenderContext(state, table)
+        return this.template.renderRoot(rootId, context)
+    }
+
+
+
+
+}

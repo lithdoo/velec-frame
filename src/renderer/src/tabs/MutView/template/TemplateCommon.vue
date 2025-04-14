@@ -32,7 +32,7 @@ import { fixReactive } from '@renderer/fix'
 import { VxSelector } from '@renderer/components'
 import VxButton from '@renderer/components/VxButton/VxButton.vue'
 import { MVFileController } from '../controller';
-import { MVTemplateApply, MVTemplateComponentType, MVTemplateCond, MVTemplateElement, MVTemplateFlowType, MVTemplateHtmlType, MVTemplateLoop, MVTemplateNode, MVTemplateScope, MVTemplateText } from '@renderer/mods/mutv-template';
+import { MVTemplateApply, MVTemplateComponentType, MVTemplateCond, MVTemplateElement, MVTemplateFlowType, MVTemplateHtmlType, MVTemplateLoop, MVTemplateNode, MVTemplateContext, MVTemplateText } from '@renderer/mods/mutv-template';
 import { nanoid } from 'nanoid';
 
 
@@ -43,8 +43,8 @@ const createBlankNode = (type: string) => {
     }
     return data
   }
-  if (type === MVTemplateComponentType.Scope) {
-    const data: MVTemplateScope = {
+  if (type === MVTemplateComponentType.Context) {
+    const data: MVTemplateContext = {
       type, id: nanoid(), isLeaf: false, bind: { '_VALUE_GENERATOR_REFERENCE_': 'empty_object' }
     }
     return data
@@ -95,7 +95,7 @@ const changeType = fixReactive(
 
     options: { key: string; label: string }[] = [
       { key: MVTemplateComponentType.Apply, label: 'APPLY' },
-      { key: MVTemplateComponentType.Scope, label: 'Scope' },
+      { key: MVTemplateComponentType.Context, label: 'Context' },
       { key: MVTemplateHtmlType.Element, label: 'Element' },
       { key: MVTemplateHtmlType.Text, label: 'Text' },
       { key: MVTemplateFlowType.Loop, label: 'Loop' },

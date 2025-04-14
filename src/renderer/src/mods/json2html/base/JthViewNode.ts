@@ -47,7 +47,6 @@ type Tail<Tuple extends any[]> = ((...args: Tuple) => void) extends ((a: any, ..
 type Head<Tuple extends any[]> = Tuple extends [infer Result, ...any[]] ? Result : never
 // (['2','3'],'1') -> ['1','2','3']
 // type Unshift<Tuple extends any[], Element> = ((a: Element, ...args: Tuple) => void) extends ((...args: infer T) => void) ? T : never
-
 type ArrayMut<S extends any[], Upper extends any[] = []> = Head<S> extends never ? Upper : ArrayMut<Tail<S>, [...Upper, MutVal<Head<S>>]>
 
 

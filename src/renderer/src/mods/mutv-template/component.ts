@@ -5,7 +5,7 @@ import { MVTemplateGroup, MVTemplateLeaf, MVTemplateNode } from "./base"
 export enum MVTemplateComponentType {
     Root = 'MVTemplateRoot',
     Apply = 'MVTemplateApply',
-    Scope = 'MVTemplateScope'
+    Context = 'MVTemplateContext'
 }
 
 
@@ -28,11 +28,11 @@ export const isMVTemplateApply = (node: MVTemplateNode): node is MVTemplateApply
     return node.type === 'MVTemplateApply'
 }
 
-export type MVTemplateScope = MVTemplateGroup & {
-    type: "MVTemplateScope",
+export type MVTemplateContext = MVTemplateGroup & {
+    type: "MVTemplateContext",
     bind: EvalRef,
 }
 
-export const isMVTemplateScope = (node: MVTemplateNode): node is MVTemplateScope => {
-    return node.type === 'MVTemplateScope'
+export const isMVTemplateContext = (node: MVTemplateNode): node is MVTemplateContext => {
+    return node.type === 'MVTemplateContext'
 }

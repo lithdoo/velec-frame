@@ -3,7 +3,7 @@ import { computed, watch } from 'vue';
 import { MVFileController } from '../controller';
 import { MVComponent } from '@renderer/mods/mutv-mods/component';
 import { FlatTreeHandler, FlatTreeItem, FlatTree } from '@renderer/widgets/FlatTree';
-import { isMVTemplateApply, isMVTemplateCond, isMVTemplateScope, isMVTemplateLoop, isMVTemplateText, MVTemplateElement, MVTemplateHtmlType, MVTemplateNode, isMVTemplateElement } from '@renderer/mods/mutv-template';
+import { isMVTemplateApply, isMVTemplateCond, isMVTemplateContext, isMVTemplateLoop, isMVTemplateText, MVTemplateElement, MVTemplateHtmlType, MVTemplateNode, isMVTemplateElement } from '@renderer/mods/mutv-template';
 import { fixReactive } from '@renderer/fix';
 import { ToolBarBuilder, ToolBar } from '@renderer/widgets/ToolBar';
 import { nanoid } from 'nanoid';
@@ -129,7 +129,7 @@ const tree = fixReactive(new class extends FlatTreeHandler<FlatTreeItem & { temp
                 })
 
                 setTimeout(()=>{
-                    tree.open(node.id)
+                    tree.open(item.id)
                     tree.select(node.id)
                 })
             }
@@ -233,7 +233,7 @@ const current = computed(() => {
                 <TemplateText v-if="isMVTemplateText(current)" :controller="controller" :template="current">
                 </TemplateText>
 
-                <TemplateScope v-if="isMVTemplateScope(current)" :controller="controller" :template="current">
+                <TemplateScope v-if="isMVTemplateContext(current)" :controller="controller" :template="current">
                 </TemplateScope>
 
                 <TemplateCondition v-if="isMVTemplateCond(current)" :controller="controller" :template="current">
@@ -251,7 +251,14 @@ const current = computed(() => {
 
                 <FlatTree :handler="tree">
                     <template #item="{ item }">
-                        <div>{{ item.templateData.type }}</div>
+                        <!-- <div>{{ item.templateData.type }}</div> -->
+                        <div v-if="isMVTemplateElement(item.templateData)">
+                            {{'<'}}{{ item.templateData.tagName }} {{"/>"}}
+                        </div>
+                        
+                        <div v-else>
+                            {{ item.templateData.type }}
+                        </div>
                     </template>
                 </FlatTree>
             </div>

@@ -1,5 +1,8 @@
 import { EvalRef } from "../mutv-eval"
-import { MVFileMod, MVFileState } from "./base"
+import { MutComputed } from "../mutv/mut"
+import { MVFileMod, MVFileState, MVRenderMod } from "./base"
+import { MVRenderValueStore } from "./store"
+import { MVRenderTemplate } from "./template"
 
 
 export const BEM_STYLE_NAMESPACE: "BEM_STYLE" = "BEM_STYLE"
@@ -137,7 +140,7 @@ export class MVModBEMStyle extends MVFileMod<BEMStyleData> {
         this.update()
     }
 
-    addTagTemplate(tag: BemTag, templateId: string, cond: EvalRef = {'_VALUE_GENERATOR_REFERENCE_': 'true'}) {
+    addTagTemplate(tag: BemTag, templateId: string, cond: EvalRef = { '_VALUE_GENERATOR_REFERENCE_': 'true' }) {
 
         const tagItem = this.data.list.find(v => MVModBEMStyle.equalTag(v.tag, tag))
         if (tagItem) {
@@ -188,7 +191,81 @@ export class MVModBEMStyle extends MVFileMod<BEMStyleData> {
     }
 }
 
-// export class JthRenderModBEMStyle extends JthRenderMod<BEMStyleData> {
+
+
+export class MVRenderBEMStyle extends MVRenderMod<BEMStyleData> {
+
+    static replace(cssText: string, tag: BemTag) {
+        return cssText.replace(/([^{]+?)(\s*\{)/g, (_match, selectors, rest) => {
+            const replacedSelectors = selectors.replace(/&/g, `.${MVModBEMStyle.tagClass(tag)}`);
+            return replacedSelectors + rest;
+        });
+    }
+
+    readonly namespace = MVModBEMStyle.namespace
+
+    constructor(
+        file: MVFileState,
+        public template: MVRenderTemplate,
+        public stroe: MVRenderValueStore
+    ) {
+        super(file)
+    }
+
+
+    css() {
+        const data = this.getData() ?? MVModBEMStyle.blankData()
+        const { list } = data
+
+        return list.map(({ tag, content }) => {
+            return MVRenderBEMStyle.replace(content, tag)
+        })
+    }
+
+
+
+    onBeforeRender() {
+        const data = this.getData() ?? MVModBEMStyle.blankData()
+        const { list } = data
+
+        list.flatMap(({ tag, targets }) => targets.map(val => ({ ...val, tag })))
+            .forEach(({ tag, templateId, cond }) => {
+                const trans = this.template.attrTransfer.get(templateId)
+                const className = MVModBEMStyle.tagClass(tag)
+                if (trans) {
+                    // todo
+                } else {
+                    this.template.attrTransfer.set(templateId, (upper, val) => {
+                        const condtion = val(cond)
+                        return new MutComputed<[{ [key: string]: any; }, any], any>
+                            ([upper, condtion], (attr, cond) => {
+                                return {
+                                    ...attr,
+                                    class: `${attr?.class ?? ''} ${cond ? className : ''}`
+                                }
+                            })
+                    })
+                }
+            })
+    }
+
+    onRootCompleted(root: ShadowRoot) {
+        this.css()
+            .map(cssHtml => {
+                console.log({ cssHtml })
+                const style = document.createElement('style')
+                style.innerHTML = cssHtml
+                return style
+            })
+            .forEach(style => {
+                root.appendChild(style)
+            })
+    }
+
+    
+
+
+}// export class JthRenderModBEMStyle extends JthRenderMod<BEMStyleData> {
 
 //     static replace(cssText: string, tag: BemTag) {
 //         return cssText.replace(/([^{]+?)(\s*\{)/g, (_match, selectors, rest) => {
