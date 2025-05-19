@@ -27,7 +27,7 @@ export interface TextEditorOption {
     // width?: string,
     // height?: string,
     submit?(content: string): void
-    cancel?(): void
+    cancel?(): void,
 }
 
 export class ModalStackHandler extends ModalStackHandlerBase {
@@ -52,4 +52,6 @@ export class ModalStackHandler extends ModalStackHandlerBase {
 
         this.push({ key, content: inner })
     }
+
+    
 }

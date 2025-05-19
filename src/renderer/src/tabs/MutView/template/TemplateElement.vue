@@ -7,6 +7,13 @@
         </div>
 
         <div class="mv-template__sub-title">
+            InnerHTML
+        </div>
+        <div class="mv-template__component">
+            <EditValue :valRef="template.innerHTML" :controller="controller" :onchange="onInnerHTMLChange"></EditValue>
+        </div>
+
+        <div class="mv-template__sub-title">
             BEM Style
             <VxButton only-icon icon="plus" :click="() => bemBinderHandler.newTag()" />
         </div>
@@ -63,6 +70,11 @@ const tagNameInput = computed(() => fixReactive(new class extends InputTextHandl
     }
 }))
 
+const onInnerHTMLChange = (innerHTML:EvalRef)=>{
+    props.controller.template.updateNode<MVTemplateElement>(props.template.id,(node)=>{
+        return { ...node , innerHTML }
+    })
+}
 
 const bemBinderHandler  = computed(() => fixReactive(new BEMElementBinderHandler(
     props.template.id, props.controller

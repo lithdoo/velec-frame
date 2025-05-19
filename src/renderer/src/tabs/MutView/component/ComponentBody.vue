@@ -128,7 +128,7 @@ const tree = fixReactive(new class extends FlatTreeHandler<FlatTreeItem & { temp
                     return newTree
                 })
 
-                setTimeout(()=>{
+                setTimeout(() => {
                     tree.open(item.id)
                     tree.select(node.id)
                 })
@@ -153,7 +153,7 @@ const tree = fixReactive(new class extends FlatTreeHandler<FlatTreeItem & { temp
                         }, {} as TemplateNodeTree)
                     return newTree
                 })
-                setTimeout(()=>{
+                setTimeout(() => {
                     tree.select(node.id)
                 })
             }
@@ -177,8 +177,8 @@ const tree = fixReactive(new class extends FlatTreeHandler<FlatTreeItem & { temp
                         }, {} as TemplateNodeTree)
                     return newTree
                 })
-                
-                setTimeout(()=>{
+
+                setTimeout(() => {
                     tree.select(node.id)
                 })
             }
@@ -202,6 +202,8 @@ const tree = fixReactive(new class extends FlatTreeHandler<FlatTreeItem & { temp
         }
 })
 
+
+const bem = computed(() => props.controller.bem)
 
 const current = computed(() => {
     const id = tree.selectedKeys[0]
@@ -253,17 +255,24 @@ const current = computed(() => {
                     <template #item="{ item }">
                         <!-- <div>{{ item.templateData.type }}</div> -->
                         <div v-if="isMVTemplateElement(item.templateData)">
-                            {{'<'}}{{ item.templateData.tagName }} {{"/>"}}
-                        </div>
-                        
-                        <div v-else>
-                            {{ item.templateData.type }}
-                        </div>
+                            {{ '<' }}{{ item.templateData.tagName }} <template
+                                v-if="bem.getTagsByTemplateId(item.id)[0]">
+                                .  <span>{{ bem.getTagsByTemplateId(item.id)[0].tag[0] }}</span>  <span v-if="bem.getTagsByTemplateId(item.id)[0].tag[1]">__{{
+                                    bem.getTagsByTemplateId(item.id)[0].tag[1] }}</span>
+                                <span v-if="bem.getTagsByTemplateId(item.id)[0].tag[2]">--{{
+                                    bem.getTagsByTemplateId(item.id)[0].tag[2] }}</span>
                     </template>
-                </FlatTree>
+                    {{ "/>" }}
             </div>
-        </div>
-    </div>
+
+            <div v-else>
+                {{ item.templateData.type }}
+            </div>
+</template>
+</FlatTree>
+</div>
+</div>
+</div>
 </template>
 
 <style lang="scss" scoped>

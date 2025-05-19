@@ -18,7 +18,7 @@
         a.__iconfont__svg__cssinject__ = !0
         try {
           document.write(
-            '<style>.svgfont {display: inline-block;width: 1em;height: 1em;fill: currentColor;vertical-align: -0.1em;font-size:16px;}</style>'
+            '<style class="iconfont-inject">.svgfont {display: inline-block;width: 1em;height: 1em;fill: currentColor;vertical-align: -0.1em;font-size:16px;}</style>'
           )
         } catch (e) {
           console && console.log(e)
@@ -34,6 +34,7 @@
             (t.style.width = 0),
             (t.style.height = 0),
             (t.style.overflow = 'hidden'),
+            (t.classList.add('iconfont-inject')),
             (t = t),
             (e = document.body).firstChild ? h(t, e.firstChild) : e.appendChild(t))
       }),

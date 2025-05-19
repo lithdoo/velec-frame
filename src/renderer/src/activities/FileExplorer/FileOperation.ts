@@ -8,7 +8,7 @@ export enum FileExtType {
   SqliteDB = 'db',
   JthFile = 'jth',
   Unknown = 'unknown',
-  MutView = 'muv'
+  MutView = 'muv',
 }
 
 export const parseFileExt = (fileUrlOrName: string): FileExtType => {

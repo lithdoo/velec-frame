@@ -50,19 +50,21 @@ import { fixReactive } from '@renderer/fix';
 import { TextEditorOption } from '@renderer/widgets/ModalStack';
 
 const props = defineProps<{
-  valRef: EvalRef,
+  valRef?: EvalRef,
   controller: MVFileController,
   onchange: (val: EvalRef) => void
 }>()
 
+const valRef = computed(()=> props.valRef?? {'_VALUE_GENERATOR_REFERENCE_':'null'})
+
 const type = computed(() => {
-  const val = props.controller.store.get(props.valRef)
+  const val = props.controller.store.get(valRef.value)
   if (val) return val.type
   else return '<unknown>'
 })
 
 const content = computed(() => {
-  const val = props.controller.store.get(props.valRef)
+  const val = props.controller.store.get(valRef.value)
   if (val) return val.content.trim()
   else return '<unknown>'
 })
@@ -75,7 +77,7 @@ const editor = computed(() => {
     oldValue: EvalVal | null = null
     currentValue: { key: EvalVal['type']; label: string; target: EvalVal } | null = null
     beginEdit() {
-      const old = props.controller.store.get(props.valRef)
+      const old = props.controller.store.get(valRef.value)
       this.oldValue = old
       this.options = [
         {

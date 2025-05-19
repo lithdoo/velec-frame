@@ -10,7 +10,8 @@ export enum MVTemplateHtmlType {
 
 
 export type MVTemplateElement = MVTemplateGroup & {
-    type:MVTemplateHtmlType.Element
+    type: MVTemplateHtmlType.Element,
+    innerHTML?: EvalRef,
     tagName: string
     attrs: {
         name: string

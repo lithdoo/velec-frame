@@ -62,12 +62,14 @@ export class MutViewElement extends MutViewNode {
     constructor(
         public readonly tagName: string,
         public readonly attr: Mut<{ [key: string]: string }>,
-        public readonly children: MutViewFragment
+        public readonly children: MutViewFragment,
+        public readonly innerHTML: Mut<unknown>
     ) {
         super()
         this.elementNode = WrapedNode.element(tagName)
         this.target = new MutVal([this.elementNode])
         this.children.target.on(this.onChilrenChanged)
+        this.innerHTML.on(this.onChilrenChanged)
         this.attr.on(this.onAttrChanged)
         this.updateChildren()
         this.updateAttr()
@@ -83,10 +85,15 @@ export class MutViewElement extends MutViewNode {
 
     private updateChildren() {
         this.currentChildren.forEach(v => v.remove())
-        this.currentChildren = this.children.target.val()
-        this.elementNode.appendChildren(this.currentChildren)
+        const innerHTML = this.innerHTML.val()
+        if(typeof innerHTML === 'string'){
+            this.currentChildren = []
+            this.elementNode.target.innerHTML = innerHTML
+        }else {
+            this.currentChildren = this.children.target.val()
+            this.elementNode.appendChildren(this.currentChildren)
+        }
     }
-
     destory(): void {
         super.destory()
         this.children.target.off(this.onChilrenChanged)

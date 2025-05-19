@@ -204,7 +204,7 @@ export class MVRenderTemplate extends MVRenderMod<MVTemplateTreeData> {
 
 
     renderRoot(rootId: string, scope: RenderContext) {
-        console.log({rootId,scope})
+        console.log({ rootId, scope })
         const node = this.nodes[rootId]
         if (!node)
             throw new Error('error root id!')
@@ -234,8 +234,9 @@ export class MVRenderTemplate extends MVRenderMod<MVTemplateTreeData> {
                 const attrs = context.attr(node.attrs)
                 const trans = this.attrTransfer.get(id)
                 const tranAttr = trans ? trans(attrs, (ref) => context.val(ref)) : attrs
+                const innerHTML = node.innerHTML ? context.val(node.innerHTML) :new MutVal(null)
                 const children = this.renderChildren(id, context)
-                const vnode = new MutViewElement(tagName, tranAttr, children)
+                const vnode = new MutViewElement(tagName, tranAttr, children, innerHTML)
                 return vnode
             }
 
@@ -264,7 +265,7 @@ export class MVRenderTemplate extends MVRenderMod<MVTemplateTreeData> {
                     .reduce((res, { name, value }) => {
                         return { ...res, [name]: value }
                     }, {} as Record<string, Mut<unknown>>)
-                const table =  context.getTable()
+                const table = context.getTable()
 
                 console.warn({ node, bind, state })
                 const newContext = new RenderContext(state, table)
@@ -283,7 +284,7 @@ export class MVRenderTemplate extends MVRenderMod<MVTemplateTreeData> {
         }
 
         return new MutViewText(new MutVal('ERROR'))
-        
+
     }
 
     renderChildren(id: string, context: RenderContext): MutViewFragment {

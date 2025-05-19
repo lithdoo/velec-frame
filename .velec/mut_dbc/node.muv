@@ -1,0 +1,441 @@
+{
+  "TEMPLATE_TREE_NODE": {
+    "last_mod_ts": 1745317417881,
+    "template_node": {
+      "kc9Y0b9TV7KTwNB6qRHiG": {
+        "id": "kc9Y0b9TV7KTwNB6qRHiG",
+        "type": "MVTemplateRoot",
+        "isLeaf": false,
+        "props": [
+          "render",
+          "fields",
+          "table"
+        ]
+      },
+      "rRBWHsQy9oOOsPFuMiUH3": {
+        "type": "MVTemplateElement",
+        "id": "rRBWHsQy9oOOsPFuMiUH3",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "3pfDfUJJHUxqJeIgXQN3v": {
+        "id": "3pfDfUJJHUxqJeIgXQN3v",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "d8MhGThJsZzpw3zy5j4yF": {
+        "id": "d8MhGThJsZzpw3zy5j4yF",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "BjECgqAQcJVHDy5RVMXf4": {
+        "id": "BjECgqAQcJVHDy5RVMXf4",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "Mu2gYZiZNJPRjmWDgn2KH": {
+        "type": "MVTemplateLoop",
+        "id": "Mu2gYZiZNJPRjmWDgn2KH",
+        "isLeaf": false,
+        "valueField": "field",
+        "indexField": "index",
+        "loopValue": {
+          "_VALUE_GENERATOR_REFERENCE_": "0.8454488885787863"
+        }
+      },
+      "aZNdd3d9ntym-KPc-85sZ": {
+        "id": "aZNdd3d9ntym-KPc-85sZ",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "ZGS2U6JxYGrh3P7rJpof5": {
+        "id": "ZGS2U6JxYGrh3P7rJpof5",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "4SCeDzD2dJffkGE-JgMQp": {
+        "id": "4SCeDzD2dJffkGE-JgMQp",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "dWWRo9ERLqHN4nEPiTykZ": {
+        "id": "dWWRo9ERLqHN4nEPiTykZ",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "hJ6p_udyRGda1zpvpMC8i": {
+        "id": "hJ6p_udyRGda1zpvpMC8i",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "AlxD5X_UmTykuUo6x8WBb": {
+        "id": "AlxD5X_UmTykuUo6x8WBb",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false
+      },
+      "UgPhrARKB4c-mH2OBHCBZ": {
+        "type": "MVTemplateText",
+        "id": "UgPhrARKB4c-mH2OBHCBZ",
+        "isLeaf": true,
+        "text": {
+          "_VALUE_GENERATOR_REFERENCE_": "0.7537591720549555"
+        }
+      },
+      "XsE8FyrnTB2tM9ye8356W": {
+        "type": "MVTemplateText",
+        "id": "XsE8FyrnTB2tM9ye8356W",
+        "isLeaf": true,
+        "text": {
+          "_VALUE_GENERATOR_REFERENCE_": "0.7744887439488992"
+        }
+      },
+      "pxmz-CePKNitJmgll294L": {
+        "type": "MVTemplateText",
+        "id": "pxmz-CePKNitJmgll294L",
+        "isLeaf": true,
+        "text": {
+          "_VALUE_GENERATOR_REFERENCE_": "0.6422127889854619"
+        }
+      },
+      "F73IM6lHj5RdEN3n2GsWT": {
+        "type": "MVTemplateText",
+        "id": "F73IM6lHj5RdEN3n2GsWT",
+        "isLeaf": true,
+        "text": {
+          "_VALUE_GENERATOR_REFERENCE_": "0.58687618276324"
+        }
+      },
+      "O57RL6Ypqdqy0L4HJ-sVT": {
+        "type": "MVTemplateText",
+        "id": "O57RL6Ypqdqy0L4HJ-sVT",
+        "isLeaf": true,
+        "text": {
+          "_VALUE_GENERATOR_REFERENCE_": "0.1059839622221006"
+        }
+      },
+      "GNHolga0DMo2iqBdFfrCC": {
+        "id": "GNHolga0DMo2iqBdFfrCC",
+        "type": "MVTemplateElement",
+        "tagName": "div",
+        "attrs": [],
+        "isLeaf": false,
+        "innerHTML": {
+          "_VALUE_GENERATOR_REFERENCE_": "0.3103786758247975"
+        }
+      }
+    },
+    "template_tree": {
+      "kc9Y0b9TV7KTwNB6qRHiG": [
+        "rRBWHsQy9oOOsPFuMiUH3"
+      ],
+      "rRBWHsQy9oOOsPFuMiUH3": [
+        "3pfDfUJJHUxqJeIgXQN3v",
+        "d8MhGThJsZzpw3zy5j4yF",
+        "BjECgqAQcJVHDy5RVMXf4"
+      ],
+      "BjECgqAQcJVHDy5RVMXf4": [
+        "Mu2gYZiZNJPRjmWDgn2KH"
+      ],
+      "Mu2gYZiZNJPRjmWDgn2KH": [
+        "aZNdd3d9ntym-KPc-85sZ"
+      ],
+      "aZNdd3d9ntym-KPc-85sZ": [
+        "ZGS2U6JxYGrh3P7rJpof5",
+        "4SCeDzD2dJffkGE-JgMQp",
+        "dWWRo9ERLqHN4nEPiTykZ"
+      ],
+      "d8MhGThJsZzpw3zy5j4yF": [
+        "GNHolga0DMo2iqBdFfrCC",
+        "hJ6p_udyRGda1zpvpMC8i",
+        "AlxD5X_UmTykuUo6x8WBb"
+      ],
+      "hJ6p_udyRGda1zpvpMC8i": [
+        "UgPhrARKB4c-mH2OBHCBZ"
+      ],
+      "AlxD5X_UmTykuUo6x8WBb": [
+        "XsE8FyrnTB2tM9ye8356W"
+      ],
+      "ZGS2U6JxYGrh3P7rJpof5": [
+        "O57RL6Ypqdqy0L4HJ-sVT"
+      ],
+      "4SCeDzD2dJffkGE-JgMQp": [
+        "F73IM6lHj5RdEN3n2GsWT"
+      ],
+      "dWWRo9ERLqHN4nEPiTykZ": [
+        "pxmz-CePKNitJmgll294L"
+      ],
+      "GNHolga0DMo2iqBdFfrCC": []
+    }
+  },
+  "COMPONENT": {
+    "last_mod_ts": 1745305322821,
+    "components": [
+      {
+        "keyName": "EntityNode",
+        "rootId": "kc9Y0b9TV7KTwNB6qRHiG"
+      }
+    ]
+  },
+  "BEM_STYLE": {
+    "last_mod_ts": 1745391111856,
+    "list": [
+      {
+        "tag": [
+          "entity-node",
+          null,
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "rRBWHsQy9oOOsPFuMiUH3",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    border: 3px solid rgb(51 65 85);\r\n    border-radius: 6px;\r\n    background: #2F3035;\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "color-bar",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "3pfDfUJJHUxqJeIgXQN3v",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    background: #66ccff;\r\n    height: 6px;\r\n    border-radius: 3px 3px 0 0;\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "table-name",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "hJ6p_udyRGda1zpvpMC8i",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    flex: 1 1 0;\r\n    width: 0;\r\n    overflow: hidden;\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "field-list",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "BjECgqAQcJVHDy5RVMXf4",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    background: rgb(2,6,32);\r\n    border-radius: 0 0 3px 3px;\r\n    overflow: auto;\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "field-info",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "aZNdd3d9ntym-KPc-85sZ",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    font-size: 14px;\r\n    color: rgba(255,255,255,0.85);\r\n    padding: 0 12px;\r\n    display: flex;\r\n    flex-direction: row;\r\n    border-top: 1px solid rgb(30,41,59);\r\n    height: 30px;\r\n    align-items: center;\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "field-is-key",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "ZGS2U6JxYGrh3P7rJpof5",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    color: chocolate;\r\n    margin-right: 2px;\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "field-name",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "4SCeDzD2dJffkGE-JgMQp",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    flex: 1 1 0;\r\n    width: 0;\r\n    overflow: hidden;\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "field-type",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "dWWRo9ERLqHN4nEPiTykZ",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    color: rgba(255,255,255,0.45);\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "table-repeat-type",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "AlxD5X_UmTykuUo6x8WBb",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    flex: 0 0 auto;\r\n    color: aqua;\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "table-info",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "d8MhGThJsZzpw3zy5j4yF",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: start;\r\n    height: 32px;\r\n    line-height: 32px;\r\n    background: rgb(15 23 42);\r\n    font-size: 14px;\r\n    padding: 0 4px;\r\n    color: rgba(255,255,255,0.85);\r\n    font-weight: 800;\r\n}"
+      },
+      {
+        "tag": [
+          "entity-node",
+          "table-icon",
+          null
+        ],
+        "targets": [
+          {
+            "templateId": "GNHolga0DMo2iqBdFfrCC",
+            "cond": {
+              "_VALUE_GENERATOR_REFERENCE_": "true"
+            }
+          }
+        ],
+        "content": "&{\r\n    margin: 0 8px 0 4px;\r\n    display: flex;\r\n    align-items: center;\r\n}"
+      }
+    ]
+  },
+  "VALUE_STORE_V0": {
+    "last_mod_ts": 1745390855725,
+    "data": {
+      "0.8454488885787863": {
+        "type": "eval:js",
+        "content": "return fields"
+      },
+      "0.06139587183799122": {
+        "type": "eval:js",
+        "content": "return type"
+      },
+      "0.6422127889854619": {
+        "type": "eval:js",
+        "content": "return field.type"
+      },
+      "0.58687618276324": {
+        "type": "eval:js",
+        "content": "return field.field_name"
+      },
+      "0.1059839622221006": {
+        "type": "eval:js",
+        "content": "return field.is_key ? \"*\" : \"\""
+      },
+      "0.7744887439488992": {
+        "type": "eval:js",
+        "content": "return table.repeat_deal_type"
+      },
+      "0.7537591720549555": {
+        "type": "eval:js",
+        "content": "return table.table_name"
+      },
+      "0.38639212947204804": {
+        "type": "json",
+        "content": "{\r\n  \"table\": {\r\n    \"_ref_key_\": \"Ns3Fx5JothF0dRAa--cKk\",\r\n    \"table_name\": \"javr-record\",\r\n    \"repeat_deal_type\": \"\"\r\n  },\r\n  \"fields\": [],\r\n  \"render\": {\r\n    \"_ref_key_\": \"T_R_qSKlxI9tfny8KcgQa\",\r\n    \"x\": 0,\r\n    \"y\": 0,\r\n    \"height\": 44,\r\n    \"width\": 300,\r\n    \"source_table\": [\r\n      \"Ns3Fx5JothF0dRAa--cKk\"\r\n    ]\r\n  }\r\n}"
+      },
+      "0.9344264761263972": {
+        "type": "eval:js",
+        "content": "return `<svg class=\"icon\" aria-hidden=\"true\">\r\n    <use xlink:href=\"#vx-base-table\"></use>\r\n</svg>`"
+      },
+      "0.3103786758247975": {
+        "type": "eval:js",
+        "content": "return `<svg class=\"icon svgfont\" aria-hidden=\"true\">\r\n    <use xlink:href=\"#vx-base-table\"></use>\r\n</svg>`"
+      },
+      "0.1968769716214651": {
+        "type": "json",
+        "content": "{\r\n  \"table\": {\r\n    \"_ref_key_\": \"Ns3Fx5JothF0dRAa--cKk\",\r\n    \"table_name\": \"javr-record\",\r\n    \"repeat_deal_type\": \"\"\r\n  },\r\n  \"fields\": [\r\n    {\"_ref_key_\":\"EAFTzTjElpLFex5rCI6Kc\",\"is_key\":true,\"field_name\":\"2131\",\"source_table\":[\"9jltSnOYGz_xgozHjVMxV\"],\"index\":0,\"type\":\"Number\"},\r\n    {\"_ref_key_\":\"EAFTzTjElpLFex5rCI6Kc1\",\"is_key\":true,\"field_name\":\"21231\",\"source_table\":[\"9jltSnOYGz_xgozHjVMxV\"],\"index\":0,\"type\":\"Number\"}\r\n  ],\r\n  \"render\": {\r\n    \"_ref_key_\": \"T_R_qSKlxI9tfny8KcgQa\",\r\n    \"x\": 0,\r\n    \"y\": 0,\r\n    \"height\": 44,\r\n    \"width\": 300,\r\n    \"source_table\": [\r\n      \"Ns3Fx5JothF0dRAa--cKk\"\r\n    ]\r\n  }\r\n}"
+      }
+    }
+  },
+  "CONTEXT_DATA": {
+    "last_mod_ts": 1745390855725,
+    "table": [
+      {
+        "id": "W39T8FJrSqesDOtljsrYC",
+        "name": "x6NodeData",
+        "context": [],
+        "value": {
+          "_VALUE_GENERATOR_REFERENCE_": "0.1968769716214651"
+        }
+      }
+    ]
+  }
+}

@@ -1,3 +1,5 @@
+import { message } from "ant-design-vue"
+
 const debounceWaitTimeout = new Map<string, any>()
 
 export const debounce = (id: string, call: () => void) => {
@@ -14,36 +16,49 @@ export const debounce = (id: string, call: () => void) => {
   )
 }
 
-
 export class Snapshot<T> {
-    old: T[] = []
-    idx: number = -1
+  old: T[] = []
+  idx: number = -1
 
-    constructor(public lastest: T) { }
+  constructor(public lastest: T) { }
 
-    current() {
-        const old = this.old[this.idx]
-        return old ?? this.lastest
-    }
+  current() {
+    const old = this.old[this.idx]
+    return old ?? this.lastest
+  }
 
-    update(updateFn: (current: T) => T | void) {
-        const old = this.old[this.idx]
-        if (!old) {
-            this.old = [JSON.parse(JSON.stringify(this.lastest))].concat(this.old)
-            const res = updateFn(this.lastest)
-            this.lastest = res ?? this.lastest
-        } else {
-            this.old = this.old.filter((_, i) => i <= this.idx)
-            this.idx = -1
-            this.lastest = old
-            const res = updateFn(this.lastest)
-            this.lastest = res ?? this.lastest
-        }
-    }
-
-    init(val:T){
-      this.old = []
+  update(updateFn: (current: T) => T | void) {
+    const old = this.old[this.idx]
+    if (!old) {
+      this.old = [JSON.parse(JSON.stringify(this.lastest))].concat(this.old)
+      const res = updateFn(this.lastest)
+      this.lastest = res ?? this.lastest
+    } else {
+      this.old = this.old.filter((_, i) => i <= this.idx)
       this.idx = -1
-      this.lastest = val
+      this.lastest = old
+      const res = updateFn(this.lastest)
+      this.lastest = res ?? this.lastest
     }
+  }
+
+  init(val: T) {
+    this.old = []
+    this.idx = -1
+    this.lastest = val
+  }
+}
+
+export class Msg {
+  static error(content: string) {
+    return message.error(content)
+  }
+
+  static success(content: string) {
+    return message.success(content)
+  }
+
+  static warning(content:string){
+    return message.warning(content)
+  }
 }

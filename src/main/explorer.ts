@@ -75,6 +75,7 @@ export class ExplorerService {
     })
 
     ipcMain.handle('@explorer/content/read', async (_, fileUrl: string) => {
+      console.log(fileUrl)
       if (!existsSync(new URL(fileUrl))) {
         return null
       }
@@ -110,7 +111,7 @@ export class ExplorerService {
       try {
         const text = JSON.stringify(content)
         fs.writeFileSync(new URL(fileUrl), text)
-      } catch (_e) {}
+      } catch (_e) { }
     })
 
     ipcMain.handle('@explorer/content/write', async (_, fileUrl: string, content: string) => {
@@ -120,7 +121,14 @@ export class ExplorerService {
       })
       try {
         fs.writeFileSync(new URL(fileUrl), content)
-      } catch (_e) {}
+      } catch (_e) { }
+    })
+
+    ipcMain.handle('@explorer/setting/file/url', async (_, filePath: string) => {
+      const settingDir = await findAppSettingDir()
+      if (!settingDir) return ''
+      const templateDir = path.join(settingDir, filePath)
+      return pathToFileURL(templateDir).href
     })
 
     ipcMain.handle('@explorer/file/template/list', async (_) => {

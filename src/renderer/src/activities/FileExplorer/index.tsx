@@ -12,6 +12,8 @@ import { nanoid } from 'nanoid'
 import VxInput from '@renderer/components/VxInput/VxInput.vue'
 import VxSelector from '@renderer/components/VxInput/VxSelector.vue'
 import VxButton from '@renderer/components/VxButton/VxButton.vue'
+import { tabControl } from '@renderer/parts/PageTab'
+import { PageMutDBChart } from '@renderer/tabs/MutDataBase/handler'
 
 // import { tabControl } from "@renderer/parts/PageTab"
 // import { PageSqlErd } from "@renderer/page/_sqlErd"
@@ -222,6 +224,9 @@ export class ExplorerWrokspace {
       PopMenuBuilder.create()
         .button('createFile', '从模板添加文件', async () => {
           this.newFile(dirUrl)
+        })
+        .button('openMutDBChart','通过 MutDBChart', async()=>{
+          tabControl.addTab(await PageMutDBChart.create(dirUrl))
         })
         .build(),
       ev

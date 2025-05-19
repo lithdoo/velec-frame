@@ -4,7 +4,8 @@ import { onMounted, ref } from 'vue'
 const model = defineModel<string>()
 const inputRef = ref<typeof Input | null>(null)
 const props = defineProps<{
-  placeholder?: string
+  placeholder?: string,
+  disabled?: boolean
   mounted?: (el: { focus: () => void }) => void
 }>()
 
@@ -25,6 +26,7 @@ onMounted(() => {
       v-model:value="model"
       ref="inputRef"
       :placeholder="placeholder"
+      :disabled="disabled"
       :style="{ width: '100%' }"
     >
       <template #suffix>

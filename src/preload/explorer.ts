@@ -18,12 +18,15 @@ export const explorerApi = {
   readDir: async (filename: string) => {
     return (await ipcRenderer.invoke('@explorer/dir/read', filename)) as Promise<
       | {
-          name: string
-          url: string
-          type: FileType
-        }[]
+        name: string
+        url: string
+        type: FileType
+      }[]
       | null
     >
+  },
+  getSettingFileUrl: async (filePath: string) => {
+    return ipcRenderer.invoke('@explorer/setting/file/url', filePath) as Promise<null | string>
   },
   readJson: async (filename: string) => {
     return (await ipcRenderer.invoke('@explorer/json/read', filename)) as Promise<any>

@@ -1,0 +1,32 @@
+[
+  {
+    "_ref_key_": "v_OoAbfxnu0hC3Z3fAhoN",
+    "table_name": "MaxJavr_Record",
+    "repeat_deal_type": "Update"
+  },
+  {
+    "_ref_key_": "aBylKYeEQfnjqt9l-I-iA",
+    "table_name": "MaxJavr_WebContent",
+    "repeat_deal_type": "Update"
+  },
+  {
+    "_ref_key_": "_aGq98EjZIutowUWaCMkl",
+    "table_name": "MaxJavr_FileUrl",
+    "repeat_deal_type": "Error"
+  },
+  {
+    "_ref_key_": "hsJKO8-yhzECehFMM2KSO",
+    "table_name": "MaxJavr_Keyword_Tag",
+    "repeat_deal_type": "Error"
+  },
+  {
+    "_ref_key_": "lbwLEHe94FSO2vCOfKAaC",
+    "table_name": "MaxJavr_Keyword",
+    "repeat_deal_type": "Error"
+  },
+  {
+    "_ref_key_": "8oPANQJcxZR0sEmDQDRmR",
+    "table_name": "MaxJavr_Keyword_Tag_Binder",
+    "repeat_deal_type": "Error"
+  }
+]

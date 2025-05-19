@@ -97,7 +97,6 @@ export class MVRenderController {
 
 }
 
-
 export class MVRenderRoot {
     shadow: ShadowRoot
     viewNode?: MutViewNode
@@ -108,6 +107,12 @@ export class MVRenderRoot {
     ) {
         this.cntr.style.height = '100%'
         this.shadow = this.cntr.attachShadow({ mode: 'open' })
+        const style = `<style class="iconfont-inject">.svgfont {display: inline-block;width: 1em;height: 1em;fill: currentColor;vertical-align: -0.1em;font-size:16px;}</style>`
+        const s = document.createElement('div')
+        s.innerHTML = style
+        const nodes = [... document.querySelectorAll('.iconfont-inject'),...document.head.querySelectorAll('.iconfont-inject')].map(v=>v.cloneNode(true))
+        nodes.forEach(v=>this.shadow.appendChild(v))
+        this.shadow.appendChild(s)
     }
 
     private caches: WrapedNode[] = []
