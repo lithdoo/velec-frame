@@ -8,10 +8,16 @@ An Electron application with Vue and TypeScript
 
 ## Project Setup
 
+### Set NVM
+
+```bash
+$ nvm use 20
+```
+
 ### Install
 
 ```bash
-$ pnpm install
+$ npm install
 ```
 
 ### Development
