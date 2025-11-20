@@ -10,6 +10,9 @@ export interface TabPage {
   onDestroy?(): void
 }
 
+
+
+
 export const tabControl = reactive(
   new (class TabControl {
     list: TabPage[] = []

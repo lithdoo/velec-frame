@@ -22,7 +22,7 @@ export class PageTextEditor implements TabPage {
   tabId: string = Math.random().toString()
   element: VNode
   icon = 'del'
-  handler: TextEditorHandler
+  handler: TextEditorHandler 
 
   constructor(
     public title: string,
