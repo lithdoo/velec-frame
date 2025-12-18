@@ -26,7 +26,6 @@ async function createWindow() {
       symbolColor: '#fff',
       height: 36
     },
-
     show: true,
     autoHideMenuBar: true,
     backgroundColor: '#292929',
